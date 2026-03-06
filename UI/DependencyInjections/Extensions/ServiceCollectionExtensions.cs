@@ -15,7 +15,8 @@ public static class ServiceCollectionExtensions
             options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
         });
 
-        services.AddCORSPolicy(configuration)
+        services
+                //.AddCORSPolicy(configuration)
                 //.AddRateLimiting(configuration)
                 .AddFluentValidation()
                 .AddProblemDetails();                          // Middlewares

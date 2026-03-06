@@ -17,4 +17,9 @@
 		<Folder Include="DependencyInjections\Options\" />
 	</ItemGroup>
 
+	<Target Name="TailwindBuild" BeforeTargets="Build">
+		<Exec Command="npm install" WorkingDirectory="$(ProjectDir)" Condition="!Exists('$(ProjectDir)node_modules')" />
+		<Exec Command="npm run tw:build" WorkingDirectory="$(ProjectDir)" />
+	</Target>
+
 </Project>
