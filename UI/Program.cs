@@ -9,10 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection")));
 
-// Add Identity services
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
+// Use custom User entity and BCrypt, so skipping default Identity registration to avoid conflict.
+// If you need Identity features later, the ApplicationDbContext must inherit from IdentityDbContext<User>.
 
 builder.Services
     .AddInfrastructureServices(builder.Configuration)

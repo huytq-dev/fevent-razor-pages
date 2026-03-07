@@ -6,13 +6,11 @@ namespace UI.Pages
 {
     public class LoginModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly ApplicationDbContext _db;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+        public LoginModel(ApplicationDbContext db)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
+            _db = db;
         }
         [BindProperty]
         public string? Email { get; set; }
@@ -22,10 +20,7 @@ namespace UI.Pages
         public bool RememberMe { get; set; }
         public string? ErrorMessage { get; set; }
 
-        public void OnGet()
-        {
-            // Any logic for GET
-        }
+        public void OnGet() { }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -38,19 +33,14 @@ namespace UI.Pages
                 ErrorMessage = "Email and password are required.";
                 return Page();
             }
-            var user = await _userManager.FindByEmailAsync(Email);
-            if (user == null)
+            var user = _db.Users.FirstOrDefault(u => u.Email == Email);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(Password, user.PasswordHash))
             {
                 ErrorMessage = "Invalid email or password.";
                 return Page();
             }
-            var result = await _signInManager.PasswordSignInAsync(user, Password, RememberMe, lockoutOnFailure: false);
-            if (result.Succeeded)
-            {
-                return RedirectToPage("Index");
-            }
-            ErrorMessage = "Invalid email or password.";
-            return Page();
+            // TODO: Set session/cookie/JWT here nếu muốn
+            return RedirectToPage("Index");
         }
     }
 }
