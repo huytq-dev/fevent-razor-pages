@@ -1,40 +1,81 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* Custom styles (migrated from site.css) */
+/* Sources cho Razor - path tương đối từ wwwroot/css/ lên UI/ */
+@source "../../**/*.cshtml";
+@source "../../**/*.razor";
+@source "../../**/*.cs";
+
+/* ── CSS Variables ───────────────────────────────────────────── */
 :root {
-  --bs-secondary-color: #6b7280;
+    --radius: 0.65rem;
+    /* Brand - màu chủ đạo #f96706 */
+    --primary: #f96706;
+    --primary-hover: #e05a00;
+    --primary-foreground: #ffffff;
+    --primary-muted: #fff3ec;
+    --fpt-orange: #F27124;
+    --fpt-green: #40b549;
+    /* Màu nền & chữ */
+    --background: #f8f7f5;
+    --background-light: #f8f7f5;
+    --background-dark: #23170f;
+    --foreground: #1c130d;
+    /* Card */
+    --card: #ffffff;
+    --card-foreground: #1c130d;
+    /* Secondary / Muted */
+    --secondary: #f3f4f6;
+    --secondary-foreground: #374151;
+    --muted: #f3f4f6;
+    --muted-foreground: #9e6a47;
+    /* Trạng thái */
+    --destructive: #ef4444;
+    --success: #40b549;
+    /* Border / Input / Ring */
+    --border: #e9d9ce;
+    --input: #ffffff;
+    --ring: #f96706;
 }
 
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-  margin-bottom: 60px;
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+/* ── Tailwind Theme ──────────────────────────────────────────── */
+@theme inline {
+    /* Brand */
+    --color-primary: var(--primary);
+    --color-primary-hover: var(--primary-hover);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary-muted: var(--primary-muted);
+    --color-fpt-orange: var(--fpt-orange);
+    --color-fpt-green: var(--fpt-green);
+    /* Nền & chữ */
+    --color-background: var(--background);
+    --color-background-light: var(--background-light);
+    --color-foreground: var(--foreground);
+    /* Card */
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    /* Secondary / Muted */
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    /* Trạng thái */
+    --color-destructive: var(--destructive);
+    --color-success: var(--success);
+    /* Border / Input / Ring */
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    /* Màu nền dark (dùng trong Auth pages) */
+    --color-background-dark: var(--background-dark);
+    /* Font */
+    --font-display: "Lexend", sans-serif;
+    /* Border Radius */
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+    --radius-full: 9999px;
+    /* Box Shadow */
+    --shadow-glow: 0 0 20px rgba(249, 103, 6, 0.15);
+    --shadow-primary: 0 4px 14px 0 rgba(249, 103, 6, 0.39);
 }

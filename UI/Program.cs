@@ -17,6 +17,14 @@ builder.Services
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = ".FEvents.Session";
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -33,6 +41,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+app.UseSession();
+
 app.MapRazorPages()
    .WithStaticAssets();
 

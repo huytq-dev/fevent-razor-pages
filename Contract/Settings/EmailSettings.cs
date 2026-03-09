@@ -1,10 +1,10 @@
 ﻿namespace Contract;
 
-public interface EmailSettings
+public class EmailSettings
 {
-    public string SenderEmail { get; set; }
-    public string SenderName { get; set; }
-    public string SmtpHost { get; set; }
+    public required string SenderEmail { get; set; }
+    public required string SenderName { get; set; }
+    public required string SmtpHost { get; set; }
     public int SmtpPort { get; set; }
-    public string AppPassword { get; set; }
+    public required string AppPassword { get; set; }
 }

@@ -2,7 +2,7 @@
 
 public static class AppConstants
 {
-    public readonly static string BaseUrl = "https://fevent.vercel.app";
+    public readonly static string BaseUrl = "https://localhost:7137";
     public const int DefaultPageTop = 10;
     public const int DefaultPageSkip = 0;
     public const bool DefaultNeedTotalCount = false;

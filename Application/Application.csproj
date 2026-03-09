@@ -14,18 +14,13 @@
 
 	<ItemGroup>
 	  <PackageReference Include="FluentValidation" Version="12.1.1" />
+	  <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
 	  <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
 	  <PackageReference Include="Mapster" Version="7.4.0" />
 	  <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
 	  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
 	  <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.3" />
 	  <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.3" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Services\Implementations\" />
-	  <Folder Include="Services\Interfaces\" />
-	  <Folder Include="Validators\" />
 	</ItemGroup>
 
 </Project>

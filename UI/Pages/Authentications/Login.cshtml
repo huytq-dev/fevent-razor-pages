@@ -1,0 +1,153 @@
+@page "/login"
+@model UI.LoginModel
+@{
+    ViewData["Title"] = "FEvents - Đăng Nhập";
+    Layout = "~/Pages/Shared/Authentications/_AuthLayout.cshtml";
+}
+
+<div class="flex w-full min-h-screen bg-white">
+
+    <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gray-50 items-center justify-center p-12 border-r border-gray-200">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 z-10"></div>
+            <div class="w-full h-full bg-center bg-no-repeat bg-cover opacity-40"
+                 style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAimiTMCYAqmttfrcVh6_f1ZLNj8CtQxUXUYSNAd-8eNT4zcPCqzkBYWslPUZhdCifvfvqHYEXNekiY5krQdnXNQ__SRVPy3z7VNnm1IRIepE1LxTStVJNhH84lM1RMUhtyF5QASZsfUYF_5pNbF5zLXQupFuC3jLm6pDnZv97oDhOGR8DBbjyULjGDbENBjdaHOf9ff5EngY7k-Nh_537-4f1DotOJC6UHY6JkYlYNxHuJI4xT0s1-J3E09J-l2gfo0bFzQhCc8h71");'>
+            </div>
+        </div>
+        <div class="relative z-20 max-w-lg text-gray-800">
+            <div class="mb-8 flex items-center gap-2">
+                <span class="material-symbols-outlined text-4xl text-primary">event_upcoming</span>
+                <span class="text-3xl font-black tracking-tight">FEvents</span>
+            </div>
+            <h1 class="text-5xl font-black leading-tight tracking-[-0.033em] mb-6 text-gray-900">
+                Kết Nối. Tổ Chức. Trải Nghiệm.
+            </h1>
+            <p class="text-lg text-gray-600 leading-relaxed">
+                Trung tâm tổng hợp tất cả sự kiện của Đại học FPT. Tham gia hội thảo, cuộc thi và hoạt động câu lạc bộ sinh viên chỉ với một cú nhấp chuột.
+            </p>
+            <div class="mt-12 flex gap-4">
+                <div class="flex flex-col">
+                    <span class="text-2xl font-bold text-primary">100+</span>
+                    <span class="text-sm text-gray-500 uppercase tracking-wider">Sự Kiện</span>
+                </div>
+                <div class="w-[1px] bg-gray-300"></div>
+                <div class="flex flex-col">
+                    <span class="text-2xl font-bold text-primary">10k+</span>
+                    <span class="text-sm text-gray-500 uppercase tracking-wider">Sinh Viên</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 bg-white">
+        <div class="w-full max-w-[480px] flex flex-col gap-8">
+
+            <div class="lg:hidden flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-3xl">event_upcoming</span>
+                <span class="text-2xl font-black tracking-tight text-gray-900">FEvents</span>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <h2 class="text-gray-900 text-3xl font-black leading-tight tracking-[-0.033em] lg:text-4xl">
+                    Chào mừng trở lại
+                </h2>
+                <p class="text-gray-500 text-base">
+                    Vui lòng nhập thông tin của bạn hoặc sử dụng tài khoản trường.
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <button type="button" class="flex w-full items-center justify-center gap-3 rounded-lg h-12 px-5 bg-primary text-white text-base font-bold transition-transform hover:scale-[1.01] active:scale-[0.99]">
+                    <img alt="Logo Google" class="w-5 h-5 bg-white rounded-full p-0.5"
+                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuDf6Ug4v_bBDB7NORNdA4CYtuY9ie9loEFRnTvgyZJQ-GOIOrtbFzCREos9V6bDmRbtF7oq2k7HToKeHE-w4uRAqYXW7dM4awUH7PxkPmv4HxEjqgXXfcg71KcJfgwj2O80pTvA5tcPbEPFFRUt5td54Fi40jWwit7u73WjOZ-g72CQ9Hg8sSgx7h6XqF4_AAsGKeTUw4NAleJXh9-jQ7C5ABUD4yQueHgMCGYommrzZp-ueRtFE4jYavrggYBgXJ01b72k6FtZbXOC" />
+                    Đăng nhập bằng Email FPT
+                </button>
+                <div class="flex items-center gap-4 py-2">
+                    <div class="h-px bg-gray-200 flex-1"></div>
+                    <span class="text-gray-500 text-sm font-medium uppercase tracking-wider">hoặc đăng nhập bằng email</span>
+                    <div class="h-px bg-gray-200 flex-1"></div>
+                </div>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="rounded-lg border border-red-400 bg-red-100 px-4 py-2 text-red-700">
+                    @Model.ErrorMessage
+                </div>
+            }
+
+            <form method="post" class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-gray-700 text-sm font-semibold">Email Trường</label>
+                    <input asp-for="Input.Email"
+                           class="form-input w-full rounded-lg border border-gray-300 bg-white h-14 p-[15px] text-gray-900 placeholder:text-gray-400 focus:outline-0 focus:ring-2 focus:ring-primary/20 focus:border-primary text-base"
+                           placeholder="sinhvien@fpt.edu.vn" type="email" />
+                </div>
+                <span asp-validation-for="Input.Email" class="text-xs text-destructive"></span>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-gray-700 text-sm font-semibold">Mật Khẩu</label>
+                    <div class="flex w-full items-stretch rounded-lg border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
+                        <input asp-for="Input.Password" id="loginPasswordInput"
+                               class="form-input flex-1 border-0 bg-transparent h-14 p-[15px] text-gray-900 placeholder:text-gray-400 focus:ring-0 text-base"
+                               placeholder="Nhập mật khẩu của bạn" type="password" />
+                        <button type="button" id="loginTogglePassword" class="px-4 text-gray-500 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined" id="loginToggleIcon">visibility</span>
+                        </button>
+                    </div>
+                </div>
+                <span asp-validation-for="Input.Password" class="text-xs text-destructive"></span>
+
+                <div class="flex items-center justify-between">
+                    @* <label class="flex items-center gap-2 cursor-pointer group">
+                        <input asp-for="Input.RememberMe" class="rounded border-gray-300 text-primary focus:ring-primary w-4 h-4" type="checkbox" />
+                        <span class="text-sm text-gray-700 font-medium group-hover:text-primary transition-colors">Ghi nhớ đăng nhập</span>
+                    </label> *@
+                    <a class="text-primary text-sm font-bold hover:underline" asp-page="/Authentications/ForgotPassword">Quên mật khẩu?</a>
+                </div>
+
+                <button type="submit"
+                        class="mt-2 w-full h-14 rounded-lg bg-primary text-white text-base font-bold hover:opacity-90 transition-opacity">
+                    Đăng Nhập
+                </button>
+            </form>
+
+            <div class="text-center">
+                <p class="text-gray-500 text-sm">
+                    Chưa có tài khoản?
+                    <a class="text-primary font-bold hover:underline ml-1" asp-page="/Authentications/SignUp">Tạo tài khoản</a>
+                </p>
+            </div>
+
+            <div class="pt-8 border-t border-gray-200">
+                <div class="flex justify-center gap-6">
+                    <a class="text-gray-500 text-xs hover:text-primary transition-colors" href="#">Chính Sách Bảo Mật</a>
+                    <a class="text-gray-500 text-xs hover:text-primary transition-colors" href="#">Điều Khoản Dịch Vụ</a>
+                    <a class="text-gray-500 text-xs hover:text-primary transition-colors" href="#">Liên Hệ Hỗ Trợ</a>
+                </div>
+                <p class="text-center text-gray-400 text-[10px] mt-4 uppercase tracking-widest">
+                    © 2026 Hệ Thống Quản Lý Sự Kiện Đại Học FPT
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const loginPasswordInput = document.getElementById("loginPasswordInput");
+        const loginToggleIcon    = document.getElementById("loginToggleIcon");
+        document.getElementById("loginTogglePassword").addEventListener("click", function () {
+            const isPassword = loginPasswordInput.type === "password";
+            loginPasswordInput.type     = isPassword ? "text" : "password";
+            loginToggleIcon.textContent = isPassword ? "visibility_off" : "visibility";
+        });
+    </script>
+}

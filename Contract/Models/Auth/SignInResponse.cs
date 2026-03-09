@@ -1,13 +1,12 @@
-﻿using System.Text.Json.Serialization;
+﻿namespace Domain;
 
-namespace Contract;
-
-public sealed class SignInResponse
+public class SignInResponse
 {
-    public required string AccessToken { get; set; }
-    public required int ExpiresIn { get; set; }
-    
-    // Không gửi Refreshtoken lên client
-    [JsonIgnore]
-    public string? RefreshToken { get; set; }
+    public Guid Id { get; set; }
+    public string FullName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? AvatarUrl { get; set; }
+    public string? Role { get; set; }
+    public string RoleName { get; init; } = "PARTICIPANT";
+
 }
