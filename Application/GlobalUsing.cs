@@ -3,3 +3,7 @@ global using Domain;
 global using Infrastructure;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
+global using MapsterMapper;
+global using Mapster;
+global using FluentValidation;
+

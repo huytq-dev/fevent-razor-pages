@@ -1,13 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+namespace UI;
 
-namespace UI.Pages
+public class IndexModel : PageModel
 {
-    public class IndexModel : PageModel
+    public IActionResult OnGet()
     {
-        public void OnGet()
-        {
-
-        }
+        return RedirectToPage("/Authentications/Login");
     }
 }

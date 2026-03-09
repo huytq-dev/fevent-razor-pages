@@ -1,7 +1,4 @@
-﻿using Mapster;
-using MapsterMapper;
-
-namespace Application;
+﻿namespace Application;
 
 internal static class MapsterExtensions
 {

@@ -1,4 +1,6 @@
-﻿namespace Application;
+﻿using FluentValidation.AspNetCore;
+
+namespace Application;
 
 public static class ServiceCollectionExtensions
 {
@@ -7,7 +9,10 @@ public static class ServiceCollectionExtensions
         var appAssembly = AssemblyReference.Assembly;
 
         services.AddServicesFromAssembly(appAssembly)
-            .AddMapsterServices();
+            .AddMapsterServices()
+            .AddValidatorsFromAssembly(AssemblyReference.Assembly)
+            .AddFluentValidationAutoValidation()        // ← server-side
+            .AddFluentValidationClientsideAdapters();
 
         return services;
     }
