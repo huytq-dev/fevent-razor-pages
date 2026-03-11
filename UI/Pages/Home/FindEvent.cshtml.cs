@@ -1,8 +1,3 @@
-using Application;
-using Contract;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
 namespace UI;
 
 public class FindEventModel(IEventsService eventsService, ICatalogService catalogService) : PageModel

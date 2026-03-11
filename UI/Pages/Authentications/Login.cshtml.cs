@@ -7,10 +7,18 @@ public class LoginModel(IAuthServices authServices) : PageModel
 
     public string? ErrorMessage { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public string? ReturnUrl { get; set; }
+
     public IActionResult OnGet()
     {
         var userId = HttpContext.Session.GetString("UserId");
-        if (!string.IsNullOrWhiteSpace(userId)) return RedirectToPage("/Home/Index");
+        if (!string.IsNullOrWhiteSpace(userId))
+        {
+            if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+                return Redirect(ReturnUrl);
+            return RedirectToPage("/Home/Index");
+        }
 
         return Page();
     }
@@ -34,8 +42,10 @@ public class LoginModel(IAuthServices authServices) : PageModel
         HttpContext.Session.SetString("FullName", auth.FullName);
         HttpContext.Session.SetString("Email", auth.Email);
         HttpContext.Session.SetString("AvatarUrl", auth.AvatarUrl ?? "");
-        //HttpContext.Session.SetString("Role", auth.Role); đang bị lỗi 
+        //HttpContext.Session.SetString("Role", auth.Role); đang bị lỗi
 
+        if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+            return Redirect(ReturnUrl);
         return RedirectToPage("/Home/Index");
     }
 }

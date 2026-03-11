@@ -164,7 +164,7 @@
                                         <span class="bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">@category</span>
                                         <span class="@(isClosed ? "bg-gray-100 text-gray-600" : "bg-green-50 text-success") text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">@statusLabel</span>
                                     </div>
-                                    <h3 class="font-display font-bold text-lg text-foreground mb-3 line-clamp-2">@ev.Title</h3>
+                                    <a href="/Events/@ev.Id" class="font-display font-bold text-lg text-foreground mb-3 line-clamp-2 block hover:text-primary transition-colors">@ev.Title</a>
                                     <div class="space-y-1.5 mb-3">
                                         <p class="text-sm text-muted-foreground flex items-center gap-2">
                                             <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -180,18 +180,18 @@
                                         </p>
                                     </div>
                                     <p class="text-sm text-muted-foreground line-clamp-2 mb-4">@ev.Description</p>
-                                    <div class="mt-auto">
+                                    <div class="mt-auto flex gap-2">
                                         @if (isClosed)
                                         {
-                                            <button disabled class="w-full bg-secondary text-secondary-foreground font-medium py-2 rounded-lg cursor-not-allowed">
+                                            <button disabled class="flex-1 bg-secondary text-secondary-foreground font-medium py-2 rounded-lg cursor-not-allowed">
                                                 Đã đóng đăng ký
                                             </button>
                                         }
                                         else
                                         {
-                                            <button class="w-full bg-primary hover:bg-primary-hover text-white font-medium py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                            <a href="/events/@ev.Id" class="flex-1 bg-primary hover:bg-primary-hover text-white font-medium py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
                                                 Đăng ký ngay <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                                            </button>
+                                            </a>
                                         }
                                     </div>
                                 </div>

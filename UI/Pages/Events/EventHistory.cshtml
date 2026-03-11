@@ -1,0 +1,122 @@
+@page "/events/history"
+@using Contract
+@using Domain
+@using System.Globalization
+@model UI.EventHistoryModel
+@{
+    ViewData["Title"] = "Lịch sử đăng ký";
+    var registrations = Model.Registrations ?? Array.Empty<EventRegistrationSummaryResponse>();
+    var now = DateTimeOffset.UtcNow;
+}
+
+<div class="bg-background min-h-screen py-8">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-display font-extrabold text-foreground mb-2">Lịch sử đăng ký</h1>
+                <p class="text-muted-foreground">Theo dõi hồ sơ đăng ký và lịch sử tham gia sự kiện của bạn.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button class="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium text-foreground hover:border-primary transition-colors shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Chế độ lịch
+                </button>
+                <button class="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium text-foreground hover:border-primary transition-colors shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Xuất dữ liệu
+                </button>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div class="flex flex-wrap items-center gap-2">
+                <button class="px-5 py-2 bg-foreground text-background rounded-full text-sm font-bold shadow-sm">Tất cả</button>
+                <button class="px-5 py-2 bg-transparent text-muted-foreground hover:bg-secondary hover:text-foreground rounded-full text-sm font-medium transition-colors">Sắp tới</button>
+                <button class="px-5 py-2 bg-transparent text-muted-foreground hover:bg-secondary hover:text-foreground rounded-full text-sm font-medium transition-colors">Đã tham gia</button>
+                <button class="px-5 py-2 bg-transparent text-muted-foreground hover:bg-secondary hover:text-foreground rounded-full text-sm font-medium transition-colors">Vắng mặt</button>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg>
+                Sắp xếp: Mới nhất
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-700 text-sm">@Model.SuccessMessage</div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700 text-sm">@Model.ErrorMessage</div>
+        }
+
+        @if (registrations.Count == 0)
+        {
+            <div class="rounded-2xl border border-border bg-card px-8 py-16 text-center">
+                <p class="text-muted-foreground mb-4">Bạn chưa đăng ký sự kiện nào.</p>
+                <a href="/Home/find-events" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white font-bold rounded-lg transition-colors">
+                    Tìm sự kiện <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+            </div>
+        }
+        else
+        {
+        <div class="space-y-5">
+            @foreach (var r in registrations)
+            {
+                var status = (RegistrationStatus)r.Status;
+                var (statusLabel, statusClass, isPast, isCancelled) = status switch
+                {
+                    RegistrationStatus.Cancelled => ("Đã hủy", "bg-red-50 text-destructive", true, true),
+                    RegistrationStatus.CheckedIn => ("Đã tham gia", "bg-green-50 text-success", true, false),
+                    RegistrationStatus.PendingPayment => ("Chờ thanh toán", "bg-amber-50 text-amber-600", r.EndTime < now, false),
+                    RegistrationStatus.Paid or RegistrationStatus.Confirmed => (r.EndTime < now ? "Đã kết thúc" : "Sắp tới", "bg-orange-50 text-primary", r.EndTime < now, false),
+                    _ => ("Không xác định", "bg-gray-50 text-gray-600", r.EndTime < now, false)
+                };
+                var thumb = r.EventThumbnailUrl ?? "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80";
+                var monthDay = r.StartTime.ToString("dd 'Thg' MM", new CultureInfo("vi-VN"));
+                var registeredAt = r.RegisteredAt.ToString("dd 'Thg' MM", new CultureInfo("vi-VN"));
+                var timeRange = $"{r.StartTime:HH:mm} - {r.EndTime:HH:mm}";
+
+                <div class="bg-card border border-border rounded-2xl p-4 flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow relative group @(isCancelled ? "opacity-75" : "")">
+                    <div class="relative w-full md:w-64 h-48 rounded-xl overflow-hidden flex-shrink-0 @(isCancelled ? "grayscale" : "")">
+                        <img src="@thumb" alt="@r.EventTitle" class="w-full h-full object-cover @(isCancelled ? "" : "group-hover:scale-105 transition-transform duration-500")">
+                        <span class="absolute top-3 left-3 bg-white px-3 py-1.5 rounded-full text-xs font-black text-foreground uppercase shadow-sm tracking-wider">@monthDay</span>
+                    </div>
+                    <div class="flex-1 flex flex-col justify-between py-1">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="@statusClass text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md">@statusLabel</span>
+                                <span class="text-xs text-muted-foreground font-medium">Đăng ký ngày @registeredAt</span>
+                            </div>
+                            <h3 class="font-display font-bold text-xl text-foreground mb-3 @(isCancelled ? "text-gray-500" : "")">@r.EventTitle</h3>
+                            <div class="space-y-1.5 mb-4">
+                                <p class="text-sm text-muted-foreground flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    @r.LocationName
+                                </p>
+                                <p class="text-sm text-muted-foreground flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    @(status == RegistrationStatus.CheckedIn ? $"Hoàn thành vào {r.EndTime:dd 'Thg' MM, yyyy}" : timeRange)
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <a href="/events/@r.EventId" class="px-5 py-2 bg-primary hover:bg-primary-hover text-white text-sm font-bold rounded-lg transition-colors shadow-sm">Xem chi tiết</a>
+                            @if (!isCancelled && !isPast)
+                            {
+                                <span class="px-5 py-2 text-xs font-medium text-muted-foreground bg-secondary/50 rounded-lg">Mã vé: @r.TicketCode</span>
+                                <form method="post" asp-page-handler="Cancel" asp-route-eventId="@r.EventId" class="inline" onsubmit="return confirm('Bạn có chắc muốn hủy đăng ký sự kiện này?');">
+                                    <button type="submit" class="px-5 py-2 border border-destructive text-destructive hover:bg-destructive/10 text-sm font-medium rounded-lg transition-colors">Hủy đăng ký</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        }
+
+    </div>
+</div>
