@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FEvents</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="bg-background text-foreground font-sans min-h-screen flex flex-col">
+
+    <partial name="Home/_Header" />
+
+    <main role="main" class="flex-grow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            @RenderBody()
+        </div>
+    </main>
+
+    <partial name="Home/_Footer" />
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

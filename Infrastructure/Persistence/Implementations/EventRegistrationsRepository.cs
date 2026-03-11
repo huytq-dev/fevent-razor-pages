@@ -14,6 +14,17 @@ public class EventRegistrationsRepository : GenericRepository<EventRegistration>
                 r.UserId == userId &&
                 r.Status != RegistrationStatus.Cancelled, ct);
 
+    public async Task<EventRegistration?> GetByEventAndUserAsync(Guid eventId, Guid userId, CancellationToken ct = default)
+        => await _set
+            .Include(r => r.TicketType)
+            .FirstOrDefaultAsync(r => r.EventId == eventId && r.UserId == userId, ct);
+
+    public async Task<TicketType?> GetFirstAvailableTicketTypeAsync(Guid eventId, CancellationToken ct = default)
+        => await _context.TicketTypes
+            .Where(t => t.EventId == eventId && t.SoldCount < t.Quantity)
+            .OrderBy(t => t.Price)
+            .FirstOrDefaultAsync(ct);
+
     public async Task<List<EventRegistrationSummaryResponse>> GetByUserAsync(
         Guid userId,
         CancellationToken ct = default)
@@ -69,4 +80,24 @@ public class EventRegistrationsRepository : GenericRepository<EventRegistration>
                 r.EventId == eventId &&
                 r.UserId == userId &&
                 r.Status == RegistrationStatus.CheckedIn, ct);
+
+    public async Task<bool> CancelAsync(Guid eventId, Guid userId, string? reason = null, CancellationToken ct = default)
+    {
+        var reg = await _set
+            .Include(r => r.TicketType)
+            .FirstOrDefaultAsync(r =>
+                r.EventId == eventId &&
+                r.UserId == userId &&
+                r.Status != RegistrationStatus.Cancelled &&
+                r.Status != RegistrationStatus.CheckedIn, ct);
+        if (reg is null)
+            return false;
+
+        reg.Status = RegistrationStatus.Cancelled;
+        reg.CancelledAt = DateTimeOffset.UtcNow;
+        reg.CancellationReason = reason;
+        if (reg.TicketType.SoldCount > 0)
+            reg.TicketType.SoldCount--;
+        return true;
+    }
 }
