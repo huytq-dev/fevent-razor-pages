@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Infrastructure;
 
@@ -18,6 +18,8 @@ public class UnitOfWork : IUnitOfWork
     public IEventsRepository Events => (IEventsRepository)Repository<Event>();
     public IEventRegistrationsRepository EventRegistrations => (IEventRegistrationsRepository)Repository<EventRegistration>();
     public IEventReviewsRepository EventReviews => (IEventReviewsRepository)Repository<EventReview>();
+    public ICategoriesRepository Categories => (ICategoriesRepository)Repository<Category>();
+    public ILocationsRepository Locations => (ILocationsRepository)Repository<Location>();
 
     public UnitOfWork(ApplicationDbContext context)
     {
@@ -30,6 +32,8 @@ public class UnitOfWork : IUnitOfWork
             { typeof(Event), ctx => new EventsRepository(ctx) },
             { typeof(EventRegistration), ctx => new EventRegistrationsRepository(ctx) },
             { typeof(EventReview), ctx => new EventReviewsRepository(ctx) },
+            { typeof(Category), ctx => new CategoriesRepository(ctx) },
+            { typeof(Location), ctx => new LocationsRepository(ctx) },
         };
     }
 

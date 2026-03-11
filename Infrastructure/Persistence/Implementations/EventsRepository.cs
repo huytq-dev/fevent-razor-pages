@@ -26,6 +26,28 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
                 (e.Description ?? string.Empty).Contains(search));
         }
 
+        if (queryInfo.CategoryIds is { Count: > 0 })
+        {
+            query = query.Where(e => queryInfo.CategoryIds.Contains(e.CategoryId));
+        }
+
+        if (queryInfo.LocationIds is { Count: > 0 })
+        {
+            query = query.Where(e => queryInfo.LocationIds.Contains(e.LocationId));
+        }
+
+        if (queryInfo.StartDateFrom.HasValue)
+        {
+            var from = queryInfo.StartDateFrom.Value.Date;
+            query = query.Where(e => e.StartTime.Date >= from);
+        }
+
+        if (queryInfo.StartDateTo.HasValue)
+        {
+            var to = queryInfo.StartDateTo.Value.Date;
+            query = query.Where(e => e.StartTime.Date <= to);
+        }
+
         query = ApplyOrderBy(query, queryInfo.OrderBy);
 
         var totalCount = queryInfo.NeedTotalCount
@@ -113,7 +135,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
 
         return field.ToLowerInvariant() switch
         {
-            "createdat" or "createddate" or "created" or "created_time" or "createdatetime" or "createDate" =>
+            "createdat" or "createdate" or "createddate" or "created" or "created_time" or "createdatetime" =>
                 isDesc ? query.OrderByDescending(e => e.CreatedAt) : query.OrderBy(e => e.CreatedAt),
 
             "starttime" or "start" =>

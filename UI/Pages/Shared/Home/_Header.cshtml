@@ -1,0 +1,63 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    // Lấy dữ liệu từ Session
+    var userId = Context.Session.GetString("UserId");
+    var fullName = Context.Session.GetString("FullName");
+    var avatarUrl = Context.Session.GetString("AvatarUrl");
+
+    if (string.IsNullOrEmpty(avatarUrl) && !string.IsNullOrEmpty(fullName))
+    {
+        avatarUrl = $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(fullName)}&background=f96706&color=fff";
+    }
+}
+
+<header class="bg-white border-b border-border sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+
+            <div class="flex items-center gap-2">
+                <a href="/" class="flex items-center gap-2">
+                    <svg class="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 002 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" />
+                    </svg>
+                    <span class="font-display font-bold text-xl text-foreground tracking-tight">FEvents</span>
+                </a>
+            </div>
+
+            <nav class="hidden md:flex space-x-8">
+                <a href="/" class="text-foreground hover:text-primary font-medium transition-colors">Home</a>
+                <a asp-page="/Home/FindEvent" class="text-primary font-medium transition-colors">Find Events</a>
+                <a href="/MySchedule" class="text-foreground hover:text-primary font-medium transition-colors">My Schedule</a>
+                <a href="/Organize" class="text-foreground hover:text-primary font-medium transition-colors">Organize</a>
+            </nav>
+
+            <div class="flex items-center gap-5">
+                @if (!string.IsNullOrEmpty(userId))
+                {
+                    <button class="text-muted-foreground hover:text-primary transition-colors relative">
+                        <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-destructive ring-2 ring-white"></span>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                    </button>
+
+                    <div class="flex items-center gap-3 cursor-pointer">
+                        <div class="hidden sm:block text-right">
+                            <p class="text-sm font-semibold text-foreground leading-tight">@fullName</p>
+                            <p class="text-xs text-muted-foreground">Student</p>
+                        </div>
+                        <img class="h-9 w-9 rounded-full object-cover border border-border"
+                             src="@avatarUrl"
+                             alt="User avatar">
+                    </div>
+                }
+                else
+                {
+                    <a href="/Authentications/Login" class="text-foreground hover:text-primary font-medium transition-colors">Log in</a>
+                    <a href="/Authentications/SignUp" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors font-medium">Sign up</a>
+                }
+            </div>
+
+        </div>
+    </div>
+</header>

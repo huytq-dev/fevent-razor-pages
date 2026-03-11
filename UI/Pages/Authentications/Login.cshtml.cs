@@ -7,7 +7,13 @@ public class LoginModel(IAuthServices authServices) : PageModel
 
     public string? ErrorMessage { get; set; }
 
-    public void OnGet() { }
+    public IActionResult OnGet()
+    {
+        var userId = HttpContext.Session.GetString("UserId");
+        if (!string.IsNullOrWhiteSpace(userId)) return RedirectToPage("/Home/Index");
+
+        return Page();
+    }
 
     public async Task<IActionResult> OnPostAsync(CancellationToken ct)
     {
@@ -30,6 +36,6 @@ public class LoginModel(IAuthServices authServices) : PageModel
         HttpContext.Session.SetString("AvatarUrl", auth.AvatarUrl ?? "");
         //HttpContext.Session.SetString("Role", auth.Role); đang bị lỗi 
 
-        return RedirectToPage("/Authentications/SignUp"); 
+        return RedirectToPage("/Home/Index");
     }
 }

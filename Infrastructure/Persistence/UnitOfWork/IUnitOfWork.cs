@@ -10,6 +10,8 @@ public interface IUnitOfWork : IDisposable
     IEventsRepository Events { get; }
     IEventRegistrationsRepository EventRegistrations { get; }
     IEventReviewsRepository EventReviews { get; }
+    ICategoriesRepository Categories { get; }
+    ILocationsRepository Locations { get; }
 
     #endregion
 

@@ -423,3 +423,5 @@ out/
 
 # Warp 
 WARP.md
+
+.dotnet/

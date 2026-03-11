@@ -1,0 +1,220 @@
+@page "/Home/find-events"
+@using Contract
+@using Domain
+@using System.Globalization
+@model UI.FindEventModel
+@{
+    ViewData["Title"] = "Tìm Sự Kiện";
+    var events = Model.Events ?? Array.Empty<EventSummaryResponse>();
+    var totalCount = Model.TotalCount ?? events.Count;
+}
+
+<div class="bg-background min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <form method="get" id="filterForm">
+        <div class="flex flex-col lg:flex-row gap-8">
+
+            <aside class="w-full lg:w-1/4 flex-shrink-0">
+                <div class="bg-card rounded-xl border border-border p-5">
+
+                    <div class="flex justify-between items-center mb-5">
+                        <h2 class="font-display font-bold text-lg flex items-center gap-2">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                            </svg>
+                            Bộ lọc
+                        </h2>
+                        <a href="@Url.Page("/Home/FindEvent")" class="text-sm text-muted-foreground hover:text-primary transition-colors">Xóa tất cả</a>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 flex justify-between items-center">
+                            DANH MỤC
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                        </h3>
+                        <div class="space-y-2.5">
+                            @foreach (var cat in Model.Categories)
+                            {
+                                var isChecked = Model.CategoryIds.Contains(cat.Id);
+                                <label class="flex items-center justify-between cursor-pointer group">
+                                    <div class="flex items-center gap-2.5">
+                                        <input type="checkbox" name="CategoryIds" value="@cat.Id" checked="@isChecked" class="w-4 h-4 rounded-sm text-primary focus:ring-primary border-border">
+                                        <span class="text-sm font-medium text-foreground group-hover:text-primary transition-colors">@cat.Name</span>
+                                    </div>
+                                </label>
+                            }
+                            @if (Model.Categories.Count == 0)
+                            {
+                                <p class="text-sm text-muted-foreground">Chưa có danh mục</p>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 flex justify-between items-center">
+                            CƠ SỞ
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                        </h3>
+                        <div class="space-y-2.5">
+                            @foreach (var loc in Model.Locations)
+                            {
+                                var isChecked = Model.LocationIds.Contains(loc.Id);
+                                <label class="flex items-center gap-2.5 cursor-pointer">
+                                    <input type="checkbox" name="LocationIds" value="@loc.Id" checked="@isChecked" class="w-4 h-4 rounded-sm text-primary focus:ring-primary border-border">
+                                    <span class="text-sm text-foreground group-hover:text-primary transition-colors">@loc.Name</span>
+                                </label>
+                            }
+                            @if (Model.Locations.Count == 0)
+                            {
+                                <p class="text-sm text-muted-foreground">Chưa có địa điểm</p>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">KHOẢNG THỜI GIAN</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs text-muted-foreground mb-1">Từ</label>
+                                <input type="date" name="StartDateFrom" value="@(Model.StartDateFrom?.ToString("yyyy-MM-dd"))" class="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-primary">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-muted-foreground mb-1">Đến</label>
+                                <input type="date" name="StartDateTo" value="@(Model.StartDateTo?.ToString("yyyy-MM-dd"))" class="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-primary">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-primary hover:bg-primary-hover text-primary-foreground font-medium py-2.5 rounded-lg transition-colors shadow-primary">
+                        Áp dụng bộ lọc
+                    </button>
+                </div>
+            </aside>
+
+            <main class="w-full lg:w-3/4">
+
+                <div class="bg-card border border-border rounded-xl p-2 md:p-3 flex flex-col md:flex-row items-center gap-4 mb-6">
+                    <div class="relative w-full md:w-auto md:flex-1">
+                        <svg class="w-5 h-5 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <input type="text" name="Search" value="@Model.Search" placeholder="Tìm kiếm sự kiện..." class="w-full pl-10 pr-4 py-2 bg-background rounded-lg text-sm focus:outline-none focus:border-primary transition-all">
+                    </div>
+
+                    <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                        <span class="text-sm text-muted-foreground font-medium">Hiển thị @events.Count / @totalCount sự kiện</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                    {
+                        <div class="col-span-full rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                            @Model.ErrorMessage
+                        </div>
+                    }
+
+                    @if (events.Count == 0 && string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                    {
+                        <div class="col-span-full rounded-lg border border-border bg-card px-4 py-6 text-center text-muted-foreground">
+                            Không tìm thấy sự kiện nào.
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var ev in events)
+                        {
+                            var status = (EventStatus)ev.Status;
+                            var statusLabel = status switch
+                            {
+                                EventStatus.Approved => "Mở đăng ký",
+                                EventStatus.Pending => "Đang chờ",
+                                EventStatus.Draft => "Bản nháp",
+                                EventStatus.Rejected => "Từ chối",
+                                EventStatus.Cancelled => "Đã hủy",
+                                EventStatus.Completed => "Đã kết thúc",
+                                _ => "Không xác định"
+                            };
+                            var isClosed = status is EventStatus.Rejected or EventStatus.Cancelled or EventStatus.Completed;
+                            var month = ev.StartTime.ToString("MMM", CultureInfo.InvariantCulture).ToUpperInvariant();
+                            var day = ev.StartTime.ToString("dd", CultureInfo.InvariantCulture);
+                            var timeRange = $"{ev.StartTime:HH:mm} - {ev.EndTime:HH:mm}"; // Đổi sang định dạng 24h cho người Việt dễ nhìn
+                            var category = string.IsNullOrWhiteSpace(ev.CategoryName) ? "Sự kiện" : ev.CategoryName;
+                            var location = string.IsNullOrWhiteSpace(ev.LocationName) ? "Chưa cập nhật" : ev.LocationName;
+                            var thumb = string.IsNullOrWhiteSpace(ev.ThumbnailUrl) ? null : ev.ThumbnailUrl;
+
+                            <div class="bg-card border border-border rounded-xl overflow-hidden hover:shadow-primary/30 hover:shadow-lg transition-all flex flex-col group">
+                                <div class="relative h-44 bg-gray-200 overflow-hidden">
+                                    @if (!string.IsNullOrWhiteSpace(thumb))
+                                    {
+                                        <img src="@thumb" alt="Cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    }
+                                    else
+                                    {
+                                        <div class="w-full h-full bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center text-white text-2xl font-bold">
+                                            @category.Substring(0, 1).ToUpperInvariant()
+                                        </div>
+                                    }
+                                    <div class="absolute bottom-3 right-3 bg-white px-3 py-1.5 rounded-lg text-center shadow-sm">
+                                        <span class="block text-xs font-bold text-muted-foreground uppercase leading-none">@month</span>
+                                        <span class="block text-lg font-black text-foreground leading-tight">@day</span>
+                                    </div>
+                                </div>
+                                <div class="p-5 flex-1 flex flex-col">
+                                    <div class="flex gap-2 mb-2">
+                                        <span class="bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">@category</span>
+                                        <span class="@(isClosed ? "bg-gray-100 text-gray-600" : "bg-green-50 text-success") text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">@statusLabel</span>
+                                    </div>
+                                    <h3 class="font-display font-bold text-lg text-foreground mb-3 line-clamp-2">@ev.Title</h3>
+                                    <div class="space-y-1.5 mb-3">
+                                        <p class="text-sm text-muted-foreground flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            @timeRange
+                                        </p>
+                                        <p class="text-sm text-muted-foreground flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                            @location
+                                        </p>
+                                        <p class="text-sm text-muted-foreground flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"></path></svg>
+                                            @ev.RegisteredCount / @ev.MaxParticipants đã đăng ký
+                                        </p>
+                                    </div>
+                                    <p class="text-sm text-muted-foreground line-clamp-2 mb-4">@ev.Description</p>
+                                    <div class="mt-auto">
+                                        @if (isClosed)
+                                        {
+                                            <button disabled class="w-full bg-secondary text-secondary-foreground font-medium py-2 rounded-lg cursor-not-allowed">
+                                                Đã đóng đăng ký
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button class="w-full bg-primary hover:bg-primary-hover text-white font-medium py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                                Đăng ký ngay <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <div class="mt-10 flex justify-center items-center gap-2">
+                    <button class="w-10 h-10 rounded-lg border border-border bg-card flex items-center justify-center text-muted-foreground hover:bg-secondary transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <button class="w-10 h-10 rounded-lg bg-primary text-white font-bold flex items-center justify-center shadow-primary">1</button>
+                    <button class="w-10 h-10 rounded-lg border border-border bg-card font-medium text-foreground hover:bg-secondary transition-colors">2</button>
+                    <button class="w-10 h-10 rounded-lg border border-border bg-card font-medium text-foreground hover:bg-secondary transition-colors">3</button>
+                    <span class="text-muted-foreground px-2">...</span>
+                    <button class="w-10 h-10 rounded-lg border border-border bg-card flex items-center justify-center text-muted-foreground hover:bg-secondary transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+
+            </main>
+        </div>
+        </form>
+    </div>
+</div>

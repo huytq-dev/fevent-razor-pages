@@ -1,4 +1,4 @@
-﻿namespace Contract;
+namespace Contract;
 
 public static class AppConstants
 {
@@ -8,5 +8,5 @@ public static class AppConstants
     public const bool DefaultNeedTotalCount = false;
     public const int MaxPageSize = 100;
     public const int DefaultPage = 1;
-    public const string DefaultOrderBy = "CreateDate";
+    public const string DefaultOrderBy = "CreateDate desc";
 }
