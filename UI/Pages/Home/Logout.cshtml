@@ -11,6 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
 </head>
 <body class="bg-[#fcfaf8] font-display text-[#1c130d] overflow-hidden">
     <!-- Overlay background: đục, không trong suốt -->
@@ -19,15 +20,10 @@
         <div class="w-full max-w-[480px] bg-white rounded-xl shadow-2xl border border-white/20 overflow-hidden animate-in fade-in zoom-in duration-300">
             <div class="relative pt-10 pb-6 flex flex-col items-center">
                 <div class="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                    <!-- SVG waving hand icon (tạm biệt) -->
-                    <svg class="w-16 h-16 text-primary" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M32 12c0-2.21 1.79-4 4-4s4 1.79 4 4v24" stroke="#f96706" stroke-width="4" stroke-linecap="round"/>
-                        <path d="M36 36v12" stroke="#f96706" stroke-width="4" stroke-linecap="round"/>
-                        <path d="M28 20v16" stroke="#f96706" stroke-width="4" stroke-linecap="round"/>
-                        <path d="M44 20v16" stroke="#f96706" stroke-width="4" stroke-linecap="round"/>
-                        <path d="M24 32c0 8 8 16 16 16" stroke="#f96706" stroke-width="4" stroke-linecap="round"/>
-                        <circle cx="40" cy="48" r="8" fill="#f96706" fill-opacity="0.2"/>
-                    </svg>
+                    <!-- Google Material Symbols waving_hand icon -->
+                    <span class="material-symbols-rounded" style="font-size:64px;color:#f96706;">
+                        waving_hand
+                    </span>
                 </div>
                 <h4 class="text-primary text-sm font-bold tracking-widest uppercase">FPT University</h4>
             </div>
