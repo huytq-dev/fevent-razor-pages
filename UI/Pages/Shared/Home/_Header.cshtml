@@ -41,7 +41,7 @@
                         </svg>
                     </button>
 
-                    <div class="flex items-center gap-3 cursor-pointer">
+                    <div class="relative flex items-center gap-3 cursor-pointer group">
                         <div class="hidden sm:block text-right">
                             <p class="text-sm font-semibold text-foreground leading-tight">@fullName</p>
                             <p class="text-xs text-muted-foreground">Student</p>
@@ -49,6 +49,12 @@
                         <img class="h-9 w-9 rounded-full object-cover border border-border"
                              src="@avatarUrl"
                              alt="User avatar">
+                             
+                        <div class="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <a asp-page="/Profile/ViewProfile" class="block px-4 py-2 text-sm text-foreground hover:bg-gray-100 font-medium whitespace-nowrap">View Profile</a>
+                            <hr class="border-border my-1" />
+                            <a asp-page="/Authentications/Logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 font-medium whitespace-nowrap">Logout</a>
+                        </div>
                     </div>
                 }
                 else
