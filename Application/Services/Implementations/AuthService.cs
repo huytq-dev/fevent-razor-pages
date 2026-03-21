@@ -1,4 +1,4 @@
-﻿namespace Application;
+namespace Application;
 
 [RegisterService(typeof(IAuthServices))]
 public class AuthService(
@@ -56,6 +56,9 @@ public class AuthService(
 
         if (await unitOfWork.Users.IsEmailExistAsync(request.Email))
             return PageResponse<SignUpResponse>.Fail($"Email {request.Email} đã tồn tại");
+
+        if (await unitOfWork.Users.IsStudentIdExistAsync(request.StudentId))
+            return PageResponse<SignUpResponse>.Fail($"Mã số sinh viên {request.StudentId} đã được đăng ký cho một tài khoản khác");
 
         var user = request.Adapt<User>();
         user.PasswordHash = passwordHasher.Hash(request.Password);
