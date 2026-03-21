@@ -1,8 +1,10 @@
 @page
+@using Microsoft.AspNetCore.Http
 @model UI.Pages.Profile.ViewProfileModel
 @{
-    Layout = "~/Pages/Shared/Home/_HomeLayout.cshtml";
     ViewData["Title"] = "Xem Profile Sinh Viên";
+    var roleName = HttpContext.Session.GetString("RoleName");
+    Layout = roleName == "Admin" ? "~/Pages/Shared/Admin/_AdminLayout.cshtml" : "~/Pages/Shared/Home/_HomeLayout.cshtml";
     var student = Model.Student;
     var avatarUrl = string.IsNullOrEmpty(student?.AvatarUrl)
         ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(student?.FullName ?? "Student")}&background=f96706&color=fff"
@@ -26,7 +28,7 @@
                         <h1 class="text-2xl md:text-3xl font-bold text-[#181411] text-center">@(student?.FullName ?? "Tên sinh viên")</h1>
                         <div class="flex items-center gap-2 mt-1">
                             <span class="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20">@(student?.StudentId ?? "MSSV")</span>
-                            <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium border border-green-200">@((student?.IsVerified ?? false) ? "Active Student" : "Inactive")</span>
+                            <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium border border-green-200">@((student?.IsVerified ?? false) ? "Active" : "Inactive")</span>
                         </div>
                         <p class="text-[#8c715f] text-base mt-2">@(student?.Major ?? "Major")</p>
                     </div>

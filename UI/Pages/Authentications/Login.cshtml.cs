@@ -15,8 +15,15 @@ public class LoginModel(IAuthServices authServices) : PageModel
         var userId = HttpContext.Session.GetString("UserId");
         if (!string.IsNullOrWhiteSpace(userId))
         {
+            var roleName = HttpContext.Session.GetString("RoleName");
             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
                 return Redirect(ReturnUrl);
+                
+            if (roleName == "Admin")
+            {
+                return RedirectToPage("/Admin/UserManager");
+            }
+                
             return RedirectToPage("/Home/Index");
         }
 
@@ -46,6 +53,12 @@ public class LoginModel(IAuthServices authServices) : PageModel
 
         if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             return Redirect(ReturnUrl);
+            
+        if (auth.RoleName == "Admin")
+        {
+            return RedirectToPage("/Admin/UserManager");
+        }
+            
         return RedirectToPage("/Home/Index");
     }
 }
