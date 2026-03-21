@@ -26,9 +26,16 @@
 
             <nav class="hidden md:flex space-x-8">
                 <a href="/" class="text-foreground hover:text-primary font-medium transition-colors">Trang Chủ</a>
-                <a asp-page="/Home/FindEvent" class="text-primary font-medium transition-colors">Tìm sự kiện</a>
+                <a asp-page="/Home/FindEvent" class="text-foreground hover:text-primary font-medium transition-colors">Tìm sự kiện</a>
                 <a asp-page="/Events/EventHistory" class="text-foreground hover:text-primary font-medium transition-colors">Lịch của tôi</a>
-                @* <a href="/Organize" class="text-foreground hover:text-primary font-medium transition-colors">Organize</a> *@
+                @{
+                    var roleName = Context.Session.GetString("RoleName");
+                    if (!string.IsNullOrEmpty(roleName) && roleName == "Admin")
+                    {
+                        var isUserManagerPage = ViewContext.RouteData.Values["page"]?.ToString()?.Contains("UserManager") == true;
+                        <a asp-page="/Admin/UserManager" class="@(isUserManagerPage ? "text-primary font-bold" : "text-foreground hover:text-primary font-medium") transition-colors">Quản lý người dùng</a>
+                    }
+                }
             </nav>
 
             <div class="flex items-center gap-5">
@@ -44,7 +51,7 @@
                     <div class="relative flex items-center gap-3 cursor-pointer group">
                         <div class="hidden sm:block text-right">
                             <p class="text-sm font-semibold text-foreground leading-tight">@fullName</p>
-                            <p class="text-xs text-muted-foreground">Student</p>
+                            <p class="text-xs text-muted-foreground">@roleName</p>
                         </div>
                         <img class="h-9 w-9 rounded-full object-cover border border-border"
                              src="@avatarUrl"

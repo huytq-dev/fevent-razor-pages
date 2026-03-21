@@ -5,7 +5,7 @@
     ViewData["Title"] = "Xem Profile Sinh Viên";
     var student = Model.Student;
     var avatarUrl = string.IsNullOrEmpty(student?.AvatarUrl)
-        ? "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
+        ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(student?.FullName ?? "Student")}&background=f96706&color=fff"
         : student.AvatarUrl;
 }
 <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">

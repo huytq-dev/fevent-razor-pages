@@ -37,12 +37,12 @@ public class LoginModel(IAuthServices authServices) : PageModel
 
         var auth = result.Data!;
 
-        // Lưu vào Session
-        HttpContext.Session.SetString("UserId", auth.Id.ToString());
-        HttpContext.Session.SetString("FullName", auth.FullName);
-        HttpContext.Session.SetString("Email", auth.Email);
-        HttpContext.Session.SetString("AvatarUrl", auth.AvatarUrl ?? "");
-        //HttpContext.Session.SetString("Role", auth.Role); đang bị lỗi
+    // Lưu vào Session
+    HttpContext.Session.SetString("UserId", auth.Id.ToString());
+    HttpContext.Session.SetString("FullName", auth.FullName);
+    HttpContext.Session.SetString("Email", auth.Email);
+    HttpContext.Session.SetString("AvatarUrl", auth.AvatarUrl ?? "");
+    HttpContext.Session.SetString("RoleName", auth.RoleName ?? "Student");
 
         if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
             return Redirect(ReturnUrl);
