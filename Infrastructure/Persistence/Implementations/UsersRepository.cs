@@ -17,6 +17,11 @@ public class UsersRepository : GenericRepository<User>, IUsersRepository
             .AsNoTracking()
             .AnyAsync(u => u.Username == username && !u.IsDeleted);
 
+    public async Task<bool> IsStudentIdExistAsync(string studentId)
+        => await _set
+            .AsNoTracking()
+            .AnyAsync(u => u.StudentId == studentId && !u.IsDeleted);
+
     public async Task<User?> GetUserByEmailAsync(string email)
         => await _set
             .Include(u => u.UserRoles)

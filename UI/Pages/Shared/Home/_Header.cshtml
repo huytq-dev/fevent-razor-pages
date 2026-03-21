@@ -35,6 +35,11 @@
                         var isUserManagerPage = ViewContext.RouteData.Values["page"]?.ToString()?.Contains("UserManager") == true;
                         <a asp-page="/Admin/UserManager" class="@(isUserManagerPage ? "text-primary font-bold" : "text-foreground hover:text-primary font-medium") transition-colors">Quản lý người dùng</a>
                     }
+                    if (!string.IsNullOrEmpty(roleName) && (roleName == "Admin" || roleName == "Organizer"))
+                    {
+                        var isScanPage = ViewContext.RouteData.Values["page"]?.ToString()?.Contains("ScanQR") == true;
+                        <a asp-page="/Events/ScanQR" class="@(isScanPage ? "text-primary font-bold" : "text-foreground hover:text-primary font-medium") transition-colors">Quét mã Check-in</a>
+                    }
                 }
             </nav>
 

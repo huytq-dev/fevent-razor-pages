@@ -1,0 +1,188 @@
+@page
+@model UI.Pages.Events.ScanQRModel
+@{
+    ViewData["Title"] = "Quét mã QR Check-in";
+    Layout = "~/Pages/Shared/Home/_HomeLayout.cshtml";
+}
+
+<div class="bg-background min-h-screen py-10">
+    <div class="max-w-2xl mx-auto px-4">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-display font-extrabold text-foreground mb-3">Check-in Sự Kiện</h1>
+            <p class="text-muted-foreground text-base">Đưa mã QR của khách hàng vào khung hình để kiểm tra và xác nhận tham gia.</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="mb-6 rounded-2xl border border-green-200 bg-green-50 px-6 py-4 flex items-center gap-3 text-green-800 shadow-sm animate-fade-in-up">
+                <span class="material-symbols-outlined text-green-500 text-2xl">check_circle</span>
+                <span class="font-medium text-[15px]">@Model.SuccessMessage</span>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 px-6 py-4 flex items-center gap-3 text-red-800 shadow-sm animate-fade-in-up">
+                <span class="material-symbols-outlined text-red-500 text-2xl">error</span>
+                <span class="font-medium text-[15px]">@Model.ErrorMessage</span>
+            </div>
+        }
+
+        <div class="bg-white border text-center border-[#e6dfdb] rounded-[2rem] p-6 shadow-xl relative overflow-hidden flex flex-col items-center">
+            
+            <div class="relative w-full max-w-sm rounded-3xl overflow-hidden bg-[#181411] aspect-[4/5] flex flex-col items-center justify-center shadow-inner ring-4 ring-gray-50 mb-6 group">
+                <!-- Camera Feed -->
+                <div id="reader" class="w-full h-full object-cover"></div>
+                
+                <!-- Laser Animation Overlay -->
+                <div id="laserLine" class="absolute top-0 left-0 w-full h-[2px] bg-primary shadow-[0_0_15px_4px_rgba(249,103,6,0.6)] z-10 hidden" style="animation: scan 2s linear infinite;"></div>
+                
+                <!-- Scanning Frame brackets -->
+                <div id="scanFrame" class="absolute inset-8 z-10 hidden pointer-events-none">
+                    <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-primary/70 rounded-tl-xl transition-all duration-300"></div>
+                    <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-primary/70 rounded-tr-xl transition-all duration-300"></div>
+                    <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-primary/70 rounded-bl-xl transition-all duration-300"></div>
+                    <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-primary/70 rounded-br-xl transition-all duration-300"></div>
+                </div>
+
+                <!-- Initial Placeholder -->
+                <div id="cameraPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center text-white/50 z-0 px-6 text-center">
+                    <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <p class="font-medium">Camera đang tắt.</p>
+                    <p class="text-xs mt-1">Bấm nút bên dưới để bắt đầu quét.</p>
+                </div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="flex items-center gap-3 w-full max-w-sm mb-6">
+                <button type="button" id="startBtn" onclick="startScanner()" class="flex-1 bg-[#181411] hover:bg-black text-white px-5 py-3.5 rounded-xl font-bold transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">play_circle</span>
+                    Bật Camera
+                </button>
+                <button type="button" id="stopBtn" onclick="stopScanner()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-3.5 rounded-xl font-bold transition-all shadow-sm active:scale-[0.98] hidden flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">stop_circle</span>
+                    Dừng quét
+                </button>
+            </div>
+            
+            <form method="post" id="checkInForm" class="hidden w-full max-w-sm">
+                <div class="flex items-center gap-3 mb-4">
+                    <input type="text" name="ticketCode" id="ticketCodeInput" class="flex-1 rounded-xl border border-[#e6dfdb] px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="Hoặc nhập mã gốc thẻ vé..." />
+                    <button type="submit" asp-page-handler="CheckIn" id="submitBtn" class="bg-primary hover:bg-orange-600 px-6 py-3 rounded-xl text-white font-bold transition-colors shadow-sm whitespace-nowrap">
+                        Xác nhận
+                    </button>
+                </div>
+            </form>
+
+            <button type="button" onclick="document.getElementById('checkInForm').classList.toggle('hidden')" class="text-sm font-semibold text-primary hover:underline underline-offset-4 decoration-2">
+                Không quét được? Nhập mã thủ công
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script>
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @@keyframes scan {
+                0% { top: 0%; opacity: 0; }
+                10% { opacity: 1; }
+                90% { opacity: 1; }
+                100% { top: 100%; opacity: 0; }
+            }
+            #reader video { 
+                object-fit: cover; 
+                border-radius: 1.5rem; 
+                width: 100% !important; 
+                height: 100% !important; 
+            }
+        `;
+        document.head.appendChild(style);
+
+        let html5QrCode = null;
+        let isScanning = false;
+
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const laserLine = document.getElementById('laserLine');
+        const scanFrame = document.getElementById('scanFrame');
+        const cameraPlaceholder = document.getElementById('cameraPlaceholder');
+
+        document.addEventListener('DOMContentLoaded', function () {
+            html5QrCode = new Html5Qrcode("reader");
+        });
+
+        function onScanSuccess(decodedText, decodedResult) {
+            if (!isScanning) return;
+            isScanning = false;
+            
+            stopScannerEngine().then(() => {
+                // Visual loading indicator inside the frame
+                const readerDiv = document.getElementById('reader');
+                readerDiv.innerHTML = '<div class="absolute inset-0 flex flex-col items-center justify-center p-6 bg-[#181411]/90 backdrop-blur-md z-30 rounded-3xl"><div class="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div><p class="font-bold text-white text-lg">Đang đối chiếu vé...</p><p class="text-white/60 text-sm mt-1">' + decodedText + '</p></div>';
+                
+                // Submit form
+                document.getElementById('ticketCodeInput').value = decodedText;
+                document.getElementById('submitBtn').click();
+            });
+        }
+
+        async function startScanner() {
+            if (isScanning || !html5QrCode) return;
+            
+            startBtn.classList.add('hidden');
+            startBtn.classList.remove('flex');
+            stopBtn.classList.remove('hidden');
+            stopBtn.classList.add('flex');
+            cameraPlaceholder.classList.add('hidden');
+            
+            try {
+                await html5QrCode.start(
+                    { facingMode: "environment" }, 
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 },
+                        aspectRatio: 0.8
+                    },
+                    onScanSuccess,
+                    (errorMessage) => { /* ignore */ }
+                );
+                
+                isScanning = true;
+                laserLine.classList.remove('hidden');
+                scanFrame.classList.remove('hidden');
+                
+            } catch (err) {
+                console.error("Camera start failed", err);
+                alert("Không thể bật camera. Vui lòng cấp quyền hoặc thử thiết bị khác.");
+                stopScannerUI();
+            }
+        }
+
+        function stopScannerUI() {
+            stopBtn.classList.add('hidden');
+            stopBtn.classList.remove('flex');
+            startBtn.classList.remove('hidden');
+            startBtn.classList.add('flex');
+            laserLine.classList.add('hidden');
+            scanFrame.classList.add('hidden');
+            cameraPlaceholder.classList.remove('hidden');
+        }
+
+        function stopScannerEngine() {
+            stopScannerUI();
+            if (html5QrCode && isScanning) {
+                isScanning = false;
+                return html5QrCode.stop().catch(err => {
+                    console.error("Failed to stop", err);
+                });
+            }
+            return Promise.resolve();
+        }
+
+        function stopScanner() {
+            stopScannerEngine();
+        }
+    </script>
+}
