@@ -1,7 +1,7 @@
 @page
 @model UI.Pages.Admin.UserManagerModel
 @{
-    Layout = "~/Pages/Shared/Home/_HomeLayout.cshtml";
+    Layout = "~/Pages/Shared/Admin/_AdminLayout.cshtml";
     ViewData["Title"] = "Quản lý người dùng";
 }
 
@@ -19,33 +19,59 @@
         </div>
     }
 
-    <!-- Breadcrumbs -->
-    <nav class="flex text-sm font-medium text-[#8c715f] mb-4" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-3">
-            <li class="inline-flex items-center">
-                <a href="/Home/Index" class="hover:text-primary transition-colors">Home</a>
-            </li>
-            <li>
-                <div class="flex items-center">
-                    <span class="mx-2 text-gray-400">/</span>
-                    <span class="text-[#181411] font-semibold">User Management</span>
-                </div>
-            </li>
-        </ol>
-    </nav>
+
 
     <!-- Page Heading -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
         <div class="flex flex-col gap-2">
-            <h1 class="text-[#181411] text-5xl font-black tracking-tight leading-tight">User Management</h1>
+            <h1 class="text-[#181411] text-4xl md:text-5xl font-black tracking-tight leading-tight">Quản lý người dùng</h1>
             <p class="text-[#8c715f] text-base font-normal max-w-2xl leading-relaxed">
-                Manage student, organizer, and admin accounts. View details, update roles, and monitor status across FPT University.
+                Quản lý tài khoản học sinh, ban tổ chức và ban quản trị. Xem chi tiết thông tin, cập nhật phân quyền và theo dõi trạng thái hoạt động trên toàn hệ thống FEvents.
             </p>
         </div>
-        <button class="flex items-center justify-center rounded-full h-14 px-8 bg-primary hover:bg-orange-600 text-white text-lg font-bold transition-all shadow-xl shadow-orange-500/30 active:scale-95 whitespace-nowrap shrink-0">
+        <button type="button" onclick="document.getElementById('addUserModal').classList.remove('hidden')" class="flex items-center justify-center rounded-2xl h-14 px-8 bg-[#181411] hover:bg-black text-white text-lg font-bold transition-all shadow-lg active:scale-95 whitespace-nowrap shrink-0">
             <span class="material-symbols-outlined mr-2 font-bold">add</span>
-            <span>Add New User</span>
+            <span>Thêm mới</span>
         </button>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="document.getElementById('addUserModal').classList.add('hidden')"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-gray-100 z-10 animate-fade-in-up">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Thêm người dùng</h3>
+                <button type="button" onclick="document.getElementById('addUserModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-full p-2 transition-colors">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+            </div>
+            <form method="post" asp-page-handler="CreateUser" class="flex flex-col gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Họ và Tên</label>
+                    <input type="text" name="FullName" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-gray-400" placeholder="Nguyễn Văn A">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Email</label>
+                    <input type="email" name="Email" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-gray-400" placeholder="email@fpt.edu.vn">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Mật khẩu</label>
+                    <input type="password" name="Password" required minlength="8" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-gray-400" placeholder="••••••••">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Vai trò</label>
+                    <select name="RoleId" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-gray-700">
+                        @foreach (var role in Model.AvailableRoles)
+                        {
+                            <option value="@role.Id">@role.RoleName</option>
+                        }
+                    </select>
+                </div>
+                <button type="submit" class="w-full mt-2 py-3.5 bg-primary hover:bg-[#e05b05] text-white rounded-xl font-bold transition-all shadow-md active:scale-[0.98]">
+                    Xác nhận thêm
+                </button>
+            </form>
+        </div>
     </div>
 
     <!-- Stats Cards -->
@@ -91,15 +117,15 @@
 
     <!-- Master Table -->
     <div class="bg-white rounded-2xl border border-[#e6dfdb] overflow-hidden shadow-sm">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+        <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse min-w-[1000px]">
                 <thead>
                     <tr class="bg-[#f8f7f5] border-b border-[#e6dfdb]">
-                        <th class="py-5 px-8 text-xs font-bold text-gray-500 uppercase tracking-widest">User</th>
-                        <th class="py-5 px-8 text-xs font-bold text-gray-500 uppercase tracking-widest text-center">Role</th>
-                        <th class="py-5 px-8 text-xs font-bold text-gray-500 uppercase tracking-widest hidden md:table-cell">Department</th>
-                        <th class="py-5 px-8 text-xs font-bold text-gray-500 uppercase tracking-widest text-center">Status</th>
-                        <th class="py-5 px-8 text-xs font-bold text-gray-500 uppercase tracking-widest text-right">Actions</th>
+                        <th class="py-5 px-6 text-xs font-bold text-gray-500 uppercase tracking-widest">User</th>
+                        <th class="py-5 px-6 text-xs font-bold text-gray-500 uppercase tracking-widest text-center">Role</th>
+                        <th class="py-5 px-4 text-xs font-bold text-gray-500 uppercase tracking-widest hidden md:table-cell">Department</th>
+                        <th class="py-5 px-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-center">Status</th>
+                        <th class="py-5 px-6 text-xs font-bold text-gray-500 uppercase tracking-widest text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#e6dfdb]">
@@ -116,27 +142,27 @@
                                         "bg-blue-100 text-blue-800 border-blue-200";
 
                         <tr class="hover:bg-gray-50/80 transition-colors group">
-                            <td class="py-6 px-8 whitespace-nowrap">
+                            <td class="py-5 px-6">
                                 <div class="flex items-center gap-4">
                                     <div class="h-12 w-12 rounded-full bg-cover bg-center shrink-0 border-2 border-white shadow-sm" style='background-image: url("@avatarUrl");'></div>
-                                    <div class="flex flex-col">
-                                        <span class="text-base font-bold text-[#181411]">@user.FullName</span>
-                                        <span class="text-sm text-gray-500">@user.Email</span>
+                                    <div class="flex flex-col min-w-0">
+                                        <span class="text-base font-bold text-[#181411] truncate">@user.FullName</span>
+                                        <span class="text-sm text-gray-500 truncate">@user.Email</span>
                                     </div>
                                 </div>
                             </td>
                             
-                            <td class="py-6 px-8 whitespace-nowrap text-center">
+                            <td class="py-5 px-6 text-center">
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold @roleColor border shadow-sm">
                                     @roleName
                                 </span>
                             </td>
                             
-                            <td class="py-6 px-8 whitespace-nowrap hidden md:table-cell">
+                            <td class="py-5 px-4 hidden md:table-cell">
                                 <span class="text-base text-gray-700 font-medium">@(user.Major ?? "N/A")</span>
                             </td>
                             
-                            <td class="py-6 px-8 whitespace-nowrap text-center">
+                            <td class="py-5 px-4 text-center">
                                 @if (user.IsDeleted)
                                 {
                                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-100">
@@ -151,20 +177,20 @@
                                 }
                             </td>
                             
-                            <td class="py-6 px-8 whitespace-nowrap text-right">
+                            <td class="py-5 px-6 whitespace-nowrap text-right">
                                 <div class="flex items-center justify-end gap-3">
                                     <!-- Change Role Dropdown -->
-                                    <form method="post" asp-page-handler="ChangeRole" class="inline-block relative">
+                                    <form method="post" asp-page-handler="ChangeRole" class="inline-block relative w-36">
                                         <input type="hidden" name="UserId" value="@user.Id" />
-                                        <select name="NewRoleId" onchange="this.form.submit()" class="text-sm rounded-xl border-[#e6dfdb] focus:ring-primary/20 focus:border-primary px-4 py-2 bg-white cursor-pointer shadow-sm hover:border-primary transition-all pr-10 appearance-none">
-                                            <option disabled selected hidden>Change Role</option>
+                                        <select name="NewRoleId" onchange="this.form.submit()" class="text-sm rounded-xl border-[#e6dfdb] focus:ring-primary/20 focus:border-primary px-4 py-2 bg-white cursor-pointer shadow-sm hover:border-primary transition-all pr-8 appearance-none w-full text-gray-700 font-medium font-sans">
+                                            <option disabled selected hidden>Set Role</option>
                                             @foreach (var role in Model.AvailableRoles)
                                             {
                                                 if (currentRole?.Id == role.Id) continue;
-                                                <option value="@role.Id">Set @role.RoleName</option>
+                                                <option value="@role.Id">@role.RoleName</option>
                                             }
                                         </select>
-                                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-lg">expand_more</span>
+                                        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-base">expand_more</span>
                                     </form>
                                     
                                     <!-- Ban/Unban -->
@@ -173,13 +199,13 @@
                                         @if (user.IsDeleted)
                                         {
                                             <button type="submit" class="h-10 w-10 flex items-center justify-center rounded-xl bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition-all shadow-sm" title="Unban User">
-                                                <span class="material-symbols-outlined">how_to_reg</span>
+                                                <span class="material-symbols-outlined shrink-0">how_to_reg</span>
                                             </button>
                                         }
                                         else
                                         {
                                             <button type="submit" class="h-10 w-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:bg-red-600 hover:text-white transition-all shadow-sm" title="Ban User">
-                                                <span class="material-symbols-outlined">block</span>
+                                                <span class="material-symbols-outlined shrink-0">block</span>
                                             </button>
                                         }
                                     </form>

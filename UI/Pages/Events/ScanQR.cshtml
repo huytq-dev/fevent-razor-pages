@@ -1,8 +1,10 @@
 @page
 @model UI.Pages.Events.ScanQRModel
+@using Microsoft.AspNetCore.Http
 @{
     ViewData["Title"] = "Quét mã QR Check-in";
-    Layout = "~/Pages/Shared/Home/_HomeLayout.cshtml";
+    var roleName = HttpContext.Session.GetString("RoleName");
+    Layout = roleName == "Admin" ? "~/Pages/Shared/Admin/_AdminLayout.cshtml" : "~/Pages/Shared/Home/_HomeLayout.cshtml";
 }
 
 <div class="bg-background min-h-screen py-10">
@@ -29,7 +31,7 @@
 
         <div class="bg-white border text-center border-[#e6dfdb] rounded-[2rem] p-6 shadow-xl relative overflow-hidden flex flex-col items-center">
             
-            <div class="relative w-full max-w-sm rounded-3xl overflow-hidden bg-[#181411] aspect-[4/5] flex flex-col items-center justify-center shadow-inner ring-4 ring-gray-50 mb-6 group">
+            <div class="relative w-full max-w-sm rounded-3xl overflow-hidden bg-gray-50/50 aspect-[4/5] flex flex-col items-center justify-center shadow-inner ring-4 border border-gray-100 ring-gray-50 mb-6 group">
                 <!-- Camera Feed -->
                 <div id="reader" class="w-full h-full object-cover"></div>
                 
@@ -45,10 +47,10 @@
                 </div>
 
                 <!-- Initial Placeholder -->
-                <div id="cameraPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center text-white/50 z-0 px-6 text-center">
+                <div id="cameraPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-500 z-0 px-6 text-center">
                     <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    <p class="font-medium">Camera đang tắt.</p>
-                    <p class="text-xs mt-1">Bấm nút bên dưới để bắt đầu quét.</p>
+                    <p class="font-medium text-gray-700">Camera đang tắt.</p>
+                    <p class="text-xs mt-1 text-gray-400">Bấm nút bên dưới để bắt đầu quét.</p>
                 </div>
             </div>
             

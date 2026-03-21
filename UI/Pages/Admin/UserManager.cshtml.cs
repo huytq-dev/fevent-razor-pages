@@ -9,10 +9,12 @@ namespace UI.Pages.Admin
     public class UserManagerModel : PageModel
     {
         private readonly ApplicationDbContext _db;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public UserManagerModel(ApplicationDbContext db)
+        public UserManagerModel(ApplicationDbContext db, IPasswordHasher passwordHasher)
         {
             _db = db;
+            _passwordHasher = passwordHasher;
         }
 
         public IList<User> Users { get; set; } = new List<User>();
@@ -53,6 +55,52 @@ namespace UI.Pages.Admin
             ActiveOrganizersCount = Users.Count(u => u.UserRoles.Any(ur => ur.Role.RoleName == "Organizer") && !u.IsDeleted);
 
             return Page();
+        }
+
+        public async Task<IActionResult> OnPostCreateUserAsync(string fullName, string email, string password, Guid roleId)
+        {
+            if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password) || roleId == Guid.Empty)
+            {
+                TempData["ErrorMessage"] = "Vui lòng điền đầy đủ thông tin.";
+                return RedirectToPage();
+            }
+
+            if (await _db.Users.AnyAsync(u => u.Email == email))
+            {
+                TempData["ErrorMessage"] = "Email đã tồn tại trong hệ thống.";
+                return RedirectToPage();
+            }
+
+            var role = await _db.Roles.FindAsync(roleId);
+            if (role == null)
+            {
+                TempData["ErrorMessage"] = "Vai trò không hợp lệ.";
+                return RedirectToPage();
+            }
+
+            var newUser = new User
+            {
+                Id = Guid.NewGuid(),
+                FullName = fullName,
+                Email = email,
+                Username = email.Split('@')[0], 
+                PasswordHash = _passwordHasher.Hash(password),
+                IsVerified = true,
+                IsDeleted = false
+            };
+
+            await _db.Users.AddAsync(newUser);
+            
+            _db.UserRoles.Add(new UserRole
+            {
+                UserId = newUser.Id,
+                RoleId = role.Id
+            });
+
+            await _db.SaveChangesAsync();
+            TempData["SuccessMessage"] = $"Đã thêm thành công người dùng {newUser.FullName}.";
+
+            return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostChangeRoleAsync(Guid userId, Guid newRoleId)
