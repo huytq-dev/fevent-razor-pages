@@ -19,8 +19,21 @@ public class AuthService(
         if (user.IsDeleted) return PageResponse<SignInResponse>.Fail("Tài khoản đã bị chặn.");
         if (!user.IsVerified) return PageResponse<SignInResponse>.Fail("Email chưa được xác thực.");
 
-        var userDto = user.Adapt<SignInResponse>();
-        // Kiểm tra role
+
+        // Lấy role đầu tiên của user (ưu tiên Admin nếu có)
+        var roleName = user.UserRoles
+            .Select(ur => ur.Role?.RoleName)
+            .FirstOrDefault(r => r != null) ?? "PARTICIPANT";
+
+        var userDto = new SignInResponse
+        {
+            Id = user.Id,
+            FullName = user.FullName,
+            Email = user.Email,
+            AvatarUrl = user.AvatarUrl,
+            Role = null, // giữ nguyên nếu cần
+            RoleName = roleName
+        };
 
         return PageResponse<SignInResponse>.Ok(userDto, "Đăng nhập thành công.");
 

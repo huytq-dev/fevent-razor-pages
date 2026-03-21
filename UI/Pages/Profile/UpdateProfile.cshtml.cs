@@ -10,16 +10,22 @@ namespace UI.Pages.Profile
     public class UpdateProfileModel : PageModel
     {
         private readonly ApplicationDbContext _db;
+        private readonly IWebHostEnvironment _hostEnvironment;
+
         [BindProperty]
         public User? AppUser { get; set; }
+
+        [BindProperty]
+        public IFormFile? AvatarFile { get; set; }
         [TempData]
         public string? SuccessMessage { get; set; }
         [TempData]
         public string? ErrorMessage { get; set; }
 
-        public UpdateProfileModel(ApplicationDbContext db)
+        public UpdateProfileModel(ApplicationDbContext db, IWebHostEnvironment hostEnvironment)
         {
             _db = db;
+            _hostEnvironment = hostEnvironment;
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -77,12 +83,48 @@ namespace UI.Pages.Profile
                 ErrorMessage = "Không tìm thấy thông tin người dùng.";
                 return RedirectToPage("/Profile/ViewProfile");
             }
+            // Avatar upload handling
+            if (AvatarFile != null)
+            {
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                var extension = Path.GetExtension(AvatarFile.FileName).ToLower();
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError("AvatarFile", "Chỉ chấp nhận file ảnh (.jpg, .jpeg, .png, .gif).");
+                    return Page();
+                }
+
+                if (AvatarFile.Length > 2 * 1024 * 1024) // 2MB limit
+                {
+                    ModelState.AddModelError("AvatarFile", "Kích thước ảnh không được vượt quá 2MB.");
+                    return Page();
+                }
+
+                string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "uploads", "avatars");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                string uniqueFileName = $"{userInDb.Id}_{DateTime.Now.Ticks}{extension}";
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await AvatarFile.CopyToAsync(fileStream);
+                }
+
+                userInDb.AvatarUrl = "/uploads/avatars/" + uniqueFileName;
+                HttpContext.Session.SetString("AvatarUrl", userInDb.AvatarUrl);
+            }
+
             // Cập nhật các trường cho phép sửa
             userInDb.FullName = AppUser?.FullName ?? userInDb.FullName;
             userInDb.Major = AppUser?.Major ?? userInDb.Major;
             userInDb.PhoneNumber = AppUser?.PhoneNumber ?? userInDb.PhoneNumber;
             userInDb.DOB = AppUser?.DOB ?? userInDb.DOB;
-            // Nếu có thêm trường nào cho phép sửa thì bổ sung ở đây
+
+            HttpContext.Session.SetString("FullName", userInDb.FullName); // Sync session
             await _db.SaveChangesAsync();
             SuccessMessage = "Cập nhật thông tin thành công!";
             return RedirectToPage("/Profile/ViewProfile");
