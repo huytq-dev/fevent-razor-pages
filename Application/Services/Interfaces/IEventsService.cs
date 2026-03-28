@@ -1,4 +1,4 @@
-﻿namespace Application;
+namespace Application;
 
 public interface IEventsService
 {
@@ -7,4 +7,5 @@ public interface IEventsService
         CancellationToken ct = default);
 
     Task<PageResponse<EventDetailResponse>> GetDetailAsync(Guid id, CancellationToken ct = default);
+    Task<PageResponse<Guid>> CreateAsync(CreateEventRequest request, CancellationToken ct = default);
 }

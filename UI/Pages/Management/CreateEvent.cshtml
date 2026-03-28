@@ -1,0 +1,313 @@
+@page
+@model UI.Pages.Management.CreateEventModel
+@{
+    ViewData["Title"] = "Create New Event";
+    Layout = null; // Set to null to maintain identical UI as the original HTML
+}
+
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>@ViewData["Title"] - FEvents</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f96706",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#23170f",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-[#181411] dark:text-white">
+    <div class="relative flex min-h-screen flex-col overflow-x-hidden">
+        <!-- TopNavBar -->
+        <header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-[#e6dfdb] bg-white dark:bg-[#1a120b] dark:border-[#3e342f] px-10 py-3 shadow-sm">
+            <div class="flex items-center gap-4 text-[#181411] dark:text-white">
+                <div class="size-8 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <span class="material-symbols-outlined">event</span>
+                </div>
+                <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">FEvents</h2>
+            </div>
+            <div class="flex flex-1 justify-end gap-8">
+                <nav class="hidden md:flex items-center gap-9">
+                    <a class="text-[#181411] dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+                    <a class="text-primary text-sm font-bold leading-normal" href="#">Events</a>
+                    <a class="text-[#181411] dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Reports</a>
+                    <a class="text-[#181411] dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Settings</a>
+                </nav>
+                <div class="flex items-center gap-4">
+                    <button class="flex items-center justify-center rounded-full size-10 bg-[#f4f2f0] dark:bg-[#3e342f] text-[#181411] dark:text-white hover:bg-primary/10 transition-colors">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white dark:border-[#3e342f] shadow-sm" data-alt="User profile picture placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDU3u2JRpah1k90Qoo_nYaifoPAt2zke4sg_TrCSOhzZqYbFUfKWmKi60FVq8FXiW51kpFmhr4SONCdXzVmuDkLF8p-Dd2zfHUTEkQ9yIc0tk8HxK8wNzuvRAQe68qam4fnv4lg-xY_8mLoE9DR1yjAiDhhVmjJJeSKSvekBZBeiHfwVOFBhb6OIcCOX76kb0P4ZGGfiTb1Qn6rviBTuboW5TTP4QZ4NCzUGITmxSh2zxE8Pt2USMczUR6emUR5vijzpNo3XAgUURCl");'></div>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 px-4 md:px-10 lg:px-40 py-8 pb-20">
+            <div class="mx-auto max-w-[1024px]">
+                <!-- Breadcrumbs -->
+                <nav class="flex flex-wrap gap-2 py-4 mb-2">
+                    <a class="text-[#8c715f] dark:text-[#a08c7e] text-sm font-medium hover:text-primary hover:underline" href="#">Dashboard</a>
+                    <span class="text-[#8c715f] dark:text-[#a08c7e] text-sm font-medium">/</span>
+                    <a class="text-[#8c715f] dark:text-[#a08c7e] text-sm font-medium hover:text-primary hover:underline" href="#">Events</a>
+                    <span class="text-[#8c715f] dark:text-[#a08c7e] text-sm font-medium">/</span>
+                    <span class="text-[#181411] dark:text-white text-sm font-medium">Create New</span>
+                </nav>
+
+                <form method="post" enctype="multipart/form-data">
+                    <!-- PageHeading -->
+                    <div class="flex flex-wrap justify-between items-end gap-5 mb-8">
+                        <div class="flex flex-col gap-2">
+                            <h1 class="text-[#181411] dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Create New Event</h1>
+                            <p class="text-[#8c715f] dark:text-[#a08c7e] text-base font-normal">Fill in the details to schedule a new event for FPT University students.</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button type="button" class="h-10 px-5 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#1a120b] text-[#181411] dark:text-white text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#2a221b] transition-colors">
+                                Cancel
+                            </button>
+                            <button type="button" class="h-10 px-5 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#1a120b] text-[#181411] dark:text-white text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#2a221b] transition-colors">
+                                Save Draft
+                            </button>
+                        </div>
+                    </div>
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="mb-4 rounded-lg bg-green-100 p-4 text-sm text-green-800 dark:bg-green-900 dark:text-green-200" role="alert">
+                            <span class="font-medium">Success!</span> @TempData["SuccessMessage"]
+                        </div>
+                    }
+
+                    <div asp-validation-summary="All" class="text-red-500 mb-4 font-medium italic"></div>
+
+                    <!-- Main Form Container -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Left Column: Main Details -->
+                        <div class="lg:col-span-2 flex flex-col gap-6">
+                            <!-- Event Name -->
+                            <div class="bg-white dark:bg-[#1a120b] p-6 rounded-xl border border-[#e6dfdb] dark:border-[#3e342f] shadow-sm">
+                                <label asp-for="ViewModel.Title" class="block mb-2 text-base font-bold text-[#181411] dark:text-white"></label>
+                                <input asp-for="ViewModel.Title" class="w-full h-14 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#2a221b] px-4 text-lg font-medium text-[#181411] dark:text-white placeholder-[#8c715f] dark:placeholder-[#6e5a4d] focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Enter event name..." />
+                                <span asp-validation-for="ViewModel.Title" class="text-xs text-red-500 mt-1"></span>
+                            </div>
+
+                            <!-- Logistics Grid -->
+                            <div class="bg-white dark:bg-[#1a120b] p-6 rounded-xl border border-[#e6dfdb] dark:border-[#3e342f] shadow-sm">
+                                <h3 class="text-lg font-bold text-[#181411] dark:text-white mb-6 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">info</span>
+                                    Event Logistics
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- Category -->
+                                    <label class="flex flex-col gap-2">
+                                        <span class="text-sm font-semibold text-[#181411] dark:text-[#d0c6c0]">Category</span>
+                                        <div class="relative">
+                                            <select asp-for="ViewModel.CategoryId" asp-items="Model.Categories" class="w-full h-12 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#2a221b] px-4 text-base text-[#181411] dark:text-white focus:border-primary focus:ring-1 focus:ring-primary appearance-none">
+                                                <option disabled selected value="">Select category...</option>
+                                            </select>
+                                            <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#8c715f]">
+                                                <span class="material-symbols-outlined">expand_more</span>
+                                            </div>
+                                        </div>
+                                        <span asp-validation-for="ViewModel.CategoryId" class="text-xs text-red-500"></span>
+                                    </label>
+
+                                    <!-- Venue -->
+                                    <label class="flex flex-col gap-2">
+                                        <span class="text-sm font-semibold text-[#181411] dark:text-[#d0c6c0]">Venue</span>
+                                        <div class="relative">
+                                            <select asp-for="ViewModel.LocationId" asp-items="Model.Locations" class="w-full h-12 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#2a221b] px-4 text-base text-[#181411] dark:text-white focus:border-primary focus:ring-1 focus:ring-primary appearance-none">
+                                                <option disabled selected value="">Select campus location...</option>
+                                            </select>
+                                            <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#8c715f]">
+                                                <span class="material-symbols-outlined">location_on</span>
+                                            </div>
+                                        </div>
+                                        <span asp-validation-for="ViewModel.LocationId" class="text-xs text-red-500"></span>
+                                    </label>
+
+                                    <!-- Date & Time -->
+                                    <label class="flex flex-col gap-2 md:col-span-2">
+                                        <span class="text-sm font-semibold text-[#181411] dark:text-[#d0c6c0]">Date &amp; Time</span>
+                                        <div class="flex flex-col md:flex-row gap-4">
+                                            <div class="relative flex-1">
+                                                <input asp-for="ViewModel.StartDateTime" class="w-full h-12 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#2a221b] px-4 text-base text-[#181411] dark:text-white focus:border-primary focus:ring-1 focus:ring-primary placeholder-[#8c715f]" />
+                                                <span asp-validation-for="ViewModel.StartDateTime" class="text-xs text-red-500"></span>
+                                            </div>
+                                            <div class="flex items-center justify-center text-[#8c715f]">to</div>
+                                            <div class="relative flex-1">
+                                                <input asp-for="ViewModel.EndDateTime" class="w-full h-12 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#2a221b] px-4 text-base text-[#181411] dark:text-white focus:border-primary focus:ring-1 focus:ring-primary placeholder-[#8c715f]" />
+                                                <span asp-validation-for="ViewModel.EndDateTime" class="text-xs text-red-500"></span>
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <!-- Capacity -->
+                                    <label class="flex flex-col gap-2">
+                                        <span class="text-sm font-semibold text-[#181411] dark:text-[#d0c6c0]">Max Capacity</span>
+                                        <div class="relative">
+                                            <input asp-for="ViewModel.MaxParticipants" class="w-full h-12 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#2a221b] pl-4 pr-10 text-base text-[#181411] dark:text-white focus:border-primary focus:ring-1 focus:ring-primary" min="1" placeholder="0" />
+                                            <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#8c715f]">
+                                                <span class="material-symbols-outlined text-sm">groups</span>
+                                            </div>
+                                        </div>
+                                        <span asp-validation-for="ViewModel.MaxParticipants" class="text-xs text-red-500"></span>
+                                    </label>
+
+                                    <!-- Ticket Type -->
+                                    <label class="flex flex-col gap-2">
+                                        <span class="text-sm font-semibold text-[#181411] dark:text-[#d0c6c0]">Access Type</span>
+                                        <div class="relative">
+                                            <select asp-for="ViewModel.AccessType" class="w-full h-12 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#2a221b] px-4 text-base text-[#181411] dark:text-white focus:border-primary focus:ring-1 focus:ring-primary appearance-none">
+                                                <option value="free">Free Entry</option>
+                                                <option value="paid">Paid Ticket</option>
+                                                <option value="invite">Invitation Only</option>
+                                            </select>
+                                            <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#8c715f]">
+                                                <span class="material-symbols-outlined">confirmation_number</span>
+                                            </div>
+                                        </div>
+                                        <span asp-validation-for="ViewModel.AccessType" class="text-xs text-red-500"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Description Editor -->
+                            <div class="bg-white dark:bg-[#1a120b] p-6 rounded-xl border border-[#e6dfdb] dark:border-[#3e342f] shadow-sm flex flex-col gap-4">
+                                <h3 class="text-lg font-bold text-[#181411] dark:text-white flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">description</span>
+                                    Description
+                                </h3>
+                                <!-- Fake Toolbar -->
+                                <div class="flex flex-wrap gap-2 border-b border-[#e6dfdb] dark:border-[#3e342f] pb-3">
+                                    <button type="button" class="p-2 hover:bg-[#f4f2f0] dark:hover:bg-[#3e342f] rounded text-[#8c715f] dark:text-[#a08c7e]"><span class="material-symbols-outlined text-[20px]">format_bold</span></button>
+                                    <button type="button" class="p-2 hover:bg-[#f4f2f0] dark:hover:bg-[#3e342f] rounded text-[#8c715f] dark:text-[#a08c7e]"><span class="material-symbols-outlined text-[20px]">format_italic</span></button>
+                                    <button type="button" class="p-2 hover:bg-[#f4f2f0] dark:hover:bg-[#3e342f] rounded text-[#8c715f] dark:text-[#a08c7e]"><span class="material-symbols-outlined text-[20px]">format_underlined</span></button>
+                                    <div class="w-px bg-[#e6dfdb] dark:bg-[#3e342f] mx-1 h-6 self-center"></div>
+                                    <button type="button" class="p-2 hover:bg-[#f4f2f0] dark:hover:bg-[#3e342f] rounded text-[#8c715f] dark:text-[#a08c7e]"><span class="material-symbols-outlined text-[20px]">format_list_bulleted</span></button>
+                                    <button type="button" class="p-2 hover:bg-[#f4f2f0] dark:hover:bg-[#3e342f] rounded text-[#8c715f] dark:text-[#a08c7e]"><span class="material-symbols-outlined text-[20px]">format_list_numbered</span></button>
+                                    <div class="w-px bg-[#e6dfdb] dark:bg-[#3e342f] mx-1 h-6 self-center"></div>
+                                    <button type="button" class="p-2 hover:bg-[#f4f2f0] dark:hover:bg-[#3e342f] rounded text-[#8c715f] dark:text-[#a08c7e]"><span class="material-symbols-outlined text-[20px]">link</span></button>
+                                    <button type="button" class="p-2 hover:bg-[#f4f2f0] dark:hover:bg-[#3e342f] rounded text-[#8c715f] dark:text-[#a08c7e]"><span class="material-symbols-outlined text-[20px]">image</span></button>
+                                </div>
+                                <textarea asp-for="ViewModel.Description" class="w-full min-h-[300px] resize-y bg-transparent border-0 focus:ring-0 p-0 text-base text-[#181411] dark:text-white placeholder-[#8c715f]" placeholder="Tell students what this event is about... Detailed schedule, speakers, benefits, etc."></textarea>
+                                <span asp-validation-for="ViewModel.Description" class="text-xs text-red-500"></span>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Media & Publish -->
+                        <div class="flex flex-col gap-6">
+                            <!-- Banner Image Upload -->
+                            <div class="bg-white dark:bg-[#1a120b] p-6 rounded-xl border border-[#e6dfdb] dark:border-[#3e342f] shadow-sm">
+                                <h3 class="text-lg font-bold text-[#181411] dark:text-white mb-4 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">image</span>
+                                    Banner Image
+                                </h3>
+                                <div class="relative group cursor-pointer" onclick="document.getElementById('bannerUpload').click()">
+                                    <div class="aspect-video w-full rounded-lg border-2 border-dashed border-[#e6dfdb] dark:border-[#3e342f] bg-[#f8f7f5] dark:bg-[#2a221b] flex flex-col items-center justify-center p-6 transition-colors hover:border-primary hover:bg-primary/5">
+                                        <div class="size-12 rounded-full bg-white dark:bg-[#3e342f] flex items-center justify-center mb-3 shadow-sm group-hover:scale-110 transition-transform">
+                                            <span class="material-symbols-outlined text-primary">cloud_upload</span>
+                                        </div>
+                                        <p class="text-sm font-semibold text-[#181411] dark:text-white text-center">Click to upload or drag &amp; drop</p>
+                                        <p class="text-xs text-[#8c715f] mt-1 text-center">1920x1080 recommended (Max 5MB)</p>
+                                    </div>
+                                    <input id="bannerUpload" type="file" asp-for="ViewModel.BannerImage" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                                </div>
+                                <span asp-validation-for="ViewModel.BannerImage" class="text-xs text-red-500 mt-2 block"></span>
+                                <div id="previewArea" class="mt-4 hidden flex gap-3 p-3 bg-primary/10 rounded-lg items-center">
+                                    <div id="imagePreview" class="bg-cover bg-center h-10 w-16 rounded border border-primary/20"></div>
+                                    <div class="flex-1 min-w-0">
+                                        <p id="fileName" class="text-sm font-medium text-[#181411] dark:text-white truncate">banner.jpg</p>
+                                        <p id="fileSize" class="text-xs text-[#8c715f]">0 MB • Ready</p>
+                                    </div>
+                                    <button type="button" class="text-[#8c715f] hover:text-red-500" onclick="clearUpload()">
+                                        <span class="material-symbols-outlined text-lg">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Organization Info -->
+                            <div class="bg-white dark:bg-[#1a120b] p-6 rounded-xl border border-[#e6dfdb] dark:border-[#3e342f] shadow-sm">
+                                <h3 class="text-lg font-bold text-[#181411] dark:text-white mb-4">Organizer</h3>
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-center bg-no-repeat bg-cover rounded-full size-12 border border-[#e6dfdb]" style='background-image: url("@(Model.AvatarUrl ?? "https://ui-avatars.com/api/?name=" + Model.FullName)");'></div>
+                                    <div>
+                                        <p class="text-base font-bold text-[#181411] dark:text-white">@Model.FullName</p>
+                                        <p class="text-sm text-[#8c715f]">Verified Organizer</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Panel -->
+                            <div class="bg-white dark:bg-[#1a120b] p-6 rounded-xl border border-[#e6dfdb] dark:border-[#3e342f] shadow-sm sticky top-24">
+                                <h3 class="text-lg font-bold text-[#181411] dark:text-white mb-4">Publish</h3>
+                                <div class="flex flex-col gap-3">
+                                    <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-bold text-white shadow-md hover:bg-[#d85805] hover:shadow-lg transition-all active:scale-[0.98]">
+                                        <span class="material-symbols-outlined">send</span>
+                                        Submit for Approval
+                                    </button>
+                                    <button type="button" class="flex w-full items-center justify-center gap-2 rounded-lg bg-white dark:bg-[#2a221b] border border-[#e6dfdb] dark:border-[#3e342f] px-6 py-3 text-base font-medium text-[#181411] dark:text-white hover:bg-gray-50 dark:hover:bg-[#3e342f] transition-colors">
+                                        <span class="material-symbols-outlined">visibility</span>
+                                        Preview
+                                    </button>
+                                </div>
+                                <p class="mt-4 text-xs text-[#8c715f] text-center">
+                                    By submitting, you agree to the <a class="underline hover:text-primary" href="#">Event Guidelines</a> of FPT University.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Simple preview logic for the banner image
+        const uploadInput = document.getElementById('bannerUpload');
+        const previewArea = document.getElementById('previewArea');
+        const imagePreview = document.getElementById('imagePreview');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+
+        uploadInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    imagePreview.style.backgroundImage = `url('${event.target.result}')`;
+                    fileName.textContent = file.name;
+                    fileSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB • Ready';
+                    previewArea.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function clearUpload() {
+            uploadInput.value = '';
+            previewArea.classList.add('hidden');
+        }
+    </script>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+</body>
+</html>

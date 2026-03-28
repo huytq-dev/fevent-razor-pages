@@ -1,0 +1,185 @@
+@page "{id:guid?}"
+@model UI.Pages.Management.DeleteEventModel
+@{
+    ViewData["Title"] = "Delete Event Confirmation";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>@ViewData["Title"] - FEvents</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Theme Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f96706",
+                        "primary-dark": "#d65500",
+                        "danger": "#DC2626",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#23170f",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+        .bg-danger { background-color: #DC2626; }
+        .text-danger { color: #DC2626; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display text-[#181411] dark:text-white overflow-x-hidden">
+    <!-- Global Header -->
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e6e2df] dark:border-b-[#3e2c22] px-10 py-3 bg-white dark:bg-[#1a110a]">
+        <div class="flex items-center gap-4">
+            <div class="size-8 text-primary">
+                <svg fill="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 16h2v2h-2zm0-6h2v4h-2z"></path>
+                </svg>
+            </div>
+            <h2 class="text-[#181411] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">FEvents</h2>
+        </div>
+        <div class="flex flex-1 justify-end gap-8 items-center">
+            <nav class="hidden md:flex items-center gap-9">
+                <a class="text-[#181411] dark:text-white text-sm font-medium leading-normal hover:text-primary transition-colors" asp-page="/Index">Home</a>
+                <a class="text-[#181411] dark:text-white text-sm font-medium leading-normal hover:text-primary transition-colors" asp-page="/Events/Index">Events</a>
+                <a class="text-[#181411] dark:text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Calendar</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <button class="bg-primary/10 dark:bg-white/10 p-2 rounded-full hover:bg-primary/20 dark:hover:bg-white/20 transition-colors text-primary dark:text-white">
+                    <span class="material-symbols-outlined">notifications</span>
+                </button>
+                <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-white dark:border-[#3e2c22] shadow-sm" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAiM-A3mLsKjd4qb0MlwlAvkmmWHTKLnU3znFwmjWKKkELyOS27Z1SKgAvISnWRXFRrJgALmaXdgU2DQdHHSfm-GvWkbciOBZsKz2TugupdcSrBiDBeGeICv_Z_skQiir5TtTpmZVeaGMrhTuWoufLt9_SEUnhHtEw6ObcL299SiUNyjfaZ4dqpB3ejPL6TkuJYqMw9FAxRneHKDgdBkiay5upFoc_8TRr-0bV2G68Xq5KRs_g56YkAScr9iKGWv5Lto0XyOtCIoAfJ");'></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow flex items-center justify-center p-4 md:p-10 relative">
+        <!-- Background decoration -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
+            <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-primary/5 rounded-full blur-[120px]"></div>
+            <div class="absolute top-[40%] -right-[10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[100px]"></div>
+        </div>
+        
+        <div class="layout-content-container flex flex-col max-w-[600px] w-full z-10">
+            <!-- Confirmation Card -->
+            <form method="post" asp-page-handler="Delete" class="bg-white dark:bg-[#1a110a] rounded-2xl shadow-xl border border-[#e6e2df] dark:border-[#3e2c22] overflow-hidden">
+                <input type="hidden" asp-for="ViewModel.Id" />
+                
+                <!-- Danger Header -->
+                <div class="bg-red-50 dark:bg-red-900/10 border-b border-red-100 dark:border-red-900/20 px-6 py-6 flex flex-col items-center justify-center text-center">
+                    <div class="bg-red-100 dark:bg-red-900/30 text-danger p-4 rounded-full mb-4">
+                        <span class="material-symbols-outlined text-4xl">warning</span>
+                    </div>
+                    <h1 class="text-[#181411] dark:text-white tracking-tight text-2xl md:text-3xl font-bold leading-tight px-4">Delete Event?</h1>
+                    <p class="text-[#635349] dark:text-[#a09085] text-base font-normal leading-normal pt-2">This action is permanent and cannot be undone.</p>
+                </div>
+
+                <div class="p-6 md:p-8 space-y-8">
+                    <!-- Event Summary Card -->
+                    <div class="bg-background-light dark:bg-[#2a1e16] p-4 rounded-xl border border-[#e6e2df] dark:border-[#3e2c22]">
+                        <h3 class="text-xs font-bold text-[#8c715f] dark:text-[#a09085] uppercase tracking-wider mb-3">Deleting Event</h3>
+                        <div class="flex items-start gap-4">
+                            <div class="w-20 h-20 bg-center bg-no-repeat bg-cover rounded-lg shrink-0" 
+                                 style='background-image: url("@(string.IsNullOrEmpty(Model.ViewModel.ThumbnailUrl) ? "https://images.unsplash.com/photo-1540317580384-e5d43616b9aa?q=80&w=200" : Model.ViewModel.ThumbnailUrl)");'>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <p class="text-[#181411] dark:text-white text-lg font-bold leading-tight">@Model.ViewModel.Title</p>
+                                <div class="flex items-center gap-2 text-[#635349] dark:text-[#a09085] text-sm mt-1">
+                                    <span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                                    <span>@Model.ViewModel.StartTime.ToString("MMMM dd, yyyy")</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-[#635349] dark:text-[#a09085] text-sm">
+                                    <span class="material-symbols-outlined text-[18px]">location_on</span>
+                                    <span>@Model.ViewModel.LocationName</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warning List -->
+                    <div class="space-y-3">
+                        <p class="text-[#181411] dark:text-white font-medium">What happens when you delete:</p>
+                        <ul class="space-y-2">
+                            <li class="flex items-start gap-3 text-[#635349] dark:text-[#a09085] text-sm">
+                                <span class="material-symbols-outlined text-danger text-[20px] shrink-0">remove_circle</span>
+                                <span>All participant registration data will be permanently removed.</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-[#635349] dark:text-[#a09085] text-sm">
+                                <span class="material-symbols-outlined text-danger text-[20px] shrink-0">remove_circle</span>
+                                <span>Feedback and history associated with this event will be lost.</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-[#635349] dark:text-[#a09085] text-sm">
+                                <span class="material-symbols-outlined text-danger text-[20px] shrink-0">remove_circle</span>
+                                <span>Waitlisted students will be notified of cancellation.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Safety Check Input -->
+                    <div class="space-y-3 pt-2">
+                        <label class="block text-sm font-medium text-[#181411] dark:text-white" asp-for="ViewModel.DeleteConfirmation">
+                            To confirm, type "<span class="font-bold select-all">DELETE</span>" below:
+                        </label>
+                        <input asp-for="ViewModel.DeleteConfirmation" class="block w-full rounded-lg border-2 border-[#e6e2df] dark:border-[#3e2c22] bg-white dark:bg-[#1a110a] py-3 px-4 text-[#181411] dark:text-white shadow-sm focus:border-danger focus:ring-danger sm:text-sm transition-colors outline-none placeholder:text-[#a09085]/50" placeholder="DELETE" type="text" id="deleteConfirmInput" oninput="toggleDeleteButton()" autocomplete="off" />
+                        <span asp-validation-for="ViewModel.DeleteConfirmation" class="text-xs text-red-500"></span>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-2">
+                        <a class="w-full sm:w-auto px-6 py-3 rounded-full bg-white dark:bg-transparent border border-[#e6e2df] dark:border-[#3e2c22] text-center text-[#181411] dark:text-white font-bold text-sm hover:bg-gray-50 dark:hover:bg-white/5 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+                           asp-page="/Events/Detail" asp-route-id="@Model.ViewModel.Id">
+                            Keep Event
+                        </a>
+                        <button type="submit" id="deleteButton" disabled 
+                            class="w-full sm:w-auto px-6 py-3 rounded-full bg-danger text-white font-bold text-sm hover:bg-red-700 transition-colors shadow-lg shadow-red-500/30 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">delete_forever</span>
+                            Permanently Delete
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <p class="text-center text-[#8c715f] dark:text-[#a09085] text-xs mt-6">
+                Need help? <a class="text-primary hover:underline" href="#">Contact Support</a>
+            </p>
+        </div>
+    </main>
+
+    <script>
+        function toggleDeleteButton() {
+            const input = document.getElementById('deleteConfirmInput');
+            const button = document.getElementById('deleteButton');
+            button.disabled = input.value.trim().toUpperCase() !== 'DELETE';
+        }
+    </script>
+    
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+</body>
+</html>

@@ -1,0 +1,297 @@
+@page "{id:guid?}"
+@model UI.Pages.Management.UpdateEventModel
+@{
+    ViewData["Title"] = "Update Event Details";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>@ViewData["Title"] - FEvents</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;family=Noto+Sans:wght@300..800&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f96706",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#23170f",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#2c241b",
+                        "text-main": "#181411",
+                        "text-secondary": "#8c715f",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e6dfdb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8c715f; }
+        .dark ::-webkit-scrollbar-thumb { background: #4a4a4a; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main dark:text-white font-display min-h-screen flex flex-col overflow-x-hidden transition-colors duration-200">
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#e6dfdb] dark:border-[#3e352f] px-10 py-3 bg-surface-light dark:bg-surface-dark sticky top-0 z-50">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-4 text-text-main dark:text-white">
+                <div class="size-8 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-4xl">event_available</span>
+                </div>
+                <h2 class="text-text-main dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em]">FEvents</h2>
+            </div>
+            <nav class="hidden md:flex items-center gap-9">
+                <a class="text-text-main dark:text-gray-200 text-sm font-medium leading-normal hover:text-primary transition-colors" asp-page="/Events/Index">Events</a>
+                <a class="text-primary text-sm font-bold leading-normal" href="#">Manage</a>
+                <a class="text-text-main dark:text-gray-200 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Reports</a>
+            </nav>
+        </div>
+        <div class="flex flex-1 justify-end gap-8">
+            <div class="hidden md:flex w-full max-w-[320px] items-center gap-2">
+                <div class="flex w-full flex-1 items-stretch rounded-xl h-10 bg-[#f5f2f0] dark:bg-[#3a322a] overflow-hidden focus-within:ring-2 focus-within:ring-primary/50 transition-shadow">
+                    <div class="text-[#8c715f] dark:text-gray-400 flex items-center justify-center pl-4">
+                        <span class="material-symbols-outlined text-[20px]">search</span>
+                    </div>
+                    <input class="flex w-full min-w-0 flex-1 bg-transparent border-none focus:outline-0 focus:ring-0 h-full placeholder:text-[#8c715f] dark:placeholder:text-gray-500 px-4 text-sm font-normal text-text-main dark:text-white" placeholder="Search events..." />
+                </div>
+            </div>
+            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-white dark:ring-[#2c241b]" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDi4fJM95sacu0J_HqXjgl4D78ff_lRH7cqBAGPkGNCsHIV00BRruNLNjqgijcmzTdEC35t7NTuh7CYuNppbxnt_kI94__Zao9vdd-dDpZ6TJ72wnfXU2yoURTZIdLFC0q7gDgEZ7HmHrnCpKGMgfTXUHxdjZfdZ3QmoTlt7BUAawLRm-IW5U9mfRFBpdqkloRsIDD9Pus4YtCCDVQyueF0fyuy6D1DbP1IS4mIr7YyzVrEg2V9V3r8WtIm91wuE864VVGEp3DEQclo");'></div>
+        </div>
+    </header>
+
+    <div class="layout-container flex h-full grow flex-col">
+        <div class="px-4 md:px-10 lg:px-20 xl:px-40 flex flex-1 justify-center py-5">
+            <div class="layout-content-container flex flex-col max-w-[1200px] flex-1">
+                <nav class="flex flex-wrap gap-2 px-4 py-2 items-center">
+                    <a class="text-text-secondary dark:text-gray-400 text-sm font-medium hover:underline" href="#">Dashboard</a>
+                    <span class="material-symbols-outlined text-text-secondary dark:text-gray-400 text-sm">chevron_right</span>
+                    <a class="text-text-secondary dark:text-gray-400 text-sm font-medium hover:underline" href="#">My Events</a>
+                    <span class="material-symbols-outlined text-text-secondary dark:text-gray-400 text-sm">chevron_right</span>
+                    <span class="text-text-main dark:text-white text-sm font-medium">Update Event</span>
+                </nav>
+
+                <form method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="ViewModel.Id" />
+                    <input type="hidden" asp-for="ViewModel.ThumbnailUrl" id="currentThumbnail" />
+
+                    <div class="flex flex-wrap justify-between gap-3 px-4 py-6">
+                        <div class="flex min-w-72 flex-col gap-2">
+                            <h1 class="text-text-main dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Update Event Details</h1>
+                            <p class="text-text-secondary dark:text-gray-400 text-base font-normal">Modify the details for <span class="font-semibold text-primary">@Model.ViewModel.Title</span></p>
+                        </div>
+                        <div class="flex gap-3 items-center">
+                            <button type="button" class="hidden sm:flex items-center justify-center h-10 px-6 rounded-full border border-[#e6dfdb] dark:border-[#5a4d44] text-text-main dark:text-white text-sm font-bold bg-surface-light dark:bg-surface-dark hover:bg-gray-50 dark:hover:bg-[#3a322a] transition-colors">Preview</button>
+                        </div>
+                    </div>
+
+                    <div asp-validation-summary="All" class="text-red-500 px-4 mb-4"></div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4">
+                        <div class="lg:col-span-2 flex flex-col gap-6">
+                            <!-- Image Uploader Card -->
+                            <div class="bg-surface-light dark:bg-surface-dark p-2 rounded-[2rem] shadow-sm border border-[#e6dfdb] dark:border-[#3e352f]">
+                                <div id="coverPreview" class="bg-cover bg-center flex flex-col items-stretch justify-end rounded-[1.5rem] h-[240px] md:h-[320px] relative group overflow-hidden" 
+                                     style='background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%), url("@(string.IsNullOrEmpty(Model.ViewModel.ThumbnailUrl) ? "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=1200" : Model.ViewModel.ThumbnailUrl)");'>
+                                    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors"></div>
+                                    <div class="relative z-10 flex flex-col md:flex-row w-full items-start md:items-end justify-between gap-4 p-6 md:p-8">
+                                        <div class="flex flex-col gap-1 text-white">
+                                            <p class="tracking-light text-xl md:text-2xl font-bold leading-tight">Cover Image</p>
+                                            <p class="text-gray-200 text-sm md:text-base font-medium">Recommended size: 1200x600px</p>
+                                        </div>
+                                        <label class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-6 bg-primary hover:bg-orange-600 text-white text-sm font-bold transition-all shadow-lg transform active:scale-95">
+                                            <span class="material-symbols-outlined text-[18px] mr-2">cloud_upload</span>
+                                            <span>Change Cover</span>
+                                            <input type="file" asp-for="ViewModel.CoverImage" class="hidden" id="coverInput" accept="image/*" />
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Basic Information -->
+                            <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-[2rem] shadow-sm border border-[#e6dfdb] dark:border-[#3e352f] flex flex-col gap-6">
+                                <h3 class="text-lg font-bold text-text-main dark:text-white border-b border-[#f5f2f0] dark:border-[#3e352f] pb-4">Basic Information</h3>
+                                <div class="flex flex-col gap-4">
+                                    <label class="flex flex-col flex-1">
+                                        <p class="text-text-main dark:text-gray-200 text-sm font-medium pb-2">Event Name <span class="text-red-500">*</span></p>
+                                        <input asp-for="ViewModel.Title" class="flex w-full rounded-xl text-text-main dark:text-white border border-[#e6dfdb] dark:border-[#5a4d44] bg-[#f8f7f5] dark:bg-[#23170f] h-12 px-4 focus:ring-2 focus:ring-primary outline-none transition-all" />
+                                        <span asp-validation-for="ViewModel.Title" class="text-xs text-red-500 mt-1"></span>
+                                    </label>
+                                    <div class="flex flex-col md:flex-row gap-4">
+                                        <label class="flex flex-col flex-1">
+                                            <p class="text-text-main dark:text-gray-200 text-sm font-medium pb-2">Category</p>
+                                            <div class="relative">
+                                                <select asp-for="ViewModel.CategoryId" asp-items="Model.Categories" class="appearance-none flex w-full rounded-xl text-text-main dark:text-white border border-[#e6dfdb] dark:border-[#5a4d44] bg-[#f8f7f5] dark:bg-[#23170f] h-12 px-4 pr-10 focus:ring-2 focus:ring-primary outline-none transition-all">
+                                                    <option value="">Select Category</option>
+                                                </select>
+                                                <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary">
+                                                    <span class="material-symbols-outlined">expand_more</span>
+                                                </div>
+                                            </div>
+                                            <span asp-validation-for="ViewModel.CategoryId" class="text-xs text-red-500 mt-1"></span>
+                                        </label>
+                                        <label class="flex flex-col flex-1">
+                                            <p class="text-text-main dark:text-gray-200 text-sm font-medium pb-2">Location</p>
+                                            <div class="relative">
+                                                <select asp-for="ViewModel.LocationId" asp-items="Model.Locations" class="appearance-none flex w-full rounded-xl text-text-main dark:text-white border border-[#e6dfdb] dark:border-[#5a4d44] bg-[#f8f7f5] dark:bg-[#23170f] h-12 pl-10 px-4 focus:ring-2 focus:ring-primary outline-none transition-all">
+                                                    <option value="">Select Location</option>
+                                                </select>
+                                                <div class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary">
+                                                    <span class="material-symbols-outlined text-[20px]">location_on</span>
+                                                </div>
+                                            </div>
+                                            <span asp-validation-for="ViewModel.LocationId" class="text-xs text-red-500 mt-1"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-[2rem] shadow-sm border border-[#e6dfdb] dark:border-[#3e352f] flex flex-col gap-4">
+                                <h3 class="text-lg font-bold text-text-main dark:text-white">Description</h3>
+                                <div class="flex flex-col rounded-xl border border-[#e6dfdb] dark:border-[#5a4d44] overflow-hidden bg-[#f8f7f5] dark:bg-[#23170f]">
+                                    <div class="flex items-center gap-1 p-2 border-b border-[#e6dfdb] dark:border-[#5a4d44] bg-surface-light dark:bg-[#2c241b]">
+                                        <button type="button" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-white/10 text-text-secondary"><span class="material-symbols-outlined text-[20px]">format_bold</span></button>
+                                        <button type="button" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-white/10 text-text-secondary"><span class="material-symbols-outlined text-[20px]">format_italic</span></button>
+                                        <button type="button" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-white/10 text-text-secondary"><span class="material-symbols-outlined text-[20px]">format_underlined</span></button>
+                                        <div class="w-px h-5 bg-[#e6dfdb] dark:bg-[#5a4d44] mx-1"></div>
+                                        <button type="button" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-white/10 text-text-secondary"><span class="material-symbols-outlined text-[20px]">format_list_bulleted</span></button>
+                                        <button type="button" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-white/10 text-text-secondary"><span class="material-symbols-outlined text-[20px]">format_list_numbered</span></button>
+                                        <div class="w-px h-5 bg-[#e6dfdb] dark:bg-[#5a4d44] mx-1"></div>
+                                        <button type="button" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-white/10 text-text-secondary"><span class="material-symbols-outlined text-[20px]">link</span></button>
+                                        <button type="button" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-white/10 text-text-secondary"><span class="material-symbols-outlined text-[20px]">image</span></button>
+                                    </div>
+                                    <textarea asp-for="ViewModel.Description" class="w-full h-48 p-4 bg-transparent border-none resize-y focus:ring-0 text-text-main dark:text-white leading-relaxed text-sm" placeholder="Describe your event..."></textarea>
+                                </div>
+                                <span asp-validation-for="ViewModel.Description" class="text-xs text-red-500 mt-1"></span>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Settings -->
+                        <div class="lg:col-span-1 flex flex-col gap-6">
+                            <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-[2rem] shadow-sm border border-[#e6dfdb] dark:border-[#3e352f] flex flex-col gap-6">
+                                <h3 class="text-lg font-bold text-text-main dark:text-white">Publishing</h3>
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-[#f8f7f5] dark:bg-[#23170f]">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-primary">visibility</span>
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-bold text-text-main dark:text-white">Status</span>
+                                            <span class="text-xs text-text-secondary" id="statusLabel">@(Model.ViewModel.IsPublished ? "Published" : "Draft")</span>
+                                        </div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" asp-for="ViewModel.IsPublished" class="sr-only peer" id="publishToggle" />
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 dark:peer-focus:ring-primary/20 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                                    </label>
+                                </div>
+                                <div class="flex flex-col gap-3 mt-2">
+                                    <button type="submit" class="w-full h-12 rounded-full bg-primary hover:bg-orange-600 text-white font-bold text-base transition-colors shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2">
+                                        <span class="material-symbols-outlined text-[20px]">save</span>
+                                        Update Event
+                                    </button>
+                                    <button type="button" class="w-full h-12 rounded-full border border-transparent hover:border-[#e6dfdb] text-text-secondary font-medium text-base transition-colors hover:bg-gray-50 dark:hover:bg-white/5" onclick="window.history.back()">Cancel</button>
+                                </div>
+                            </div>
+
+                            <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-[2rem] shadow-sm border border-[#e6dfdb] dark:border-[#3e352f] flex flex-col gap-5">
+                                <h3 class="text-lg font-bold text-text-main dark:text-white">Date &amp; Time</h3>
+                                <label class="flex flex-col gap-2">
+                                    <span class="text-sm font-medium text-text-main dark:text-gray-200">Start Date</span>
+                                    <input asp-for="ViewModel.StartDate" class="w-full rounded-xl border border-[#e6dfdb] dark:border-[#5a4d44] bg-[#f8f7f5] dark:bg-[#23170f] h-12 px-4 text-text-main dark:text-white focus:ring-2 focus:ring-primary outline-none" type="date" />
+                                    <span asp-validation-for="ViewModel.StartDate" class="text-xs text-red-500 mt-1"></span>
+                                </label>
+                                <div class="flex gap-4">
+                                    <label class="flex flex-col gap-2 flex-1">
+                                        <span class="text-sm font-medium text-text-main dark:text-gray-200">Start Time</span>
+                                        <input asp-for="ViewModel.StartTime" class="w-full rounded-xl border border-[#e6dfdb] dark:border-[#5a4d44] bg-[#f8f7f5] dark:bg-[#23170f] h-12 px-4 text-text-main dark:text-white focus:ring-2 focus:ring-primary outline-none" type="time" />
+                                        <span asp-validation-for="ViewModel.StartTime" class="text-xs text-red-500 mt-1"></span>
+                                    </label>
+                                    <label class="flex flex-col gap-2 flex-1">
+                                        <span class="text-sm font-medium text-text-main dark:text-gray-200">End Time</span>
+                                        <input asp-for="ViewModel.EndTime" class="w-full rounded-xl border border-[#e6dfdb] dark:border-[#5a4d44] bg-[#f8f7f5] dark:bg-[#23170f] h-12 px-4 text-text-main dark:text-white focus:ring-2 focus:ring-primary outline-none" type="time" />
+                                        <span asp-validation-for="ViewModel.EndTime" class="text-xs text-red-500 mt-1"></span>
+                                    </label>
+                                </div>
+                                <div class="h-px w-full bg-[#f5f2f0] dark:bg-[#3e352f]"></div>
+                                <label class="flex flex-col gap-2">
+                                    <span class="text-sm font-medium text-text-main dark:text-gray-200">Registration Deadline</span>
+                                    <input asp-for="ViewModel.RegistrationDeadline" class="w-full rounded-xl border border-[#e6dfdb] dark:border-[#5a4d44] bg-[#f8f7f5] dark:bg-[#23170f] h-12 px-4 text-text-main dark:text-white focus:ring-2 focus:ring-primary outline-none" type="date" />
+                                    <span asp-validation-for="ViewModel.RegistrationDeadline" class="text-xs text-red-500 mt-1"></span>
+                                </label>
+                            </div>
+
+                            <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-[2rem] shadow-sm border border-[#e6dfdb] dark:border-[#3e352f] flex flex-col gap-5">
+                                <h3 class="text-lg font-bold text-text-main dark:text-white">Capacity</h3>
+                                <label class="flex flex-col gap-2">
+                                    <span class="text-sm font-medium text-text-main dark:text-gray-200">Max Attendees</span>
+                                    <div class="relative">
+                                        <input asp-for="ViewModel.MaxParticipants" class="w-full rounded-xl border border-[#e6dfdb] dark:border-[#5a4d44] bg-[#f8f7f5] dark:bg-[#23170f] h-12 pl-10 px-4 text-text-main dark:text-white focus:ring-2 focus:ring-primary outline-none" type="number" />
+                                        <div class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary">
+                                            <span class="material-symbols-outlined text-[20px]">groups</span>
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="ViewModel.MaxParticipants" class="text-xs text-red-500 mt-1"></span>
+                                </label>
+                                <div class="p-4 bg-orange-50 dark:bg-orange-900/10 rounded-xl border border-orange-100 dark:border-orange-900/20">
+                                    <div class="flex items-start gap-3">
+                                        <span class="material-symbols-outlined text-primary mt-0.5">info</span>
+                                        <p class="text-xs text-text-main dark:text-orange-100/80 leading-relaxed">
+                                            Increasing capacity will allow more students to register immediately. Decreasing below current registrations is not allowed.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="h-20 w-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Image preview logic
+        const coverInput = document.getElementById('coverInput');
+        const coverPreview = document.getElementById('coverPreview');
+        const publishToggle = document.getElementById('publishToggle');
+        const statusLabel = document.getElementById('statusLabel');
+
+        coverInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    coverPreview.style.backgroundImage = `linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%), url('${event.target.result}')`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        publishToggle.addEventListener('change', function() {
+            statusLabel.textContent = this.checked ? "Published" : "Draft";
+        });
+    </script>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+</body>
+</html>
