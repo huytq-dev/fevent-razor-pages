@@ -36,7 +36,7 @@ public class AppConfiguration(IConfiguration configuration) : IAppConfiguration
 
     public string GetBaseUrl()
     {
-        return configuration.GetValue<string>("BaseUrl") ?? "https://localhost:7137";
+        return configuration.GetValue<string>("BaseUrl") ?? "https://fevent.tryasp.net";
     }
 
     //public string? GetSqlServerConnectionString()
