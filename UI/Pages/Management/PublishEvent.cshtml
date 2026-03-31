@@ -1,0 +1,224 @@
+@page "{id:guid?}"
+@model UI.Pages.Management.PublishEventModel
+@{
+    ViewData["Title"] = "Publish Event Confirmation";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>@ViewData["Title"] - FEvents</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;family=Noto+Sans:wght@300..900&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Theme Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f96706",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#23170f",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#181411] font-display antialiased">
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        <!-- TopNavBar -->
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#e6dfdb] bg-white px-10 py-3 sticky top-0 z-50">
+            <div class="flex items-center gap-8">
+                <div class="flex items-center gap-4 text-[#181411]">
+                    <div class="size-8 text-primary">
+                        <svg class="w-full h-full" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <path clip-rule="evenodd" d="M24 18.4228L42 11.475V34.3663C42 34.7796 41.7457 35.1504 41.3601 35.2992L24 42V18.4228Z" fill="currentColor" fill-rule="evenodd"></path>
+                            <path clip-rule="evenodd" d="M24 8.18819L33.4123 11.574L24 15.2071L14.5877 11.574L24 8.18819ZM9 15.8487L21 20.4805V37.6263L9 32.9945V15.8487ZM27 37.6263V20.4805L39 15.8487V32.9945L27 37.6263ZM25.354 2.29885C24.4788 1.98402 23.5212 1.98402 22.646 2.29885L4.98454 8.65208C3.7939 9.08038 3 10.2097 3 11.475V34.3663C3 36.0196 4.01719 37.5026 5.55962 38.098L22.9197 44.7987C23.6149 45.0671 24.3851 45.0671 25.0803 44.7987L42.4404 38.098C43.9828 37.5026 45 36.0196 45 34.3663V11.475C45 10.2097 44.2061 9.08038 43.0155 8.65208L25.354 2.29885Z" fill="currentColor" fill-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-[#181411] text-xl font-bold leading-tight tracking-[-0.015em]">FEvents</h2>
+                </div>
+                <label class="hidden md:flex flex-col min-w-40 !h-10 max-w-64">
+                    <div class="flex w-full flex-1 items-stretch rounded-xl h-full bg-[#f5f2f0]">
+                        <div class="text-[#8c715f] flex border-none items-center justify-center pl-4 pr-2">
+                            <span class="material-symbols-outlined text-[20px]">search</span>
+                        </div>
+                        <input class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#181411] focus:outline-0 focus:ring-0 border-none bg-transparent focus:border-none h-full placeholder:text-[#8c715f] px-2 text-sm font-normal leading-normal" placeholder="Search events..." />
+                    </div>
+                </label>
+            </div>
+            <div class="flex flex-1 justify-end gap-8">
+                <div class="hidden md:flex items-center gap-9">
+                    <a class="text-[#181411] text-sm font-medium leading-normal hover:text-primary transition-colors" asp-page="/Index">Dashboard</a>
+                    <a class="text-[#181411] text-sm font-medium leading-normal hover:text-primary transition-colors" asp-page="/Events/Index">Events</a>
+                    <a class="text-[#181411] text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Reports</a>
+                </div>
+                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-white cursor-pointer" data-alt="User profile" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCCguEBc1Y6z3v4FaoZ0v0nCWrSetQ2Tbma1t_Bzqz4qN2tZW4ef1SxyAxRVYIK-xivOl24hlnbjhQ79XypGUVzj-29vP76UJmInXa5in0vEssUtHfwFWZyw5YiPdMJxjVLxQR3seTa_e-WGd9TogIpHhLsgJbZS7UilB41wUSs8cAZKrCqDRaKe39zY7LV8sUQ_i_xwHTJ67dslfEYuAzHE_dVXARXYnG6KKTEP5Rb8aMIFXTKlI9xeCHvxnptM5MlaPBdUJZQrGaa");'>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 flex justify-center py-8 px-4 sm:px-6 lg:px-8">
+            <div class="w-full max-w-[1200px] flex flex-col gap-6">
+                <!-- Breadcrumbs -->
+                <nav aria-label="Breadcrumb" class="flex px-4">
+                    <ol class="flex items-center gap-2">
+                        <li><a class="text-[#8c715f] text-sm font-medium hover:text-primary transition-colors" href="#">Draft</a></li>
+                        <li class="text-[#8c715f] text-sm font-medium">/</li>
+                        <li><a class="text-[#8c715f] text-sm font-medium hover:text-primary transition-colors" href="#">Review</a></li>
+                        <li class="text-[#8c715f] text-sm font-medium">/</li>
+                        <li aria-current="page" class="text-primary text-sm font-bold">Publish</li>
+                    </ol>
+                </nav>
+
+                <!-- Page Heading -->
+                <div class="flex flex-wrap justify-between items-end gap-4 px-4">
+                    <div class="flex max-w-2xl flex-col gap-2">
+                        <h1 class="text-[#181411] text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Ready to go live?</h1>
+                        <p class="text-[#8c715f] text-base font-normal leading-normal">Please review the details below. This event will be visible to all FPT students immediately upon publishing.</p>
+                    </div>
+                </div>
+
+                <!-- Main Grid Layout -->
+                <form method="post" asp-page-handler="Publish" class="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4">
+                    <input type="hidden" asp-for="ViewModel.Id" />
+                    
+                    <!-- Left Column: Actions & Validation -->
+                    <div class="lg:col-span-7 flex flex-col gap-6">
+                        <!-- Validation Checklist Section -->
+                        <div class="bg-white rounded border border-[#e6dfdb] overflow-hidden">
+                            <div class="px-6 py-4 border-b border-[#e6dfdb]">
+                                <h3 class="text-[#181411] text-lg font-bold leading-tight">Validation Checklist</h3>
+                            </div>
+                            <div class="p-6 flex flex-col gap-4">
+                                @if (Model.ViewModel.Checks != null && Model.ViewModel.Checks.Any())
+                                {
+                                    @foreach (var check in Model.ViewModel.Checks)
+                                    {
+                                        <div class="flex items-center gap-3">
+                                            <div class="flex items-center justify-center size-6 rounded-full bg-green-100 text-green-600">
+                                                <span class="material-symbols-outlined text-[16px] font-bold">check</span>
+                                            </div>
+                                            <span class="text-[#181411] text-base font-medium">@check</span>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <p class="text-sm text-gray-500 italic">No automated checks available.</p>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Action Panel (Warning) -->
+                        <div class="flex flex-col gap-4 rounded border border-orange-100 bg-orange-50/50 p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="text-primary mt-1">
+                                    <span class="material-symbols-outlined">warning</span>
+                                </div>
+                                <div class="flex flex-col gap-1 flex-1">
+                                    <p class="text-[#181411] text-base font-bold leading-tight">Publication Warning</p>
+                                    <p class="text-[#8c715f] text-sm font-normal leading-relaxed">
+                                        Once published, all students will receive a push notification. This action cannot be undone without admin approval.
+                                    </p>
+                                </div>
+                                <label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-[#e6dfdb] p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary transition-colors duration-200">
+                                    <input class="peer invisible absolute" type="checkbox" asp-for="ViewModel.AcknowledgeWarning" id="warningToggle" />
+                                    <div class="h-full w-[27px] rounded-full bg-white shadow-sm"></div>
+                                </label>
+                            </div>
+                            <span asp-validation-for="ViewModel.AcknowledgeWarning" class="text-xs text-red-500"></span>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="flex flex-col-reverse sm:flex-row gap-4 pt-4">
+                            <a class="flex-1 px-8 py-3.5 rounded-full border border-[#e6dfdb] bg-white text-center text-[#181411] font-bold text-base hover:bg-gray-50 transition-colors"
+                               asp-page="./UpdateEvent" asp-route-id="@Model.ViewModel.Id">
+                                Edit Details
+                            </a>
+                            <button type="submit" id="publishBtn"
+                                class="flex-[2] px-8 py-3.5 rounded-full bg-primary text-white font-bold text-base shadow-lg shadow-orange-200 hover:bg-orange-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <span class="material-symbols-outlined">publish</span>
+                                Confirm &amp; Publish
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Live Preview -->
+                    <div class="lg:col-span-5 flex flex-col gap-4">
+                        <div class="flex items-center justify-between px-1">
+                            <span class="text-xs font-bold uppercase tracking-wider text-[#8c715f]">Live Preview</span>
+                            <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full">Student View</span>
+                        </div>
+                        <!-- Preview Card -->
+                        <div class="group relative flex flex-col overflow-hidden rounded border border-[#e6dfdb] bg-white shadow-sm hover:shadow-md transition-shadow">
+                            <!-- Image -->
+                            <div class="relative h-56 w-full overflow-hidden bg-gray-100">
+                                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" 
+                                     style='background-image: url("@(string.IsNullOrEmpty(Model.ViewModel.ThumbnailUrl) ? "https://images.unsplash.com/photo-1540317580384-e5d43616b9aa?q=80&w=1200" : Model.ViewModel.ThumbnailUrl)");'>
+                                </div>
+                                <div class="absolute top-4 left-4">
+                                    <span class="inline-flex items-center rounded-full bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold text-primary shadow-sm">
+                                        @Model.ViewModel.CategoryName
+                                    </span>
+                                </div>
+                            </div>
+                            <!-- Content -->
+                            <div class="flex flex-col p-5 gap-3">
+                                <div class="flex justify-between items-start gap-4">
+                                    <h3 class="font-display text-xl font-bold text-[#181411] leading-tight">@Model.ViewModel.Title</h3>
+                                </div>
+                                <div class="flex flex-col gap-2.5 mt-1">
+                                    <div class="flex items-center gap-2 text-[#8c715f]">
+                                        <span class="material-symbols-outlined text-[18px]">calendar_month</span>
+                                        <span class="text-sm font-medium">@Model.ViewModel.StartTime.ToString("MMM dd, yyyy • hh:mm tt")</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-[#8c715f]">
+                                        <span class="material-symbols-outlined text-[18px]">location_on</span>
+                                        <span class="text-sm font-medium">@Model.ViewModel.LocationName</span>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-4 border-t border-[#f5f2f0] flex items-center justify-between">
+                                    <div class="flex -space-x-2 overflow-hidden">
+                                        <img alt="Speaker" class="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100" />
+                                        <img alt="Speaker" class="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100" />
+                                        <div class="flex h-8 w-8 items-center justify-center rounded-full ring-2 ring-white bg-gray-100 text-xs font-medium text-gray-500">+12</div>
+                                    </div>
+                                    <span class="text-primary text-sm font-bold">Free Entry</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center p-4">
+                            <p class="text-xs text-[#8c715f]">This is how the card will appear on the student feed.</p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+</body>
+</html>
