@@ -48,6 +48,21 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
             query = query.Where(e => e.StartTime.Date <= to);
         }
 
+        if (queryInfo.OrganizerId.HasValue)
+        {
+            query = query.Where(e => e.OrganizerId == queryInfo.OrganizerId.Value);
+        }
+
+        if (queryInfo.MajorId.HasValue)
+        {
+            query = query.Where(e => e.MajorId == queryInfo.MajorId.Value);
+        }
+
+        if (queryInfo.Status.HasValue)
+        {
+            query = query.Where(e => (int)e.Status == queryInfo.Status.Value);
+        }
+
         query = ApplyOrderBy(query, queryInfo.OrderBy);
 
         var totalCount = queryInfo.NeedTotalCount

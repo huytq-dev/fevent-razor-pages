@@ -75,6 +75,6 @@ public class PublishEventModel : PageModel
         }
 
         TempData["SuccessMessage"] = "Event published successfully! Push notifications have been sent to students.";
-        return RedirectToPage("/Events/Index");
+        return RedirectToPage("./CreateEvent", new { tab = "create" });
     }
 }

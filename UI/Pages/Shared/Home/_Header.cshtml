@@ -25,15 +25,15 @@
             </div>
 
             <nav class="hidden md:flex space-x-8">
-                <a href="/" class="text-foreground hover:text-primary font-medium transition-colors">Trang Chủ</a>
-                <a asp-page="/Home/FindEvent" class="text-foreground hover:text-primary font-medium transition-colors">Tìm sự kiện</a>
-                <a asp-page="/Events/EventHistory" class="text-foreground hover:text-primary font-medium transition-colors">Lịch của tôi</a>
+                <a href="/" class="text-foreground hover:text-primary font-medium transition-colors">Home</a>
+                <a asp-page="/Home/FindEvent" class="text-foreground hover:text-primary font-medium transition-colors">Find Events</a>
+                <a asp-page="/Events/EventHistory" class="text-foreground hover:text-primary font-medium transition-colors">My Schedule</a>
                 @{
                     var roleName = Context.Session.GetString("RoleName");
                     if (!string.IsNullOrEmpty(roleName) && roleName == "Organizer")
                     {
                         var isScanPage = ViewContext.RouteData.Values["page"]?.ToString()?.Contains("ScanQR") == true;
-                        <a asp-page="/Events/ScanQR" class="@(isScanPage ? "text-primary font-bold" : "text-foreground hover:text-primary font-medium") transition-colors">Quét mã Check-in</a>
+                        <a asp-page="/Events/ScanQR" class="@(isScanPage ? "text-primary font-bold" : "text-foreground hover:text-primary font-medium") transition-colors">Scan Check-in QR</a>
                     }
                 }
             </nav>

@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-
-namespace Infrastructure;
+﻿namespace Infrastructure;
 
 public partial class ApplicationDbContext : DbContext
 {

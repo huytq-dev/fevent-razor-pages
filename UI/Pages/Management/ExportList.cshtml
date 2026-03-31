@@ -69,9 +69,9 @@
             </div>
             <div class="flex flex-1 justify-end gap-8">
                 <div class="hidden md:flex items-center gap-9">
-                    <a class="text-sm font-medium leading-normal hover:text-primary transition-colors dark:text-gray-300" asp-page="/Events/Index">Events</a>
-                    <a class="text-sm font-medium leading-normal text-primary" href="#">Participants</a>
-                    <a class="text-sm font-medium leading-normal hover:text-primary transition-colors dark:text-gray-300" href="#">Reports</a>
+                    <a class="text-sm font-medium leading-normal hover:text-primary transition-colors dark:text-gray-300" asp-page="/Management/CreateEvent" asp-route-tab="events">My Events</a>
+                    <a class="text-sm font-medium leading-normal text-primary" asp-page="/Management/ViewParticipantList" asp-route-eventId="@Model.ViewModel.EventId">Participants</a>
+                    <a class="text-sm font-medium leading-normal hover:text-primary transition-colors dark:text-gray-300" asp-page="/Management/CreateEvent" asp-route-tab="events">My Events</a>
                 </div>
                 <div class="flex items-center gap-4">
                     <a class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-6 bg-primary hover:bg-orange-600 transition-colors text-white text-sm font-bold leading-normal tracking-[0.015em]" 
@@ -90,9 +90,9 @@
                 <div class="layout-content-container flex flex-col max-w-[960px] flex-1 gap-6">
                     <!-- Breadcrumbs -->
                     <div class="flex flex-wrap gap-2 px-4">
-                        <a class="text-[#8c715f] dark:text-gray-400 text-base font-medium leading-normal hover:underline" asp-page="/Index">Home</a>
+                        <a class="text-[#8c715f] dark:text-gray-400 text-base font-medium leading-normal hover:underline" asp-page="/Management/CreateEvent" asp-route-tab="events">Home</a>
                         <span class="text-[#8c715f] dark:text-gray-400 text-base font-medium leading-normal">/</span>
-                        <a class="text-[#8c715f] dark:text-gray-400 text-base font-medium leading-normal hover:underline" asp-page="/Events/Detail" asp-route-id="@Model.ViewModel.EventId">@Model.ViewModel.EventTitle</a>
+                        <a class="text-[#8c715f] dark:text-gray-400 text-base font-medium leading-normal hover:underline" asp-page="/Management/EventDetail" asp-route-id="@Model.ViewModel.EventId">@Model.ViewModel.EventTitle</a>
                         <span class="text-[#8c715f] dark:text-gray-400 text-base font-medium leading-normal">/</span>
                         <span class="text-[#181411] dark:text-white text-base font-medium leading-normal">Export</span>
                     </div>

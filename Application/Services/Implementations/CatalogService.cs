@@ -20,4 +20,13 @@ public class CatalogService(IUnitOfWork unitOfWork) : ICatalogService
             .Select(l => new LocationFilterItem(l.Id, l.Name))
             .ToList();
     }
+
+    public async Task<IReadOnlyList<MajorFilterItem>> GetMajorsAsync(CancellationToken ct = default)
+    {
+        var items = await unitOfWork.Majors.GetAllAsync();
+        return items
+            .OrderBy(m => m.Name)
+            .Select(m => new MajorFilterItem(m.Id, m.Name, m.Code))
+            .ToList();
+    }
 }

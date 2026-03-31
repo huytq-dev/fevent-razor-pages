@@ -22,6 +22,7 @@ public partial class ApplicationDbContext
     // Reference entities
     public DbSet<Category> Categories { get; set; } = null!;
     public DbSet<Location> Locations { get; set; } = null!;
+    public DbSet<Major> Majors { get; set; } = null!;
     public DbSet<Club> Clubs {  get; set; } = null!;
     public DbSet<ClubMember> ClubMembers { get; set; } = null!;
 }

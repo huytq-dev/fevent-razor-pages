@@ -20,4 +20,6 @@ public interface IEventRegistrationsRepository : IGenericRepository<EventRegistr
     Task<bool> HasCheckedInAsync(Guid eventId, Guid userId, CancellationToken ct = default);
 
     Task<bool> CancelAsync(Guid eventId, Guid userId, string? reason = null, CancellationToken ct = default);
+
+    Task<List<ParticipantSummaryResponse>> GetByEventAsync(Guid eventId, CancellationToken ct = default);
 }

@@ -18,6 +18,8 @@ public class UpdateEventViewModel
     [Required(ErrorMessage = "Location is required")]
     public Guid LocationId { get; set; }
 
+    public Guid? MajorId { get; set; }
+
     [Required(ErrorMessage = "Description is required")]
     public string Description { get; set; } = string.Empty;
 

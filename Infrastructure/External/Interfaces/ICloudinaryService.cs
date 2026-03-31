@@ -4,6 +4,6 @@ namespace Infrastructure;
 
 public interface ICloudinaryService
 {
-    Task<string> UploadPhotoAsync(IFormFile file);
+    Task<string> UploadImageAsync(IFormFile file, string folder = "fevent-images");
     Task DeletePhotoAsync(string publicId);
 }

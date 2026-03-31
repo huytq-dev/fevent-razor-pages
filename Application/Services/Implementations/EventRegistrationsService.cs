@@ -62,6 +62,9 @@ public class EventRegistrationsService(IUnitOfWork unitOfWork) : IEventRegistrat
     public async Task<IReadOnlyList<EventRegistrationSummaryResponse>> GetByUserAsync(Guid userId, CancellationToken ct = default)
         => await unitOfWork.EventRegistrations.GetByUserAsync(userId, ct);
 
+    public async Task<IReadOnlyList<ParticipantSummaryResponse>> GetByEventAsync(Guid eventId, CancellationToken ct = default)
+        => await unitOfWork.EventRegistrations.GetByEventAsync(eventId, ct);
+
     public async Task<PageResponse> CancelAsync(Guid eventId, Guid userId, string? reason = null, CancellationToken ct = default)
     {
         var cancelled = await unitOfWork.EventRegistrations.CancelAsync(eventId, userId, reason, ct);

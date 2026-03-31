@@ -1,0 +1,274 @@
+@page "/Admin/EventApproval"
+@model UI.Pages.Admin.EventApprovalModel
+@using Domain
+@using System.Globalization
+@{
+    Layout = "~/Pages/Shared/Admin/_AdminLayout.cshtml";
+    ViewData["Title"] = "Event Approval";
+
+    string TabUrl(string? status) {
+        var qs = status != null ? $"?StatusFilter={status}" : "?";
+        if (!string.IsNullOrWhiteSpace(Model.Search))
+            qs += $"&Search={Uri.EscapeDataString(Model.Search)}";
+        return Request.Path + qs;
+    }
+
+    string PageUrl(int p) {
+        var qs = $"?PageNumber={p}";
+        if (!string.IsNullOrEmpty(Model.StatusFilter)) qs += $"&StatusFilter={Model.StatusFilter}";
+        if (!string.IsNullOrWhiteSpace(Model.Search))  qs += $"&Search={Uri.EscapeDataString(Model.Search)}";
+        return Request.Path + qs;
+    }
+
+    var tabs = new[] {
+        (Label: "All",       Value: (string?)null,       Count: (int?)null),
+        (Label: "Pending",   Value: "Pending",   Count: (int?)null),
+        (Label: "Approved",  Value: "Approved",  Count: (int?)null),
+        (Label: "Rejected",  Value: "Rejected",  Count: (int?)null),
+        (Label: "Cancelled", Value: "Cancelled", Count: (int?)null),
+    };
+}
+
+<div class="w-full max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 py-8">
+
+    @* Page Header *@
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black tracking-tight text-foreground">Event Approval</h1>
+            <p class="text-muted-foreground mt-1">Review and manage event submissions from organizers.</p>
+        </div>
+        <div class="text-sm text-muted-foreground bg-card border border-border px-4 py-2 rounded-xl">
+            Total: <span class="font-bold text-foreground">@Model.TotalCount</span> events
+        </div>
+    </div>
+
+    @* Alerts *@
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="mb-6 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-green-700 text-sm animate-fade-in">
+            <span class="material-symbols-outlined text-[20px]">check_circle</span>
+            @Model.SuccessMessage
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="mb-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700 text-sm animate-fade-in">
+            <span class="material-symbols-outlined text-[20px]">error</span>
+            @Model.ErrorMessage
+        </div>
+    }
+
+    @* Search + Tabs *@
+    <div class="bg-card border border-border rounded-2xl p-4 mb-6 flex flex-col md:flex-row items-center gap-4">
+        <form method="get" class="relative w-full md:w-80 flex-shrink-0">
+            @if (!string.IsNullOrEmpty(Model.StatusFilter))
+            {
+                <input type="hidden" name="StatusFilter" value="@Model.StatusFilter" />
+            }
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-[20px]">search</span>
+            <input type="text" name="Search" value="@Model.Search" placeholder="Search events or organizers..."
+                   class="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:border-primary" />
+        </form>
+        <div class="flex flex-wrap gap-2 w-full">
+            @foreach (var tab in tabs)
+            {
+                var isActive = (tab.Value == null && string.IsNullOrEmpty(Model.StatusFilter))
+                            || tab.Value == Model.StatusFilter;
+                <a href="@TabUrl(tab.Value)"
+                   class="px-4 py-1.5 rounded-full text-sm font-semibold transition-colors @(isActive ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:bg-border hover:text-foreground")">
+                    @tab.Label
+                </a>
+            }
+        </div>
+    </div>
+
+    @* Events Table *@
+    @if (Model.Events.Count == 0)
+    {
+        <div class="bg-card border border-border rounded-2xl px-8 py-16 text-center">
+            <span class="material-symbols-outlined text-5xl text-border mb-4 block">event_busy</span>
+            <p class="text-muted-foreground font-medium">No events found.</p>
+        </div>
+    }
+    else
+    {
+        <div class="bg-card border border-border rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-border bg-muted/50">
+                            <th class="text-left px-5 py-3.5 font-bold text-muted-foreground uppercase tracking-wider text-xs">Event</th>
+                            <th class="text-left px-4 py-3.5 font-bold text-muted-foreground uppercase tracking-wider text-xs hidden md:table-cell">Category</th>
+                            <th class="text-left px-4 py-3.5 font-bold text-muted-foreground uppercase tracking-wider text-xs hidden lg:table-cell">Date</th>
+                            <th class="text-left px-4 py-3.5 font-bold text-muted-foreground uppercase tracking-wider text-xs hidden lg:table-cell">Location</th>
+                            <th class="text-center px-4 py-3.5 font-bold text-muted-foreground uppercase tracking-wider text-xs">Status</th>
+                            <th class="text-right px-5 py-3.5 font-bold text-muted-foreground uppercase tracking-wider text-xs">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border">
+                        @foreach (var ev in Model.Events)
+                        {
+                            var status     = (EventStatus)ev.Status;
+                            var month      = ev.StartTime.ToString("MMM", CultureInfo.InvariantCulture).ToUpperInvariant();
+                            var day        = ev.StartTime.ToString("dd",  CultureInfo.InvariantCulture);
+                            var dateStr    = ev.StartTime.ToString("MMM dd, yyyy", CultureInfo.InvariantCulture);
+                            var canApprove = status == EventStatus.Pending || status == EventStatus.Rejected;
+                            var canReject  = status == EventStatus.Pending;
+                            var canCancel  = status == EventStatus.Approved;
+
+                            var (statusLabel, statusBg, statusText) = status switch {
+                                EventStatus.Pending   => ("Pending",   "bg-amber-50",  "text-amber-600"),
+                                EventStatus.Approved  => ("Approved",  "bg-green-50",  "text-success"),
+                                EventStatus.Rejected  => ("Rejected",  "bg-red-50",    "text-destructive"),
+                                EventStatus.Cancelled => ("Cancelled", "bg-gray-100",  "text-muted-foreground"),
+                                EventStatus.Completed => ("Completed", "bg-blue-50",   "text-blue-600"),
+                                EventStatus.Draft     => ("Draft",     "bg-gray-100",  "text-muted-foreground"),
+                                _                     => ("Unknown",   "bg-gray-100",  "text-muted-foreground"),
+                            };
+
+                            <tr class="hover:bg-muted/30 transition-colors group">
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center gap-3">
+                                        @if (!string.IsNullOrEmpty(ev.ThumbnailUrl))
+                                        {
+                                            <img src="@ev.ThumbnailUrl" alt="" class="w-12 h-12 rounded-lg object-cover flex-shrink-0 border border-border">
+                                        }
+                                        else
+                                        {
+                                            <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                                <span class="material-symbols-outlined text-primary text-[20px]">event</span>
+                                            </div>
+                                        }
+                                        <div class="min-w-0">
+                                            <a href="/Events/@ev.Id" target="_blank"
+                                               class="font-semibold text-foreground hover:text-primary transition-colors line-clamp-1 block">
+                                                @ev.Title
+                                            </a>
+                                            <p class="text-xs text-muted-foreground mt-0.5">
+                                                @ev.RegisteredCount / @ev.MaxParticipants registered
+                                            </p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 hidden md:table-cell">
+                                    <span class="bg-blue-50 text-blue-600 text-xs font-semibold px-2.5 py-1 rounded-md">
+                                        @(ev.CategoryName ?? "—")
+                                    </span>
+                                </td>
+                                <td class="px-4 py-4 hidden lg:table-cell">
+                                    <p class="font-medium text-foreground">@dateStr</p>
+                                    <p class="text-xs text-muted-foreground">@($"{ev.StartTime:HH:mm} – {ev.EndTime:HH:mm}")</p>
+                                </td>
+                                <td class="px-4 py-4 hidden lg:table-cell">
+                                    <p class="text-foreground line-clamp-1">@(ev.LocationName ?? "—")</p>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    <span class="@statusBg @statusText text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md">
+                                        @statusLabel
+                                    </span>
+                                </td>
+                                <td class="px-5 py-4 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        @if (canApprove)
+                                        {
+                                            <form method="post" asp-page-handler="Approve" asp-route-eventId="@ev.Id"
+                                                  asp-route-StatusFilter="@Model.StatusFilter" asp-route-Search="@Model.Search" asp-route-PageNumber="@Model.CurrentPage">
+                                                <button type="submit"
+                                                        class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 text-success text-xs font-bold rounded-lg transition-colors">
+                                                    <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                                                    Approve
+                                                </button>
+                                            </form>
+                                        }
+                                        @if (canReject)
+                                        {
+                                            <form method="post" asp-page-handler="Reject" asp-route-eventId="@ev.Id"
+                                                  asp-route-StatusFilter="@Model.StatusFilter" asp-route-Search="@Model.Search" asp-route-PageNumber="@Model.CurrentPage"
+                                                  onsubmit="return confirm('Reject this event?')">
+                                                <button type="submit"
+                                                        class="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-destructive text-xs font-bold rounded-lg transition-colors">
+                                                    <span class="material-symbols-outlined text-[16px]">cancel</span>
+                                                    Reject
+                                                </button>
+                                            </form>
+                                        }
+                                        @if (canCancel)
+                                        {
+                                            <form method="post" asp-page-handler="Cancel" asp-route-eventId="@ev.Id"
+                                                  asp-route-StatusFilter="@Model.StatusFilter" asp-route-Search="@Model.Search" asp-route-PageNumber="@Model.CurrentPage"
+                                                  onsubmit="return confirm('Cancel this approved event?')">
+                                                <button type="submit"
+                                                        class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-muted-foreground text-xs font-bold rounded-lg transition-colors">
+                                                    <span class="material-symbols-outlined text-[16px]">block</span>
+                                                    Cancel
+                                                </button>
+                                            </form>
+                                        }
+                                        @if (!canApprove && !canReject && !canCancel)
+                                        {
+                                            <span class="text-xs text-muted-foreground italic">No actions</span>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @* Pagination *@
+        @if (Model.TotalPages > 1)
+        {
+            var winStart = Math.Max(1, Model.CurrentPage - 2);
+            var winEnd   = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+
+            <nav class="mt-6 flex justify-center items-center gap-2 flex-wrap">
+                @if (Model.CurrentPage > 1)
+                {
+                    <a href="@PageUrl(Model.CurrentPage - 1)" class="w-9 h-9 rounded-lg border border-border bg-card flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                    </a>
+                }
+                else
+                {
+                    <span class="w-9 h-9 rounded-lg border border-border bg-card flex items-center justify-center opacity-30 cursor-not-allowed">
+                        <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                    </span>
+                }
+
+                @if (winStart > 1) { <a href="@PageUrl(1)" class="w-9 h-9 rounded-lg border border-border bg-card font-medium text-foreground hover:bg-muted flex items-center justify-center text-sm">1</a> }
+                @if (winStart > 2) { <span class="text-muted-foreground px-1 text-sm">…</span> }
+
+                @for (var p = winStart; p <= winEnd; p++)
+                {
+                    if (p == Model.CurrentPage)
+                    {
+                        <span class="w-9 h-9 rounded-lg bg-primary text-white font-bold flex items-center justify-center text-sm">@p</span>
+                    }
+                    else
+                    {
+                        <a href="@PageUrl(p)" class="w-9 h-9 rounded-lg border border-border bg-card font-medium text-foreground hover:bg-muted flex items-center justify-center text-sm">@p</a>
+                    }
+                }
+
+                @if (winEnd < Model.TotalPages - 1) { <span class="text-muted-foreground px-1 text-sm">…</span> }
+                @if (winEnd < Model.TotalPages) { <a href="@PageUrl(Model.TotalPages)" class="w-9 h-9 rounded-lg border border-border bg-card font-medium text-foreground hover:bg-muted flex items-center justify-center text-sm">@Model.TotalPages</a> }
+
+                @if (Model.CurrentPage < Model.TotalPages)
+                {
+                    <a href="@PageUrl(Model.CurrentPage + 1)" class="w-9 h-9 rounded-lg border border-border bg-card flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                    </a>
+                }
+                else
+                {
+                    <span class="w-9 h-9 rounded-lg border border-border bg-card flex items-center justify-center opacity-30 cursor-not-allowed">
+                        <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                    </span>
+                }
+            </nav>
+        }
+    }
+
+</div>

@@ -44,6 +44,11 @@ public class EventConfiguration : BaseEntityConfiguration<Event, Guid>
             .HasForeignKey(e => e.OrganizerId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(e => e.Major)
+            .WithMany(m => m.Events)
+            .HasForeignKey(e => e.MajorId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         // --- Indexes ---
         builder.HasIndex(e => e.CategoryId);
         builder.HasIndex(e => e.LocationId);
@@ -52,5 +57,6 @@ public class EventConfiguration : BaseEntityConfiguration<Event, Guid>
         builder.HasIndex(e => e.Status);
         builder.HasIndex(e => e.IsDeleted);
         builder.HasIndex(e => e.ClubId);
+        builder.HasIndex(e => e.MajorId);
     }
 }

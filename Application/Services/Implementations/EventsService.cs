@@ -36,6 +36,7 @@ public class EventsService(IUnitOfWork _unitOfWork) : IEventsService
             LocationId = request.LocationId,
             OrganizerId = request.OrganizerId,
             ClubId = request.ClubId,
+            MajorId = request.MajorId,
             Status = EventStatus.Pending, // Mặc định là Pending chờ duyệt
             CreatedAt = DateTimeOffset.Now
         };
@@ -49,5 +50,29 @@ public class EventsService(IUnitOfWork _unitOfWork) : IEventsService
         }
 
         return PageResponse<Guid>.Fail("Lỗi khi tạo sự kiện");
+    }
+
+    public async Task<PageResponse<bool>> UpdateStatusAsync(Guid id, EventStatus newStatus, CancellationToken ct = default)
+    {
+        var @event = await _unitOfWork.Events.GetByIdAsync(id);
+        if (@event is null)
+            return PageResponse<bool>.Fail("Event not found.");
+
+        var allowed = (@event.Status, newStatus) switch
+        {
+            (EventStatus.Pending,  EventStatus.Approved)  => true,
+            (EventStatus.Pending,  EventStatus.Rejected)  => true,
+            (EventStatus.Rejected, EventStatus.Approved)  => true,
+            (EventStatus.Approved, EventStatus.Cancelled) => true,
+            _ => false
+        };
+
+        if (!allowed)
+            return PageResponse<bool>.Fail($"Cannot transition from {@event.Status} to {newStatus}.");
+
+        @event.Status = newStatus;
+        _unitOfWork.Events.Update(@event);
+        await _unitOfWork.SaveChangesAsync(ct);
+        return PageResponse<bool>.Ok(true);
     }
 }
