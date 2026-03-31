@@ -86,6 +86,6 @@ public class DeleteEventModel : PageModel
         }
 
         TempData["SuccessMessage"] = "Event deleted successfully.";
-        return RedirectToPage("/Events/Index");
+        return RedirectToPage("./CreateEvent", new { tab = "create" });
     }
 }

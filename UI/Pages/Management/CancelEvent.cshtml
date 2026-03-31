@@ -60,9 +60,9 @@
             </div>
             <div class="hidden md:flex flex-1 justify-end gap-8 items-center">
                 <nav class="flex items-center gap-6">
-                    <a class="text-[#181411] dark:text-[#e0dcd9] text-sm font-medium hover:text-primary transition-colors" asp-page="/Index">Dashboard</a>
-                    <a class="text-primary text-sm font-bold leading-normal" href="#">My Events</a>
-                    <a class="text-[#181411] dark:text-[#e0dcd9] text-sm font-medium hover:text-primary transition-colors" href="#">Profile</a>
+                    <a class="text-[#181411] dark:text-[#e0dcd9] text-sm font-medium hover:text-primary transition-colors" asp-page="/Management/CreateEvent" asp-route-tab="events">Dashboard</a>
+                    <a class="text-primary text-sm font-bold leading-normal" asp-page="/Management/CreateEvent" asp-route-tab="events">My Events</a>
+                    <a class="text-[#181411] dark:text-[#e0dcd9] text-sm font-medium hover:text-primary transition-colors" asp-page="/Profile/ViewProfile">Profile</a>
                 </nav>
                 <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuANzXjGCFnO8ufuz7tjVSRgd3rudUoU_L5uIapHCJ0QLaaZu9Grxs3HKV5ylyzcZBaW_pPh5Ut-dJkJc-Nz49XyuQFc5sePi8PEwXfePTPNBja1AXr4MHHBIyOje_F4PmtQ2-fDdjURCafK6zIJz1wUhVf936DSKdc15EUmvZhA4d35LN8HeUyCDS9ngfyuIUu6D133yxNxlVm3YrZhI7XX6p_PRpZe2r0FjRjnanfH8e6ROq9EVUpu0eKn8BjeQ-rC0l4Aa_rAvFb9");'>
                 </div>
@@ -78,9 +78,9 @@
                 <!-- Page Heading -->
                 <div class="flex flex-col gap-2">
                     <div class="flex items-center gap-2 text-sm text-[#8c715f] dark:text-[#b09e90]">
-                        <a class="hover:underline" href="#">My Events</a>
+                        <a class="hover:underline" asp-page="/Management/CreateEvent" asp-route-tab="events">My Events</a>
                         <span class="material-symbols-outlined text-xs">chevron_right</span>
-                        <a class="hover:underline" href="#">@Model.ViewModel.Title</a>
+                        <a class="hover:underline" asp-page="/Management/EventDetail" asp-route-id="@Model.ViewModel.Id">@Model.ViewModel.Title</a>
                         <span class="material-symbols-outlined text-xs">chevron_right</span>
                         <span>Cancel</span>
                     </div>
@@ -167,7 +167,7 @@
                     <!-- Action Buttons -->
                     <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-4 mt-6 pt-6 border-t border-[#f5f2f0] dark:border-[#2a1e16]">
                         <a class="w-full sm:w-auto px-8 py-3 rounded-full text-center text-sm font-bold text-[#5c4a3f] dark:text-[#a08e80] bg-transparent hover:bg-[#f5f2f0] dark:hover:bg-[#23170f] transition-colors"
-                           asp-page="/Events/Detail" asp-route-id="@Model.ViewModel.Id">
+                           asp-page="/Management/EventDetail" asp-route-id="@Model.ViewModel.Id">
                             Keep Event
                         </a>
                         <button type="submit" 

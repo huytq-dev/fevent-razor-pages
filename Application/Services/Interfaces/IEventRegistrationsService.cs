@@ -7,4 +7,6 @@ public interface IEventRegistrationsService
     Task<IReadOnlyList<EventRegistrationSummaryResponse>> GetByUserAsync(Guid userId, CancellationToken ct = default);
 
     Task<PageResponse> CancelAsync(Guid eventId, Guid userId, string? reason = null, CancellationToken ct = default);
+
+    Task<IReadOnlyList<ParticipantSummaryResponse>> GetByEventAsync(Guid eventId, CancellationToken ct = default);
 }

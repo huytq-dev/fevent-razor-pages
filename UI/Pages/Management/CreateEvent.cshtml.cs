@@ -1,4 +1,5 @@
 using Application;
+using Contract;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -10,13 +11,13 @@ public class CreateEventModel : PageModel
 {
     private readonly ICatalogService _catalogService;
     private readonly IEventsService _eventsService;
-    private readonly IWebHostEnvironment _environment;
+    private readonly ICloudinaryService _cloudinaryService;
 
-    public CreateEventModel(ICatalogService catalogService, IEventsService eventsService, IWebHostEnvironment environment)
+    public CreateEventModel(ICatalogService catalogService, IEventsService eventsService, ICloudinaryService cloudinaryService)
     {
         _catalogService = catalogService;
         _eventsService = eventsService;
-        _environment = environment;
+        _cloudinaryService = cloudinaryService;
     }
 
     [BindProperty]
@@ -24,15 +25,18 @@ public class CreateEventModel : PageModel
 
     public List<SelectListItem> Categories { get; set; } = new();
     public List<SelectListItem> Locations { get; set; } = new();
-    
+    public List<SelectListItem> Majors { get; set; } = new();
+
     public string? FullName { get; set; }
     public string? AvatarUrl { get; set; }
+    public List<EventSummaryResponse> MyEvents { get; set; } = new();
 
     public async Task<IActionResult> OnGetAsync()
     {
         FullName = HttpContext.Session.GetString("FullName") ?? "Anonymous Organizer";
         AvatarUrl = HttpContext.Session.GetString("AvatarUrl");
         await LoadCatalogsAsync();
+        await LoadMyEventsAsync();
         return Page();
     }
 
@@ -44,6 +48,7 @@ public class CreateEventModel : PageModel
         if (!ModelState.IsValid)
         {
             await LoadCatalogsAsync();
+            await LoadMyEventsAsync();
             return Page();
         }
 
@@ -56,18 +61,7 @@ public class CreateEventModel : PageModel
         string? thumbnailUrl = null;
         if (ViewModel.BannerImage != null)
         {
-            var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
-            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ViewModel.BannerImage.FileName);
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await ViewModel.BannerImage.CopyToAsync(fileStream);
-            }
-
-            thumbnailUrl = "/uploads/" + fileName;
+            thumbnailUrl = await _cloudinaryService.UploadImageAsync(ViewModel.BannerImage, "fevent-thumbnails");
         }
 
         var request = new CreateEventRequest
@@ -81,7 +75,7 @@ public class CreateEventModel : PageModel
             CategoryId = ViewModel.CategoryId!.Value,
             LocationId = ViewModel.LocationId!.Value,
             OrganizerId = userId,
-            // ClubId would be set if the user belongs to a club
+            MajorId = ViewModel.MajorId,
         };
 
         var result = await _eventsService.CreateAsync(request);
@@ -89,12 +83,31 @@ public class CreateEventModel : PageModel
         if (result.IsSuccess)
         {
             TempData["SuccessMessage"] = "Event created successfully and is pending approval.";
-            return RedirectToPage("./CreateEvent"); // Or redirect to event list
+            return RedirectToPage("./CreateEvent");
         }
 
         ModelState.AddModelError(string.Empty, result.Message);
         await LoadCatalogsAsync();
+        await LoadMyEventsAsync();
         return Page();
+    }
+
+    private async Task LoadMyEventsAsync()
+    {
+        var userIdStr = HttpContext.Session.GetString("UserId");
+        if (!Guid.TryParse(userIdStr, out var userId)) return;
+
+        var result = await _eventsService.GetAllAsync(new QueryInfo
+        {
+            OrganizerId = userId,
+            Top = 50,
+            Skip = 0,
+            IsActive = true,
+            NeedTotalCount = false,
+            OrderBy = "createdAt desc"
+        });
+
+        MyEvents = result.Data?.Items.ToList() ?? new();
     }
 
     private async Task LoadCatalogsAsync()
@@ -111,6 +124,13 @@ public class CreateEventModel : PageModel
         {
             Value = l.Id.ToString(),
             Text = l.Name
+        }).ToList();
+
+        var majors = await _catalogService.GetMajorsAsync();
+        Majors = majors.Select(m => new SelectListItem
+        {
+            Value = m.Id.ToString(),
+            Text = string.IsNullOrEmpty(m.Code) ? m.Name : $"[{m.Code}] {m.Name}"
         }).ToList();
     }
 }

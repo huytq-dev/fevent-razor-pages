@@ -4,7 +4,9 @@
 @{
     ViewData["Title"] = "Xem Profile Sinh Viên";
     var roleName = HttpContext.Session.GetString("RoleName");
-    Layout = roleName == "Admin" ? "~/Pages/Shared/Admin/_AdminLayout.cshtml" : "~/Pages/Shared/Home/_HomeLayout.cshtml";
+    Layout = roleName == "Admin"     ? "~/Pages/Shared/Admin/_AdminLayout.cshtml"
+           : roleName == "Organizer" ? "~/Pages/Shared/Management/_ManagementLayout.cshtml"
+           : "~/Pages/Shared/Home/_HomeLayout.cshtml";
     var student = Model.Student;
     var avatarUrl = string.IsNullOrEmpty(student?.AvatarUrl)
         ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(student?.FullName ?? "Student")}&background=f96706&color=fff"
@@ -37,10 +39,10 @@
                             <span class="material-symbols-outlined text-[18px]">edit</span>
                             <span>Edit Profile</span>
                         </a>
-                        <button class="flex-1 flex items-center justify-center gap-2 h-10 px-6 rounded-full bg-white border border-[#e6dfdb] text-[#181411] hover:bg-gray-50 font-medium transition-all text-sm">
+                        <a asp-page="/Authentications/ChangePassword" class="flex-1 flex items-center justify-center gap-2 h-10 px-6 rounded-full bg-white border border-[#e6dfdb] text-[#181411] hover:bg-gray-50 font-medium transition-all text-sm">
                             <span class="material-symbols-outlined text-[18px]">lock_reset</span>
                             <span>Change Password</span>
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>

@@ -1,11 +1,16 @@
 namespace UI;
 
-public class SignUpModel(IAuthServices authServices) : PageModel
+public class SignUpModel(IAuthServices authServices, ICatalogService catalogService) : PageModel
 {
     [BindProperty]
     public SignUpRequest Input { get; set; }
 
-    public void OnGet() { }
+    public IReadOnlyList<MajorFilterItem> Majors { get; private set; } = [];
+
+    public async Task OnGetAsync()
+    {
+        Majors = await catalogService.GetMajorsAsync();
+    }
 
     public async Task<IActionResult> OnPostAsync(CancellationToken ct = default)
     {
@@ -16,6 +21,7 @@ public class SignUpModel(IAuthServices authServices) : PageModel
 
         if (!result.IsSuccess)
         {
+            Majors = await catalogService.GetMajorsAsync();
             ModelState.AddModelError(string.Empty, result.Message);
             return Page();
         }

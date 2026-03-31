@@ -65,11 +65,16 @@
             <nav class="hidden md:flex space-x-8">
                 @{
                     var roleName = Context.Session.GetString("RoleName");
-                    var isUserManagerPage = ViewContext.RouteData.Values["page"]?.ToString()?.Contains("UserManager") == true;
-                    var isScanPage = ViewContext.RouteData.Values["page"]?.ToString()?.Contains("ScanQR") == true;
+                    var currentAdminPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+                    var isUserManagerPage = currentAdminPage.Contains("UserManager");
+                    var isEventApprovalPage = currentAdminPage.Contains("EventApproval");
+                    var isScanPage = currentAdminPage.Contains("ScanQR");
                 }
                 <a asp-page="/Admin/UserManager" class="@(isUserManagerPage ? "text-primary font-bold" : "text-foreground hover:text-primary font-medium") transition-colors flex items-center gap-2">
                     <span class="material-symbols-outlined text-[20px]">manage_accounts</span> Quản lý người dùng
+                </a>
+                <a asp-page="/Admin/EventApproval" class="@(isEventApprovalPage ? "text-primary font-bold" : "text-foreground hover:text-primary font-medium") transition-colors flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">approval</span> Event Approval
                 </a>
                 <a asp-page="/Events/ScanQR" class="@(isScanPage ? "text-primary font-bold" : "text-foreground hover:text-primary font-medium") transition-colors flex items-center gap-2">
                     <span class="material-symbols-outlined text-[20px]">qr_code_scanner</span> Quét mã Check-in

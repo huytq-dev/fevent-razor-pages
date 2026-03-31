@@ -12,6 +12,7 @@ public interface IUnitOfWork : IDisposable
     IEventReviewsRepository EventReviews { get; }
     ICategoriesRepository Categories { get; }
     ILocationsRepository Locations { get; }
+    IMajorsRepository Majors { get; }
 
     #endregion
 

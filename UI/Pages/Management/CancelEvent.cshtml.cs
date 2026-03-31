@@ -78,6 +78,6 @@ public class CancelEventModel : PageModel
         }
 
         TempData["SuccessMessage"] = "Event has been cancelled successfully and attendees have been notified.";
-        return RedirectToPage("./MyEvents"); // Assuming there's a MyEvents page to go back to
+        return RedirectToPage("./CreateEvent", new { tab = "create" });
     }
 }

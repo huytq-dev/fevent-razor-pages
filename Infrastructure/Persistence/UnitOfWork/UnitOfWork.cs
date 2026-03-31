@@ -20,6 +20,7 @@ public class UnitOfWork : IUnitOfWork
     public IEventReviewsRepository EventReviews => (IEventReviewsRepository)Repository<EventReview>();
     public ICategoriesRepository Categories => (ICategoriesRepository)Repository<Category>();
     public ILocationsRepository Locations => (ILocationsRepository)Repository<Location>();
+    public IMajorsRepository Majors => (IMajorsRepository)Repository<Major>();
 
     public UnitOfWork(ApplicationDbContext context)
     {
@@ -34,6 +35,7 @@ public class UnitOfWork : IUnitOfWork
             { typeof(EventReview), ctx => new EventReviewsRepository(ctx) },
             { typeof(Category), ctx => new CategoriesRepository(ctx) },
             { typeof(Location), ctx => new LocationsRepository(ctx) },
+            { typeof(Major), ctx => new MajorsRepository(ctx) },
         };
     }
 

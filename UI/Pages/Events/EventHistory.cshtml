@@ -4,7 +4,7 @@
 @using System.Globalization
 @model UI.EventHistoryModel
 @{
-    ViewData["Title"] = "Lịch sử đăng ký";
+    ViewData["Title"] = "Registration History";
     var registrations = Model.Registrations ?? Array.Empty<EventRegistrationSummaryResponse>();
     var now = DateTimeOffset.UtcNow;
 }
@@ -14,31 +14,31 @@
 
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
-                <h1 class="text-3xl md:text-4xl font-display font-extrabold text-foreground mb-2">Lịch sử đăng ký</h1>
-                <p class="text-muted-foreground">Theo dõi hồ sơ đăng ký và lịch sử tham gia sự kiện của bạn.</p>
+                <h1 class="text-3xl md:text-4xl font-display font-extrabold text-foreground mb-2">Registration History</h1>
+                <p class="text-muted-foreground">Track your event registrations and attendance history.</p>
             </div>
             <div class="flex items-center gap-3">
                 <button class="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium text-foreground hover:border-primary transition-colors shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    Chế độ lịch
+                    Calendar View
                 </button>
                 <button class="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium text-foreground hover:border-primary transition-colors shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    Xuất dữ liệu
+                    Export Data
                 </button>
             </div>
         </div>
 
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <div class="flex flex-wrap items-center gap-2">
-                <button class="px-5 py-2 bg-foreground text-background rounded-full text-sm font-bold shadow-sm">Tất cả</button>
-                <button class="px-5 py-2 bg-transparent text-muted-foreground hover:bg-secondary hover:text-foreground rounded-full text-sm font-medium transition-colors">Sắp tới</button>
-                <button class="px-5 py-2 bg-transparent text-muted-foreground hover:bg-secondary hover:text-foreground rounded-full text-sm font-medium transition-colors">Đã tham gia</button>
-                <button class="px-5 py-2 bg-transparent text-muted-foreground hover:bg-secondary hover:text-foreground rounded-full text-sm font-medium transition-colors">Vắng mặt</button>
+                <button class="px-5 py-2 bg-foreground text-background rounded-full text-sm font-bold shadow-sm">All</button>
+                <button class="px-5 py-2 bg-transparent text-muted-foreground hover:bg-secondary hover:text-foreground rounded-full text-sm font-medium transition-colors">Upcoming</button>
+                <button class="px-5 py-2 bg-transparent text-muted-foreground hover:bg-secondary hover:text-foreground rounded-full text-sm font-medium transition-colors">Attended</button>
+                <button class="px-5 py-2 bg-transparent text-muted-foreground hover:bg-secondary hover:text-foreground rounded-full text-sm font-medium transition-colors">Absent</button>
             </div>
             <div class="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors font-medium">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg>
-                Sắp xếp: Mới nhất
+                Sort: Latest
             </div>
         </div>
 
@@ -54,9 +54,9 @@
         @if (registrations.Count == 0)
         {
             <div class="rounded-2xl border border-border bg-card px-8 py-16 text-center">
-                <p class="text-muted-foreground mb-4">Bạn chưa đăng ký sự kiện nào.</p>
+                <p class="text-muted-foreground mb-4">You haven't registered for any events yet.</p>
                 <a href="/Home/find-events" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white font-bold rounded-lg transition-colors">
-                    Tìm sự kiện <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    Find Events <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </a>
             </div>
         }
@@ -68,15 +68,16 @@
                 var status = (RegistrationStatus)r.Status;
                 var (statusLabel, statusClass, isPast, isCancelled) = status switch
                 {
-                    RegistrationStatus.Cancelled => ("Đã hủy", "bg-red-50 text-destructive", true, true),
-                    RegistrationStatus.CheckedIn => ("Đã tham gia", "bg-green-50 text-success", true, false),
-                    RegistrationStatus.PendingPayment => ("Chờ thanh toán", "bg-amber-50 text-amber-600", r.EndTime < now, false),
-                    RegistrationStatus.Paid or RegistrationStatus.Confirmed => (r.EndTime < now ? "Đã kết thúc" : "Sắp tới", "bg-orange-50 text-primary", r.EndTime < now, false),
-                    _ => ("Không xác định", "bg-gray-50 text-gray-600", r.EndTime < now, false)
+                    RegistrationStatus.Cancelled       => ("Cancelled",       "bg-red-50 text-destructive",  true,            true),
+                    RegistrationStatus.CheckedIn       => ("Attended",        "bg-green-50 text-success",    true,            false),
+                    RegistrationStatus.PendingPayment  => ("Pending Payment", "bg-amber-50 text-amber-600",  r.EndTime < now, false),
+                    RegistrationStatus.Paid
+                    or RegistrationStatus.Confirmed    => (r.EndTime < now ? "Ended" : "Upcoming", "bg-orange-50 text-primary", r.EndTime < now, false),
+                    _                                  => ("Unknown",         "bg-gray-50 text-gray-600",    r.EndTime < now, false)
                 };
                 var thumb = r.EventThumbnailUrl ?? "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80";
-                var monthDay = r.StartTime.ToString("dd 'Thg' MM", new CultureInfo("vi-VN"));
-                var registeredAt = r.RegisteredAt.ToString("dd 'Thg' MM", new CultureInfo("vi-VN"));
+                var monthDay    = r.StartTime.ToString("MMM dd", CultureInfo.InvariantCulture);
+                var registeredAt = r.RegisteredAt.ToString("MMM dd", CultureInfo.InvariantCulture);
                 var timeRange = $"{r.StartTime:HH:mm} - {r.EndTime:HH:mm}";
 
                 <div class="bg-card border border-border rounded-2xl p-4 flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow relative group @(isCancelled ? "opacity-75" : "")">
@@ -88,7 +89,7 @@
                         <div>
                             <div class="flex items-center gap-3 mb-2">
                                 <span class="@statusClass text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md">@statusLabel</span>
-                                <span class="text-xs text-muted-foreground font-medium">Đăng ký ngày @registeredAt</span>
+                                <span class="text-xs text-muted-foreground font-medium">Registered on @registeredAt</span>
                             </div>
                             <h3 class="font-display font-bold text-xl text-foreground mb-3 @(isCancelled ? "text-gray-500" : "")">@r.EventTitle</h3>
                             <div class="space-y-1.5 mb-4">
@@ -98,21 +99,21 @@
                                 </p>
                                 <p class="text-sm text-muted-foreground flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    @(status == RegistrationStatus.CheckedIn ? $"Hoàn thành vào {r.EndTime:dd 'Thg' MM, yyyy}" : timeRange)
+                                    @(status == RegistrationStatus.CheckedIn ? $"Completed on {r.EndTime.ToString("MMM dd, yyyy", CultureInfo.InvariantCulture)}" : timeRange)
                                 </p>
                             </div>
                         </div>
                         <div class="flex flex-wrap items-center gap-3">
-                            <a href="/events/@r.EventId" class="px-5 py-2 bg-primary hover:bg-primary-hover text-white text-sm font-bold rounded-lg transition-colors shadow-sm">Xem chi tiết</a>
+                            <a href="/events/@r.EventId" class="px-5 py-2 bg-primary hover:bg-primary-hover text-white text-sm font-bold rounded-lg transition-colors shadow-sm">View Details</a>
                             @if (!isCancelled && !isPast)
                             {
                                 <button type="button" onclick="showQrModal('@r.TicketCode', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(r.EventTitle))')" class="flex items-center gap-2 px-5 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold rounded-lg transition-colors shadow-sm text-sm">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                                     View QR
                                 </button>
-                                <span class="px-4 py-2 text-xs font-medium text-muted-foreground bg-secondary/50 rounded-lg hidden sm:inline-block">Mã: @r.TicketCode</span>
-                                <form method="post" asp-page-handler="Cancel" asp-route-eventId="@r.EventId" class="inline" onsubmit="return confirm('Bạn có chắc muốn hủy đăng ký sự kiện này?');">
-                                    <button type="submit" class="px-5 py-2 border border-destructive text-destructive hover:bg-destructive/10 text-sm font-medium rounded-lg transition-colors">Hủy đăng ký</button>
+                                <span class="px-4 py-2 text-xs font-medium text-muted-foreground bg-secondary/50 rounded-lg hidden sm:inline-block">Code: @r.TicketCode</span>
+                                <form method="post" asp-page-handler="Cancel" asp-route-eventId="@r.EventId" class="inline" onsubmit="return confirm('Are you sure you want to cancel your registration?');">
+                                    <button type="submit" class="px-5 py-2 border border-destructive text-destructive hover:bg-destructive/10 text-sm font-medium rounded-lg transition-colors">Cancel Registration</button>
                                 </form>
                             }
                         </div>
@@ -140,7 +141,7 @@
             <p id="qrEventTitle" class="text-center text-sm font-medium text-primary mb-6 break-words w-full px-4"></p>
             <div id="qrcode" class="p-4 bg-white border-2 border-[#e6dfdb] rounded-2xl shadow-sm mb-6 flex items-center justify-center min-h-[220px] min-w-[220px]"></div>
             <div class="bg-gray-50 border border-[#e6dfdb] rounded-xl px-6 py-3 text-center w-full">
-                <p class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">Mã vé của bạn</p>
+                <p class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">Your Ticket Code</p>
                 <p id="qrTicketCodeStr" class="font-mono text-lg font-bold text-[#181411] tracking-widest"></p>
             </div>
         </div>

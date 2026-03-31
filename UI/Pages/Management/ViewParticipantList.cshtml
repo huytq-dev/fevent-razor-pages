@@ -65,8 +65,8 @@
             </div>
             <div class="hidden md:flex flex-1 justify-center gap-8 px-8">
                 <nav class="flex items-center gap-9">
-                    <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" asp-page="/Index">Dashboard</a>
-                    <a class="text-primary text-sm font-bold border-b-2 border-primary pb-0.5" asp-page="/Events/Index">Events</a>
+                    <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" asp-page="/Management/CreateEvent" asp-route-tab="events">Dashboard</a>
+                    <a class="text-primary text-sm font-bold border-b-2 border-primary pb-0.5" asp-page="/Management/CreateEvent" asp-route-tab="events">My Events</a>
                     <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Students</a>
                     <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Settings</a>
                 </nav>
@@ -83,11 +83,11 @@
         <main class="flex-1 px-4 sm:px-6 lg:px-20 xl:px-40 py-8 w-full max-w-[1440px] mx-auto">
             <!-- Breadcrumbs -->
             <div class="flex flex-wrap items-center gap-2 mb-6">
-                <a class="text-text-secondary dark:text-gray-400 text-sm font-medium hover:text-primary transition-colors" asp-page="/Index">Home</a>
+                <a class="text-text-secondary dark:text-gray-400 text-sm font-medium hover:text-primary transition-colors" asp-page="/Management/CreateEvent" asp-route-tab="events">Home</a>
                 <span class="material-symbols-outlined text-text-secondary dark:text-gray-400 text-sm">chevron_right</span>
-                <a class="text-text-secondary dark:text-gray-400 text-sm font-medium hover:text-primary transition-colors" asp-page="/Events/Index">Events</a>
+                <a class="text-text-secondary dark:text-gray-400 text-sm font-medium hover:text-primary transition-colors" asp-page="/Management/CreateEvent" asp-route-tab="events">My Events</a>
                 <span class="material-symbols-outlined text-text-secondary dark:text-gray-400 text-sm">chevron_right</span>
-                <a class="text-text-secondary dark:text-gray-400 text-sm font-medium hover:text-primary transition-colors" href="#">@Model.ViewModel.EventTitle</a>
+                <a class="text-text-secondary dark:text-gray-400 text-sm font-medium hover:text-primary transition-colors" asp-page="/Management/EventDetail" asp-route-id="@Model.ViewModel.EventId">@Model.ViewModel.EventTitle</a>
                 <span class="material-symbols-outlined text-text-secondary dark:text-gray-400 text-sm">chevron_right</span>
                 <span class="text-text-main dark:text-white text-sm font-medium">Participants</span>
             </div>
@@ -111,27 +111,29 @@
             </div>
 
             <!-- Controls Toolbar (Search, Filter, Export) -->
-            <form method="get" class="flex flex-col xl:flex-row gap-4 mb-6 bg-surface-light dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-[#f5f2f0] dark:border-[#3e2c22]">
+            <form method="get" asp-page="/Management/ViewParticipantList" asp-route-eventId="@Model.ViewModel.EventId" class="flex flex-col xl:flex-row gap-4 mb-6 bg-surface-light dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-[#f5f2f0] dark:border-[#3e2c22]">
                 <!-- Search -->
                 <div class="w-full xl:w-1/3">
                     <label class="flex w-full items-center rounded-full bg-[#f5f2f0] dark:bg-[#3e2c22] h-12 px-4 border transition-colors border-transparent focus-within:border-primary">
                         <span class="material-symbols-outlined text-text-secondary dark:text-gray-400 mr-2">search</span>
-                        <input asp-for="ViewModel.SearchQuery" class="flex w-full bg-transparent border-none text-text-main dark:text-white placeholder:text-text-secondary dark:placeholder:text-gray-500 focus:ring-0 text-base" placeholder="Search by Name or MSSV" />
+                        <input asp-for="Search" class="flex w-full bg-transparent border-none text-text-main dark:text-white placeholder:text-text-secondary dark:placeholder:text-gray-500 focus:ring-0 text-base" placeholder="Search by name, MSSV, email, ticket" />
                     </label>
                 </div>
                 <!-- Filters -->
                 <div class="flex flex-1 flex-wrap gap-3 items-center">
-                    <select asp-for="ViewModel.MajorFilter" class="group flex h-10 items-center gap-2 rounded-full border border-[#e6e0db] dark:border-[#523a2d] hover:border-primary dark:hover:border-primary bg-transparent px-4 transition-all text-sm font-medium text-text-main focus:ring-primary">
+                    <select asp-for="MajorFilter" class="group flex h-10 items-center gap-2 rounded-full border border-[#e6e0db] dark:border-[#523a2d] hover:border-primary dark:hover:border-primary bg-transparent px-4 transition-all text-sm font-medium text-text-main focus:ring-primary">
                         <option value="">All Majors</option>
-                        <option value="Software Engineering">Software Engineering</option>
-                        <option value="Digital Marketing">Digital Marketing</option>
-                        <option value="Artificial Intelligence">Artificial Intelligence</option>
+                        @foreach (var m in Model.ViewModel.MajorFilterOptions)
+                        {
+                            <option value="@m">@m</option>
+                        }
                     </select>
-                    <select asp-for="ViewModel.StatusFilter" class="group flex h-10 items-center gap-2 rounded-full border border-[#e6e0db] dark:border-[#523a2d] hover:border-primary dark:hover:border-primary bg-transparent px-4 transition-all text-sm font-medium text-text-main focus:ring-primary">
+                    <select asp-for="StatusFilter" class="group flex h-10 items-center gap-2 rounded-full border border-[#e6e0db] dark:border-[#523a2d] hover:border-primary dark:hover:border-primary bg-transparent px-4 transition-all text-sm font-medium text-text-main focus:ring-primary">
                         <option value="">All Status</option>
                         <option value="Registered">Registered</option>
                         <option value="Checked-in">Checked-in</option>
-                        <option value="Cancelled">Cancelled</option>
+                        <option value="Pending Payment">Pending Payment</option>
+                        <option value="Paid">Paid</option>
                     </select>
                 </div>
                 <!-- Actions -->
@@ -175,7 +177,10 @@
                                                 </div>
                                                 <div>
                                                     <p class="text-sm font-bold text-text-main dark:text-white">@item.FullName</p>
-                                                    <p class="text-xs text-text-secondary dark:text-gray-500">K15</p>
+                                                    @if (!string.IsNullOrWhiteSpace(item.Email) && item.Email != "—")
+                                                    {
+                                                        <p class="text-xs text-text-secondary dark:text-gray-500">@item.Email</p>
+                                                    }
                                                 </div>
                                             </div>
                                         </td>
@@ -197,10 +202,23 @@
                                                     @item.Status
                                                 </span>
                                             }
+                                            else if (item.Status == "Pending Payment")
+                                            {
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 text-xs font-bold border border-amber-100 dark:border-amber-800">
+                                                    <span class="material-symbols-outlined text-[14px]">schedule</span>
+                                                    @item.Status
+                                                </span>
+                                            }
+                                            else if (item.Status == "Paid")
+                                            {
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold border border-emerald-100 dark:border-emerald-800">
+                                                    <span class="material-symbols-outlined text-[14px]">payments</span>
+                                                    @item.Status
+                                                </span>
+                                            }
                                             else
                                             {
-                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs font-bold border border-red-100 dark:border-red-800">
-                                                    <span class="material-symbols-outlined text-[14px]">cancel</span>
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800/40 text-gray-700 dark:text-gray-300 text-xs font-bold border border-gray-200 dark:border-gray-600">
                                                     @item.Status
                                                 </span>
                                             }
@@ -228,23 +246,11 @@
                     </table>
                 </div>
 
-                <!-- Pagination -->
+                <!-- Summary row -->
                 <div class="flex flex-wrap items-center justify-between border-t border-[#e6e0db] dark:border-[#3e2c22] p-4 bg-[#f5f2f0]/30 dark:bg-[#2c1e14]/50 gap-4">
                     <p class="text-sm text-text-secondary dark:text-gray-400">
-                        Showing <span class="font-bold text-text-main dark:text-white">1-@(Model.ViewModel.Participants?.Count ?? 0)</span> of <span class="font-bold text-text-main dark:text-white">@Model.ViewModel.TotalRegistered</span>
+                        Showing <span class="font-bold text-text-main dark:text-white">@(Model.ViewModel.Participants?.Count ?? 0)</span> of <span class="font-bold text-text-main dark:text-white">@Model.ViewModel.TotalRegistered</span> registrations
                     </p>
-                    <div class="flex items-center gap-2">
-                        <button class="flex items-center justify-center size-8 rounded-full border border-[#e6e0db] dark:border-[#523a2d] bg-white dark:bg-transparent text-text-secondary dark:text-gray-400 hover:border-primary hover:text-primary transition-colors disabled:opacity-50">
-                            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
-                        </button>
-                        <button class="flex items-center justify-center size-8 rounded-full bg-primary text-white font-bold text-sm shadow-md shadow-orange-500/20">1</button>
-                        <button class="flex items-center justify-center size-8 rounded-full border border-transparent bg-transparent text-text-secondary dark:text-gray-400 hover:text-text-main dark:hover:text-white transition-colors">2</button>
-                        <button class="flex items-center justify-center size-8 rounded-full border border-transparent bg-transparent text-text-secondary dark:text-gray-400 hover:text-text-main dark:hover:text-white transition-colors">3</button>
-                        <span class="text-text-secondary dark:text-gray-500 mx-1">...</span>
-                        <button class="flex items-center justify-center size-8 rounded-full border border-[#e6e0db] dark:border-[#523a2d] bg-white dark:bg-transparent text-text-secondary dark:text-gray-400 hover:border-primary hover:text-primary transition-colors">
-                            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
-                        </button>
-                    </div>
                 </div>
             </div>
         </main>
