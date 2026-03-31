@@ -1,0 +1,200 @@
+@page "{id:guid?}"
+@model UI.Pages.Management.CancelEventModel
+@{
+    ViewData["Title"] = "Cancel Event";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>@ViewData["Title"] - FEvents</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet" />
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <!-- Theme Configuration -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f96706",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#23170f",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#181411] dark:text-white transition-colors duration-200">
+    <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+        <!-- Header -->
+        <header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e6e0db] dark:border-[#4a3b32] bg-white dark:bg-[#1a110a] px-4 py-3 md:px-10">
+            <div class="flex items-center gap-3">
+                <div class="flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-3xl">event_note</span>
+                </div>
+                <h2 class="text-[#181411] dark:text-white text-xl font-bold leading-tight tracking-tight">FEvents</h2>
+            </div>
+            <div class="hidden md:flex flex-1 justify-end gap-8 items-center">
+                <nav class="flex items-center gap-6">
+                    <a class="text-[#181411] dark:text-[#e0dcd9] text-sm font-medium hover:text-primary transition-colors" asp-page="/Index">Dashboard</a>
+                    <a class="text-primary text-sm font-bold leading-normal" href="#">My Events</a>
+                    <a class="text-[#181411] dark:text-[#e0dcd9] text-sm font-medium hover:text-primary transition-colors" href="#">Profile</a>
+                </nav>
+                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuANzXjGCFnO8ufuz7tjVSRgd3rudUoU_L5uIapHCJ0QLaaZu9Grxs3HKV5ylyzcZBaW_pPh5Ut-dJkJc-Nz49XyuQFc5sePi8PEwXfePTPNBja1AXr4MHHBIyOje_F4PmtQ2-fDdjURCafK6zIJz1wUhVf936DSKdc15EUmvZhA4d35LN8HeUyCDS9ngfyuIUu6D133yxNxlVm3YrZhI7XX6p_PRpZe2r0FjRjnanfH8e6ROq9EVUpu0eKn8BjeQ-rC0l4Aa_rAvFb9");'>
+                </div>
+            </div>
+            <div class="md:hidden text-[#181411] dark:text-white">
+                <span class="material-symbols-outlined">menu</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="layout-container flex h-full grow flex-col items-center py-8 px-4 md:px-10">
+            <div class="layout-content-container flex flex-col max-w-[800px] w-full gap-8">
+                <!-- Page Heading -->
+                <div class="flex flex-col gap-2">
+                    <div class="flex items-center gap-2 text-sm text-[#8c715f] dark:text-[#b09e90]">
+                        <a class="hover:underline" href="#">My Events</a>
+                        <span class="material-symbols-outlined text-xs">chevron_right</span>
+                        <a class="hover:underline" href="#">@Model.ViewModel.Title</a>
+                        <span class="material-symbols-outlined text-xs">chevron_right</span>
+                        <span>Cancel</span>
+                    </div>
+                    <h1 class="text-[#181411] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Cancel Event</h1>
+                    <p class="text-[#8c715f] dark:text-[#b09e90] text-base">You are about to cancel an active event. Please review the details below.</p>
+                </div>
+
+                <!-- Event Summary Card -->
+                <div class="flex flex-col md:flex-row items-stretch justify-between gap-6 rounded bg-white dark:bg-[#1a110a] p-4 shadow-sm border border-[#e6e0db] dark:border-[#4a3b32]">
+                    <div class="flex flex-col justify-center gap-3 flex-[2]">
+                        <div>
+                            <span class="inline-block px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold rounded-full mb-2">@Model.ViewModel.Status</span>
+                            <h3 class="text-[#181411] dark:text-white text-xl font-bold leading-tight">@Model.ViewModel.Title</h3>
+                        </div>
+                        <div class="flex flex-col gap-2 text-sm text-[#5c4a3f] dark:text-[#a08e80]">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg text-primary">calendar_today</span>
+                                <span>@Model.ViewModel.StartTime.ToString("MMM dd, yyyy • hh:mm tt") - @Model.ViewModel.EndTime.ToString("hh:mm tt")</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg text-primary">location_on</span>
+                                <span>@Model.ViewModel.LocationName</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg text-primary">group</span>
+                                <span>@Model.ViewModel.RegisteredCount Attendees Registered</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/3 bg-center bg-no-repeat aspect-video bg-cover rounded flex-1" 
+                         style='background-image: url("@(string.IsNullOrEmpty(Model.ViewModel.ThumbnailUrl) ? "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=1200" : Model.ViewModel.ThumbnailUrl)");'>
+                    </div>
+                </div>
+
+                <!-- Warning Alert -->
+                <div class="flex items-start gap-4 rounded bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 p-5">
+                    <div class="text-red-600 dark:text-red-400 shrink-0">
+                        <span class="material-symbols-outlined text-3xl">warning</span>
+                    </div>
+                    <div>
+                        <h3 class="text-[#181411] dark:text-red-100 text-lg font-bold leading-tight mb-2">Warning: Irreversible Action</h3>
+                        <p class="text-[#5c4a3f] dark:text-red-200/80 text-sm leading-relaxed">
+                            Cancelling this event will trigger an automatic email notification to all <strong>@Model.ViewModel.RegisteredCount registered participants</strong>. This action cannot be undone and the event page will be permanently removed from public view.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Cancellation Form -->
+                <form method="post" asp-page-handler="Cancel" class="flex flex-col gap-6 bg-white dark:bg-[#1a110a] p-6 md:p-8 rounded shadow-sm border border-[#e6e0db] dark:border-[#4a3b32]">
+                    <input type="hidden" asp-for="ViewModel.Id" />
+                    
+                    <!-- Reason Input -->
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[#181411] dark:text-white text-base font-bold" asp-for="ViewModel.CancellationReason">
+                            Reason for Cancellation <span class="text-red-500">*</span>
+                        </label>
+                        <p class="text-xs text-[#8c715f] dark:text-[#8c715f]">Please provide a clear reason that will be included in the email to attendees.</p>
+                        <div class="relative mt-2">
+                            <textarea asp-for="ViewModel.CancellationReason" 
+                                class="w-full rounded bg-background-light dark:bg-[#23170f] border-0 ring-1 ring-[#e6e0db] dark:ring-[#4a3b32] p-4 text-[#181411] dark:text-white placeholder:text-[#8c715f] focus:ring-2 focus:ring-primary focus:outline-none resize-none transition-all"
+                                placeholder="E.g., Due to unforeseen circumstances regarding the guest speaker's availability..." 
+                                rows="5" id="reasonTextArea" oninput="updateCharCount()"></textarea>
+                            <div class="absolute bottom-3 right-3 text-xs text-[#8c715f]" id="charCount">0/500</div>
+                        </div>
+                        <span asp-validation-for="ViewModel.CancellationReason" class="text-xs text-red-500"></span>
+                    </div>
+
+                    <!-- Confirmation Checkbox -->
+                    <div class="flex flex-col gap-1">
+                        <div class="flex items-center gap-3 pt-2">
+                            <div class="relative flex items-center">
+                                <input asp-for="ViewModel.ConfirmConsequences" 
+                                    class="peer h-5 w-5 cursor-pointer appearance-none rounded border border-[#8c715f] bg-transparent text-primary focus:ring-0 checked:border-primary checked:bg-primary" 
+                                    id="confirm-checkbox" />
+                                <span class="material-symbols-outlined pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-sm text-white opacity-0 peer-checked:opacity-100">check</span>
+                            </div>
+                            <label class="cursor-pointer select-none text-sm font-medium text-[#181411] dark:text-[#e0dcd9]" for="confirm-checkbox">
+                                I understand the consequences of cancelling this event.
+                            </label>
+                        </div>
+                        <span asp-validation-for="ViewModel.ConfirmConsequences" class="text-xs text-red-500"></span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-4 mt-6 pt-6 border-t border-[#f5f2f0] dark:border-[#2a1e16]">
+                        <a class="w-full sm:w-auto px-8 py-3 rounded-full text-center text-sm font-bold text-[#5c4a3f] dark:text-[#a08e80] bg-transparent hover:bg-[#f5f2f0] dark:hover:bg-[#23170f] transition-colors"
+                           asp-page="/Events/Detail" asp-route-id="@Model.ViewModel.Id">
+                            Keep Event
+                        </a>
+                        <button type="submit" 
+                            class="w-full sm:w-auto px-8 py-3 rounded-full text-sm font-bold text-white bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            id="submitBtn">
+                            <span class="material-symbols-outlined text-lg">delete</span>
+                            Confirm Cancellation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function updateCharCount() {
+            const textArea = document.getElementById('reasonTextArea');
+            const charCount = document.getElementById('charCount');
+            charCount.textContent = `${textArea.value.length}/500`;
+        }
+
+        // Initialize char count
+        updateCharCount();
+    </script>
+    
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+</body>
+</html>

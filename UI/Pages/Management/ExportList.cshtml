@@ -1,0 +1,337 @@
+@page "{eventId:guid?}"
+@model UI.Pages.Management.ExportListModel
+@{
+    ViewData["Title"] = "Export Participant List";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>@ViewData["Title"] - FEvents</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet" />
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f96706",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#23170f",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for cleaner look */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        /* Custom checkbox styles */
+        .custom-checkbox:checked {
+            background-color: #f96706;
+            border-color: #f96706;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-[#181411] dark:text-white font-display">
+    <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+        <!-- Top Navigation Bar -->
+        <header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e6dfdb] dark:border-gray-800 bg-white dark:bg-[#1a110a] px-10 py-3">
+            <div class="flex items-center gap-4">
+                <div class="size-8 text-primary">
+                    <span class="material-symbols-outlined !text-3xl">event_note</span>
+                </div>
+                <h2 class="text-lg font-bold leading-tight tracking-[-0.015em] dark:text-white">FEvents</h2>
+            </div>
+            <div class="flex flex-1 justify-end gap-8">
+                <div class="hidden md:flex items-center gap-9">
+                    <a class="text-sm font-medium leading-normal hover:text-primary transition-colors dark:text-gray-300" asp-page="/Events/Index">Events</a>
+                    <a class="text-sm font-medium leading-normal text-primary" href="#">Participants</a>
+                    <a class="text-sm font-medium leading-normal hover:text-primary transition-colors dark:text-gray-300" href="#">Reports</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-6 bg-primary hover:bg-orange-600 transition-colors text-white text-sm font-bold leading-normal tracking-[0.015em]" 
+                       asp-page="/Management/CreateEvent">
+                        <span class="truncate">Create Event</span>
+                    </a>
+                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-white dark:ring-gray-700 cursor-pointer" 
+                         style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBxsDGYcMkYDus2mtlery_40V1OZ2JDfb-JkzrMOpQ2Ja0ifLCcwrl8uiPTK0qNDigHK4NWholGOw-uXeqXtq5HlvQhIT0-YrkyT_LuhGNx7OxdFjBsVSXCq0dAhmZORYnlYxkIRbUD38heOVrmdR-5QVLlueskvWkq9GWhr5QT7Zn12QSXTErV9T1m2vsFMef_CeYSHUIXROCGpIfJkjEVeYTufQRvRCS7oesIAAk45IFNBSczigb_t2-2_LPv5CvK9sF2p1HMmHY5");'>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="layout-container flex h-full grow flex-col">
+            <div class="px-4 sm:px-10 lg:px-40 flex flex-1 justify-center py-8">
+                <div class="layout-content-container flex flex-col max-w-[960px] flex-1 gap-6">
+                    <!-- Breadcrumbs -->
+                    <div class="flex flex-wrap gap-2 px-4">
+                        <a class="text-[#8c715f] dark:text-gray-400 text-base font-medium leading-normal hover:underline" asp-page="/Index">Home</a>
+                        <span class="text-[#8c715f] dark:text-gray-400 text-base font-medium leading-normal">/</span>
+                        <a class="text-[#8c715f] dark:text-gray-400 text-base font-medium leading-normal hover:underline" asp-page="/Events/Detail" asp-route-id="@Model.ViewModel.EventId">@Model.ViewModel.EventTitle</a>
+                        <span class="text-[#8c715f] dark:text-gray-400 text-base font-medium leading-normal">/</span>
+                        <span class="text-[#181411] dark:text-white text-base font-medium leading-normal">Export</span>
+                    </div>
+
+                    <!-- Page Header -->
+                    <div class="flex flex-wrap justify-between gap-3 px-4">
+                        <div class="flex min-w-72 flex-col gap-2">
+                            <h1 class="text-4xl font-black leading-tight tracking-[-0.033em] dark:text-white">Export Participant List</h1>
+                            <p class="text-[#8c715f] dark:text-gray-400 text-base font-normal leading-normal">Configure settings to download participant data for administrative use.</p>
+                        </div>
+                    </div>
+
+                    <!-- Event Stats Summary -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 px-4">
+                        <div class="flex flex-col gap-2 rounded-xl p-6 border border-[#e6dfdb] dark:border-gray-700 bg-white dark:bg-[#1a110a] shadow-sm">
+                            <div class="flex items-center gap-3 text-primary mb-1">
+                                <span class="material-symbols-outlined">celebration</span>
+                                <p class="text-[#181411] dark:text-white text-base font-medium leading-normal">Event Name</p>
+                            </div>
+                            <p class="text-[#181411] dark:text-white tracking-light text-2xl font-bold leading-tight">@Model.ViewModel.EventTitle</p>
+                        </div>
+                        <div class="flex flex-col gap-2 rounded-xl p-6 border border-[#e6dfdb] dark:border-gray-700 bg-white dark:bg-[#1a110a] shadow-sm">
+                            <div class="flex items-center gap-3 text-primary mb-1">
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                <p class="text-[#181411] dark:text-white text-base font-medium leading-normal">Date</p>
+                            </div>
+                            <p class="text-[#181411] dark:text-white tracking-light text-2xl font-bold leading-tight">@Model.ViewModel.EventDate.ToString("MMM dd, yyyy")</p>
+                        </div>
+                        <div class="flex flex-col gap-2 rounded-xl p-6 border border-[#e6dfdb] dark:border-gray-700 bg-white dark:bg-[#1a110a] shadow-sm">
+                            <div class="flex items-center gap-3 text-primary mb-1">
+                                <span class="material-symbols-outlined">groups</span>
+                                <p class="text-[#181411] dark:text-white text-base font-medium leading-normal">Total Participants</p>
+                            </div>
+                            <p class="text-[#181411] dark:text-white tracking-light text-2xl font-bold leading-tight">@Model.ViewModel.TotalParticipants.ToString("N0")</p>
+                        </div>
+                    </div>
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="mx-4 p-4 bg-green-100 text-green-700 rounded-xl">
+                            @TempData["SuccessMessage"]
+                        </div>
+                    }
+
+                    <!-- Main Export Form Card -->
+                    <form method="post" asp-page-handler="Download" class="mx-4 flex flex-col gap-8 rounded-xl bg-white dark:bg-[#1a110a] p-8 shadow-sm border border-[#e6dfdb] dark:border-gray-700 mt-2">
+                        <input type="hidden" asp-for="ViewModel.EventId" />
+                        <!-- File Format Selection -->
+                        <div class="flex flex-col gap-4">
+                            <h3 class="text-lg font-bold leading-tight tracking-[-0.015em] text-[#181411] dark:text-white">File Format</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- Excel Option -->
+                                <label class="cursor-pointer group relative">
+                                    <input asp-for="ViewModel.SelectedFormat" type="radio" value="excel" class="peer sr-only" />
+                                    <div class="flex flex-col items-center gap-3 rounded-xl border-2 border-[#e6dfdb] dark:border-gray-700 p-6 transition-all hover:border-primary peer-checked:border-primary peer-checked:bg-primary/5 dark:peer-checked:bg-primary/10">
+                                        <div class="size-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
+                                            <span class="material-symbols-outlined !text-3xl">table_view</span>
+                                        </div>
+                                        <span class="font-bold text-base dark:text-gray-200">Excel (.xlsx)</span>
+                                    </div>
+                                    <div class="absolute top-4 right-4 text-primary opacity-0 peer-checked:opacity-100 transition-opacity">
+                                        <span class="material-symbols-outlined !text-2xl">check_circle</span>
+                                    </div>
+                                </label>
+                                <!-- CSV Option -->
+                                <label class="cursor-pointer group relative">
+                                    <input asp-for="ViewModel.SelectedFormat" type="radio" value="csv" class="peer sr-only" />
+                                    <div class="flex flex-col items-center gap-3 rounded-xl border-2 border-[#e6dfdb] dark:border-gray-700 p-6 transition-all hover:border-primary peer-checked:border-primary peer-checked:bg-primary/5 dark:peer-checked:bg-primary/10">
+                                        <div class="size-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                                            <span class="material-symbols-outlined !text-3xl">csv</span>
+                                        </div>
+                                        <span class="font-bold text-base dark:text-gray-200">CSV (.csv)</span>
+                                    </div>
+                                    <div class="absolute top-4 right-4 text-primary opacity-0 peer-checked:opacity-100 transition-opacity">
+                                        <span class="material-symbols-outlined !text-2xl">check_circle</span>
+                                    </div>
+                                </label>
+                                <!-- PDF Option -->
+                                <label class="cursor-pointer group relative">
+                                    <input asp-for="ViewModel.SelectedFormat" type="radio" value="pdf" class="peer sr-only" />
+                                    <div class="flex flex-col items-center gap-3 rounded-xl border-2 border-[#e6dfdb] dark:border-gray-700 p-6 transition-all hover:border-primary peer-checked:border-primary peer-checked:bg-primary/5 dark:peer-checked:bg-primary/10">
+                                        <div class="size-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400">
+                                            <span class="material-symbols-outlined !text-3xl">picture_as_pdf</span>
+                                        </div>
+                                        <span class="font-bold text-base dark:text-gray-200">PDF Document</span>
+                                    </div>
+                                    <div class="absolute top-4 right-4 text-primary opacity-0 peer-checked:opacity-100 transition-opacity">
+                                        <span class="material-symbols-outlined !text-2xl">check_circle</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="h-px bg-[#e6dfdb] dark:bg-gray-700 w-full"></div>
+
+                        <!-- Data Fields & Filters -->
+                        <div class="flex flex-col md:flex-row gap-8">
+                            <!-- Data Fields -->
+                            <div class="flex-1 flex flex-col gap-4">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-lg font-bold leading-tight tracking-[-0.015em] text-[#181411] dark:text-white">Data Fields</h3>
+                                    <button type="button" class="text-primary text-sm font-medium hover:underline">Select All</button>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <label class="flex items-center gap-3 p-3 rounded-lg border border-transparent hover:bg-[#f8f7f5] dark:hover:bg-gray-800 cursor-pointer">
+                                        <input name="ViewModel.SelectedFields" value="FullName" type="checkbox" checked class="custom-checkbox h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary" />
+                                        <span class="text-base text-[#181411] dark:text-gray-200">Full Name</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-3 rounded-lg border border-transparent hover:bg-[#f8f7f5] dark:hover:bg-gray-800 cursor-pointer">
+                                        <input name="ViewModel.SelectedFields" value="StudentId" type="checkbox" checked class="custom-checkbox h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary" />
+                                        <span class="text-base text-[#181411] dark:text-gray-200">Student ID</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-3 rounded-lg border border-transparent hover:bg-[#f8f7f5] dark:hover:bg-gray-800 cursor-pointer">
+                                        <input name="ViewModel.SelectedFields" value="Email" type="checkbox" checked class="custom-checkbox h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary" />
+                                        <span class="text-base text-[#181411] dark:text-gray-200">Email Address</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-3 rounded-lg border border-transparent hover:bg-[#f8f7f5] dark:hover:bg-gray-800 cursor-pointer">
+                                        <input name="ViewModel.SelectedFields" value="Phone" type="checkbox" class="custom-checkbox h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary" />
+                                        <span class="text-base text-[#181411] dark:text-gray-200">Phone Number</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-3 rounded-lg border border-transparent hover:bg-[#f8f7f5] dark:hover:bg-gray-800 cursor-pointer">
+                                        <input name="ViewModel.SelectedFields" value="Status" type="checkbox" checked class="custom-checkbox h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary" />
+                                        <span class="text-base text-[#181411] dark:text-gray-200">Check-in Status</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-3 rounded-lg border border-transparent hover:bg-[#f8f7f5] dark:hover:bg-gray-800 cursor-pointer">
+                                        <input name="ViewModel.SelectedFields" value="Time" type="checkbox" class="custom-checkbox h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary" />
+                                        <span class="text-base text-[#181411] dark:text-gray-200">Check-in Time</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- Divider for mobile -->
+                            <div class="md:hidden h-px bg-[#e6dfdb] dark:bg-gray-700 w-full"></div>
+                            <!-- Filter Settings -->
+                            <div class="flex-1 md:max-w-[300px] flex flex-col gap-4">
+                                <h3 class="text-lg font-bold leading-tight tracking-[-0.015em] text-[#181411] dark:text-white">Filters</h3>
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-medium text-[#8c715f] dark:text-gray-400">Participant Status</label>
+                                    <div class="relative">
+                                        <select asp-for="ViewModel.StatusFilter" class="w-full appearance-none rounded-xl border border-[#e6dfdb] dark:border-gray-700 bg-white dark:bg-[#1a110a] p-3 pr-10 text-base text-[#181411] dark:text-white focus:border-primary focus:ring-1 focus:ring-primary">
+                                            <option>All Participants</option>
+                                            <option>Attended Only</option>
+                                            <option>Registered but Absent</option>
+                                            <option>Cancelled</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#8c715f]">
+                                            <span class="material-symbols-outlined">expand_more</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-medium text-[#8c715f] dark:text-gray-400">Sort By</label>
+                                    <div class="relative">
+                                        <select asp-for="ViewModel.SortBy" class="w-full appearance-none rounded-xl border border-[#e6dfdb] dark:border-gray-700 bg-white dark:bg-[#1a110a] p-3 pr-10 text-base text-[#181411] dark:text-white focus:border-primary focus:ring-1 focus:ring-primary">
+                                            <option>Name (A-Z)</option>
+                                            <option>Student ID</option>
+                                            <option>Check-in Time (Latest)</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#8c715f]">
+                                            <span class="material-symbols-outlined">expand_more</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions Footer -->
+                        <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-4 pt-4 border-t border-[#e6dfdb] dark:border-gray-700">
+                            <a class="w-full sm:w-auto h-12 px-8 rounded-full border border-[#e6dfdb] dark:border-gray-600 text-[#181411] dark:text-white font-bold text-sm flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                               asp-page="/Management/ViewParticipantList" asp-route-eventId="@Model.ViewModel.EventId">
+                                Cancel
+                            </a>
+                            <button type="submit" class="w-full sm:w-auto flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-primary hover:bg-orange-600 text-white font-bold text-sm shadow-lg shadow-orange-500/30 transition-all transform active:scale-95">
+                                <span class="material-symbols-outlined !text-xl">download</span>
+                                Download File
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Recent Exports (History) -->
+                    <div class="mx-4 mt-6">
+                        <h3 class="text-lg font-bold leading-tight tracking-[-0.015em] text-[#181411] dark:text-white mb-4">Recent Exports</h3>
+                        <div class="overflow-x-auto rounded-xl border border-[#e6dfdb] dark:border-gray-700 bg-white dark:bg-[#1a110a]">
+                            @if (Model.ViewModel.RecentExports != null && Model.ViewModel.RecentExports.Any())
+                            {
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-[#f8f7f5] dark:bg-gray-800 border-b border-[#e6dfdb] dark:border-gray-700">
+                                            <th class="p-4 text-sm font-medium text-[#8c715f] dark:text-gray-400">Date &amp; Time</th>
+                                            <th class="p-4 text-sm font-medium text-[#8c715f] dark:text-gray-400">Requested By</th>
+                                            <th class="p-4 text-sm font-medium text-[#8c715f] dark:text-gray-400">Format</th>
+                                            <th class="p-4 text-sm font-medium text-[#8c715f] dark:text-gray-400">Status</th>
+                                            <th class="p-4 text-sm font-medium text-[#8c715f] dark:text-gray-400 text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-[#e6dfdb] dark:divide-gray-700">
+                                        @foreach (var history in Model.ViewModel.RecentExports)
+                                        {
+                                            <tr class="group hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                                                <td class="p-4 text-sm text-[#181411] dark:text-gray-200">@history.ExportTime.ToString("MMM dd, yyyy - HH:mm")</td>
+                                                <td class="p-4 text-sm text-[#181411] dark:text-gray-200 flex items-center gap-2">
+                                                    <div class="size-6 rounded-full bg-gray-200 bg-cover" 
+                                                         style='background-image: url("@history.RequestedByAvatar");'>
+                                                    </div>
+                                                    @history.RequestedBy
+                                                </td>
+                                                <td class="p-4 text-sm text-[#181411] dark:text-gray-200">
+                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium 
+                                                        @(history.Format == "Excel" ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" : 
+                                                          history.Format == "PDF" ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" : 
+                                                          "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300")">
+                                                        @history.Format
+                                                    </span>
+                                                </td>
+                                                <td class="p-4 text-sm">
+                                                    <span class="flex items-center gap-1.5 text-green-600 dark:text-green-400">
+                                                        <span class="size-2 rounded-full bg-green-500"></span>
+                                                        @history.Status
+                                                    </span>
+                                                </td>
+                                                <td class="p-4 text-right">
+                                                    <button class="text-primary hover:text-orange-700 text-sm font-medium">Download Again</button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <div class="p-10 text-center text-[#8c715f]">
+                                    No export history found.
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="h-20"></div> <!-- Spacer -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

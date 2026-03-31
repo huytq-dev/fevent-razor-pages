@@ -6,7 +6,8 @@ public class AccountSecurityService(
     IPasswordHasher passwordHasher,
     IJwtTokensService jwtTokensService,
     IRedisCacheService redisCache,
-    IBackgroundJobService backgroundJobService
+    IBackgroundJobService backgroundJobService,
+    IAppConfiguration appConfiguration
     ) : IAccountSecurityService
 {
     public async Task<PageResponse<SendEmailVerificationResponse>> SendEmailVerificationAsync(SendEmailVerificationRequest request, CancellationToken ct = default)
@@ -82,7 +83,7 @@ public class AccountSecurityService(
         await redisCache.SetRecordAsync(RedisKeys.PasswordResetToken(token), email, TimeSpan.FromMinutes(15));
         await redisCache.SetRecordAsync(RedisKeys.PasswordResetUser(email), token, TimeSpan.FromMinutes(15));
 
-        var link = $"{AppConstants.BaseUrl}/reset-password?token={Uri.EscapeDataString(token)}";
+        var link = $"{appConfiguration.GetBaseUrl()}/reset-password?token={Uri.EscapeDataString(token)}";
 
         _ = backgroundJobService.EnqueueEmailAsync(new EmailContent
         {
@@ -165,8 +166,8 @@ public class AccountSecurityService(
         await redisCache.SetRecordAsync(RedisKeys.EmailVerifyToken(token), email, TimeSpan.FromMinutes(15));
         await redisCache.SetRecordAsync(RedisKeys.EmailVerifyUser(email), token, TimeSpan.FromMinutes(15));
 
-        // Nếu muón test đoạn này thì thay lại link trong ClientAppSettings
-        var link = $"{AppConstants.BaseUrl}/verify-email?token={Uri.EscapeDataString(token)}";
+        // Nếu muốn test đoạn này thì thay lại link trong appsettings.json hoặc ClientAppSettings
+        var link = $"{appConfiguration.GetBaseUrl()}/verify-email?token={Uri.EscapeDataString(token)}";
 
         _ = backgroundJobService.EnqueueEmailAsync(new EmailContent
         {

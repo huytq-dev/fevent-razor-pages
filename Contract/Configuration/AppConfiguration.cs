@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace Contract;
 
@@ -32,6 +32,11 @@ public class AppConfiguration(IConfiguration configuration) : IAppConfiguration
             throw new InvalidOperationException("Missing 'Cloudinary' section in appsettings.json");
 
         return cloudinaryOptions;
+    }
+
+    public string GetBaseUrl()
+    {
+        return configuration.GetValue<string>("BaseUrl") ?? "https://localhost:7137";
     }
 
     //public string? GetSqlServerConnectionString()
