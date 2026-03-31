@@ -5,6 +5,7 @@ public interface IUsersRepository : IGenericRepository<User>
     //Task<UserResponse> GetUserByIdAsync(Guid id);
     Task<bool> IsEmailExistAsync(string email);
     Task<bool> IsUsernameExistAsync(string username);
+    Task<bool> IsStudentIdExistAsync(string studentId);
     Task<User?> GetUserByEmailAsync(string email);
     Task<User?> GetProfileAsync(Guid id, CancellationToken ct = default);
     Task<User?> GetUserForProfileUpdateAsync(Guid id, CancellationToken ct = default);

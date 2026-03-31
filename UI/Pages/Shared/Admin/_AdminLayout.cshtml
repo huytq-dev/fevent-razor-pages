@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FEvents Admin</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f96706",
+                        "primary-hover": "#e05b05",
+                        "background": "#f8f7f5",
+                        "foreground": "#181411",
+                        "card": "#ffffff",
+                        "card-foreground": "#181411",
+                        "border": "#e6dfdb",
+                        "muted": "#f0ebe8",
+                        "muted-foreground": "#78716c",
+                        "accent": "#f4f0ed",
+                        "accent-foreground": "#181411",
+                        "destructive": "#ef4444",
+                        "destructive-foreground": "#ffffff",
+                        "success": "#10b981",
+                        "success-foreground": "#ffffff",
+                    },
+                    fontFamily: {
+                        sans: ['Lexend', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        display: ['Lexend', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @@layer utilities {
+            .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+            .animate-slide-up { animation: slideUp 0.4s ease-out; }
+            .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+        }
+        @@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @@keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-background text-foreground font-sans antialiased flex flex-col min-h-screen">
+    
+    <!-- Admin Header -->
+    <header class="sticky top-0 z-50 w-full border-b border-border bg-white/80 backdrop-blur-md shadow-sm">
+        <div class="max-w-[1400px] mx-auto flex h-16 md:h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center gap-2">
+                <a href="/Admin/UserManager" class="flex items-center gap-2 group">
+                    <span class="material-symbols-outlined text-primary text-3xl group-hover:-rotate-12 transition-transform duration-300">calendar_month</span>
+                    <span class="font-display font-extrabold text-2xl tracking-tight text-foreground">FEvents <span class="text-xs align-top text-primary bg-primary/10 px-2 py-0.5 rounded-full ml-1">Admin</span></span>
+                </a>
+            </div>
+
+            <!-- Main Navigation -->
+            <nav class="hidden md:flex space-x-8">
+                @{
+                    var roleName = Context.Session.GetString("RoleName");
+                    var isUserManagerPage = ViewContext.RouteData.Values["page"]?.ToString()?.Contains("UserManager") == true;
+                    var isScanPage = ViewContext.RouteData.Values["page"]?.ToString()?.Contains("ScanQR") == true;
+                }
+                <a asp-page="/Admin/UserManager" class="@(isUserManagerPage ? "text-primary font-bold" : "text-foreground hover:text-primary font-medium") transition-colors flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">manage_accounts</span> Quản lý người dùng
+                </a>
+                <a asp-page="/Events/ScanQR" class="@(isScanPage ? "text-primary font-bold" : "text-foreground hover:text-primary font-medium") transition-colors flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">qr_code_scanner</span> Quét mã Check-in
+                </a>
+            </nav>
+
+            <!-- User Menu -->
+            <div class="flex items-center gap-4">
+                @{
+                    var userId = Context.Session.GetString("UserId");
+                    var fullName = Context.Session.GetString("FullName") ?? "Tu Nguyen";
+                    var avatarUrlSession = Context.Session.GetString("AvatarUrl");
+                    
+                    var adminAvatarUrl = string.IsNullOrEmpty(avatarUrlSession) 
+                        ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(fullName)}&background=f96706&color=fff" 
+                        : avatarUrlSession;
+                }
+                
+                @if (!string.IsNullOrEmpty(userId))
+                {
+                    <div class="relative group">
+                        <button type="button" class="flex items-center gap-3 hover:bg-accent px-2 py-1.5 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20">
+                            <div class="text-right hidden sm:block">
+                                <p class="text-sm font-bold text-foreground">@fullName</p>
+                                <p class="text-xs font-semibold text-primary">Admin</p>
+                            </div>
+                            <img src="@adminAvatarUrl" alt="Admin Avatar" class="w-10 h-10 rounded-full border border-border shadow-sm group-hover:shadow-md transition-shadow">
+                        </button>
+
+                        <div class="absolute right-0 mt-2 w-56 transform opacity-0 scale-95 origin-top-right group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 ease-out border border-border rounded-xl shadow-lg bg-card z-50 invisible group-hover:visible dropdown-menu">
+                            <div class="py-2">
+                                <div class="px-4 py-3 border-b border-border sm:hidden flex flex-col gap-1">
+                                    <p class="text-sm font-bold text-foreground">@fullName</p>
+                                    <p class="text-xs font-medium text-primary">Admin</p>
+                                </div>
+                                <a href="/Profile/ViewProfile" class="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-accent hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined text-[20px]">person</span> Hồ sơ cá nhân
+                                </a>
+                                <div class="h-px bg-border my-1"></div>
+                                <a href="/Authentications/Logout" class="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-destructive hover:bg-destructive/10 transition-colors">
+                                    <span class="material-symbols-outlined text-[20px]">logout</span> Đăng xuất
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow bg-background">
+        @RenderBody()
+    </main>
+
+    <!-- Footer intentionally omitted for Admin Layout -->
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

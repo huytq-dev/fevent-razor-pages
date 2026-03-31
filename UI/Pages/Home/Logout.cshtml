@@ -1,0 +1,50 @@
+@page
+@model UI.LogoutModel
+@{
+    Layout = null;
+    ViewData["Title"] = "FEvents Logout Confirmation";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
+</head>
+<body class="bg-[#fcfaf8] font-display text-[#1c130d] overflow-hidden">
+    <!-- Overlay background: đục, không trong suốt -->
+    <div class="fixed inset-0 z-40 bg-[#e5e5e5] bg-opacity-80"></div>
+    <div class="fixed inset-0 z-50 flex items-center justify-center">
+        <div class="w-full max-w-[480px] bg-white rounded-xl shadow-2xl border border-white/20 overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div class="relative pt-10 pb-6 flex flex-col items-center">
+                <div class="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                    <!-- Google Material Symbols waving_hand icon -->
+                    <span class="material-symbols-rounded" style="font-size:64px;color:#f96706;">
+                        waving_hand
+                    </span>
+                </div>
+                <h4 class="text-primary text-sm font-bold tracking-widest uppercase">FPT University</h4>
+            </div>
+            <div class="px-8 pb-4 text-center">
+                <h3 class="text-[#1c130d] text-2xl font-bold leading-tight tracking-tight mb-2">Leaving so soon?</h3>
+                <p class="text-[#9e6a47] text-base font-normal leading-relaxed">
+                    Are you sure you want to log out of FEvents? You'll need to sign back in to manage your events and student connections.
+                </p>
+            </div>
+            <form method="post" class="flex flex-col gap-3 px-8 py-8">
+                <a href="/Home/Index" class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 bg-primary text-white text-lg font-bold shadow-lg hover:bg-primary/90 transition-colors">
+                    <span class="truncate">Stay Logged In</span>
+                </a>
+                <button type="submit" class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 bg-transparent text-[#9e6a47] text-base font-semibold hover:bg-[#f4ece6] transition-colors border border-transparent">
+                    <span class="truncate">Yes, Logout</span>
+                </button>
+            </form>
+            <div class="bg-[#f4ece6] py-3 text-center">
+                <p class="text-[10px] text-[#9e6a47] font-medium uppercase tracking-widest">FEvents • Connecting FPT Students</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
