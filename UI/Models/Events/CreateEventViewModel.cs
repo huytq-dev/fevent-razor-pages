@@ -3,25 +3,31 @@ using Microsoft.AspNetCore.Http;
 
 namespace UI.Models.Events;
 
-public class CreateEventViewModel
+public class CreateEventViewModel : IValidatableObject
 {
     [Required(ErrorMessage = "Event name is required")]
     [Display(Name = "Event Name")]
     public string Title { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Category is required")]
-    public Guid CategoryId { get; set; }
+    public Guid? CategoryId { get; set; }
 
     [Required(ErrorMessage = "Venue is required")]
-    public Guid LocationId { get; set; }
+    public Guid? LocationId { get; set; }
 
     [Required(ErrorMessage = "Start date and time is required")]
     [Display(Name = "Start Date & Time")]
-    public DateTime StartDateTime { get; set; } = DateTime.Now;
+    public DateTime? StartDateTime { get; set; }
 
     [Required(ErrorMessage = "End date and time is required")]
     [Display(Name = "End Date & Time")]
-    public DateTime EndDateTime { get; set; } = DateTime.Now.AddHours(2);
+    public DateTime? EndDateTime { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (StartDateTime.HasValue && EndDateTime.HasValue && EndDateTime.Value <= StartDateTime.Value)
+            yield return new ValidationResult("End time must be after start time.", new[] { nameof(EndDateTime) });
+    }
 
     [Required(ErrorMessage = "Max capacity is required")]
     [Range(1, int.MaxValue, ErrorMessage = "Capacity must be at least 1")]

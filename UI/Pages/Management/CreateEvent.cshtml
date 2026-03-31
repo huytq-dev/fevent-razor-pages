@@ -54,7 +54,19 @@
                     <button class="flex items-center justify-center rounded-full size-10 bg-[#f4f2f0] dark:bg-[#3e342f] text-[#181411] dark:text-white hover:bg-primary/10 transition-colors">
                         <span class="material-symbols-outlined">notifications</span>
                     </button>
-                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white dark:border-[#3e342f] shadow-sm" data-alt="User profile picture placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDU3u2JRpah1k90Qoo_nYaifoPAt2zke4sg_TrCSOhzZqYbFUfKWmKi60FVq8FXiW51kpFmhr4SONCdXzVmuDkLF8p-Dd2zfHUTEkQ9yIc0tk8HxK8wNzuvRAQe68qam4fnv4lg-xY_8mLoE9DR1yjAiDhhVmjJJeSKSvekBZBeiHfwVOFBhb6OIcCOX76kb0P4ZGGfiTb1Qn6rviBTuboW5TTP4QZ4NCzUGITmxSh2zxE8Pt2USMczUR6emUR5vijzpNo3XAgUURCl");'></div>
+                    <div class="relative flex items-center gap-3 cursor-pointer group">
+                        <div class="hidden sm:block text-right">
+                            <p class="text-sm font-semibold text-[#181411] dark:text-white leading-tight">@Model.FullName</p>
+                            <p class="text-xs text-[#8c715f]">Organizer</p>
+                        </div>
+                        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white dark:border-[#3e342f] shadow-sm"
+                             style='background-image: url("@(Model.AvatarUrl ?? "https://ui-avatars.com/api/?name=" + Uri.EscapeDataString(Model.FullName ?? "Organizer") + "&background=f96706&color=fff")");'></div>
+                        <div class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#1a120b] rounded-lg shadow-lg py-1 border border-[#e6dfdb] dark:border-[#3e342f] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <a asp-page="/Profile/ViewProfile" class="block px-4 py-2 text-sm text-[#181411] dark:text-white hover:bg-[#f4f2f0] dark:hover:bg-[#3e342f] font-medium whitespace-nowrap">View Profile</a>
+                            <hr class="border-[#e6dfdb] dark:border-[#3e342f] my-1" />
+                            <a asp-page="/Authentications/Logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-[#f4f2f0] dark:hover:bg-[#3e342f] font-medium whitespace-nowrap">Logout</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -147,12 +159,12 @@
                                         <span class="text-sm font-semibold text-[#181411] dark:text-[#d0c6c0]">Date &amp; Time</span>
                                         <div class="flex flex-col md:flex-row gap-4">
                                             <div class="relative flex-1">
-                                                <input asp-for="ViewModel.StartDateTime" class="w-full h-12 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#2a221b] px-4 text-base text-[#181411] dark:text-white focus:border-primary focus:ring-1 focus:ring-primary placeholder-[#8c715f]" />
+                                                <input asp-for="ViewModel.StartDateTime" asp-format="{0:yyyy-MM-dd}" type="date" class="w-full h-12 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#2a221b] px-4 text-base text-[#181411] dark:text-white focus:border-primary focus:ring-1 focus:ring-primary" />
                                                 <span asp-validation-for="ViewModel.StartDateTime" class="text-xs text-red-500"></span>
                                             </div>
                                             <div class="flex items-center justify-center text-[#8c715f]">to</div>
                                             <div class="relative flex-1">
-                                                <input asp-for="ViewModel.EndDateTime" class="w-full h-12 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#2a221b] px-4 text-base text-[#181411] dark:text-white focus:border-primary focus:ring-1 focus:ring-primary placeholder-[#8c715f]" />
+                                                <input asp-for="ViewModel.EndDateTime" asp-format="{0:yyyy-MM-dd}" type="date" class="w-full h-12 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#2a221b] px-4 text-base text-[#181411] dark:text-white focus:border-primary focus:ring-1 focus:ring-primary" />
                                                 <span asp-validation-for="ViewModel.EndDateTime" class="text-xs text-red-500"></span>
                                             </div>
                                         </div>

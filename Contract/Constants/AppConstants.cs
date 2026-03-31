@@ -2,7 +2,7 @@ namespace Contract;
 
 public static class AppConstants
 {
-    public readonly static string BaseUrl = "http://localhost:5002";
+    public readonly static string BaseUrl = "http://localhost:7137";
     public const int DefaultPageTop = 10;
     public const int DefaultPageSkip = 0;
     public const bool DefaultNeedTotalCount = false;
