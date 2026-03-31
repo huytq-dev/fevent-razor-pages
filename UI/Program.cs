@@ -35,6 +35,14 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Seed database
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();
+    await AppData.SeedAsync(db);
+}
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

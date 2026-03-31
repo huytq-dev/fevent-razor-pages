@@ -23,6 +23,10 @@ public class LoginModel(IAuthServices authServices) : PageModel
             {
                 return RedirectToPage("/Admin/UserManager");
             }
+            if (roleName == "Organizer")
+            {
+                return RedirectToPage("/Organizer/CreateEvent");
+            }
 
             return RedirectToPage("/Home/Index");
         }
@@ -57,6 +61,10 @@ public class LoginModel(IAuthServices authServices) : PageModel
         if (auth.RoleName == "Admin")
         {
             return RedirectToPage("/Admin/UserManager");
+        }
+        if (auth.RoleName == "Organizer")
+        {
+            return RedirectToPage("/Management/CreateEvent");
         }
 
         return RedirectToPage("/Home/Index");
