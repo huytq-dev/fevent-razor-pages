@@ -20,4 +20,7 @@ public class QueryInfo
 
     /// <summary>Filter events starting on or before this date (inclusive).</summary>
     public DateTime? StartDateTo { get; set; }
+
+    /// <summary>Filter events by a specific organizer.</summary>
+    public Guid? OrganizerId { get; set; }
 }

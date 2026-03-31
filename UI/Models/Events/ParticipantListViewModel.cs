@@ -5,7 +5,6 @@ public class ParticipantViewModel
     public int Order { get; set; }
     public string FullName { get; set; } = string.Empty;
     public string Mssv { get; set; } = string.Empty;
-    public string Major { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
     public DateTime RegistrationDate { get; set; }
@@ -22,6 +21,5 @@ public class ParticipantListViewModel
     
     // Filter properties
     public string? SearchQuery { get; set; }
-    public string? MajorFilter { get; set; }
     public string? StatusFilter { get; set; }
 }

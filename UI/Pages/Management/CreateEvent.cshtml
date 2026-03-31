@@ -45,7 +45,7 @@
             </div>
             <div class="flex flex-1 justify-end gap-8">
                 <nav class="hidden md:flex items-center gap-9">
-                    <a class="text-[#181411] dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+                    <a class="text-[#181411] dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" asp-page="/Management/Index">Dashboard</a>
                     <a class="text-primary text-sm font-bold leading-normal" href="#">Events</a>
                     <a class="text-[#181411] dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Reports</a>
                     <a class="text-[#181411] dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Settings</a>
@@ -75,7 +75,7 @@
             <div class="mx-auto max-w-[1024px]">
                 <!-- Breadcrumbs -->
                 <nav class="flex flex-wrap gap-2 py-4 mb-2">
-                    <a class="text-[#8c715f] dark:text-[#a08c7e] text-sm font-medium hover:text-primary hover:underline" href="#">Dashboard</a>
+                    <a class="text-[#8c715f] dark:text-[#a08c7e] text-sm font-medium hover:text-primary hover:underline" asp-page="/Management/Index">Dashboard</a>
                     <span class="text-[#8c715f] dark:text-[#a08c7e] text-sm font-medium">/</span>
                     <a class="text-[#8c715f] dark:text-[#a08c7e] text-sm font-medium hover:text-primary hover:underline" href="#">Events</a>
                     <span class="text-[#8c715f] dark:text-[#a08c7e] text-sm font-medium">/</span>
@@ -274,7 +274,7 @@
                                         <span class="material-symbols-outlined">send</span>
                                         Submit for Approval
                                     </button>
-                                    <button type="button" class="flex w-full items-center justify-center gap-2 rounded-lg bg-white dark:bg-[#2a221b] border border-[#e6dfdb] dark:border-[#3e342f] px-6 py-3 text-base font-medium text-[#181411] dark:text-white hover:bg-gray-50 dark:hover:bg-[#3e342f] transition-colors">
+                                    <button type="submit" asp-page-handler="Preview" class="flex w-full items-center justify-center gap-2 rounded-lg bg-white dark:bg-[#2a221b] border border-[#e6dfdb] dark:border-[#3e342f] px-6 py-3 text-base font-medium text-[#181411] dark:text-white hover:bg-gray-50 dark:hover:bg-[#3e342f] transition-colors">
                                         <span class="material-symbols-outlined">visibility</span>
                                         Preview
                                     </button>

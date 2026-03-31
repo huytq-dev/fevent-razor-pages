@@ -12,4 +12,5 @@ public sealed class CreateEventRequest
     public Guid LocationId { get; init; }
     public Guid OrganizerId { get; init; }
     public Guid? ClubId { get; init; }
+    public int Status { get; init; } = 1; // Mặc định là Pending (1)
 }

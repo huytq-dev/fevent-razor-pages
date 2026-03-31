@@ -48,6 +48,21 @@ public static class EventData
             {
                 Name = "Main Auditorium, FPT HCM",
                 Address = "FPT University, HCM Campus"
+            },
+            new
+            {
+                Name = "Main Hall, FPT Da Nang",
+                Address = "FPT University, Da Nang Campus"
+            },
+            new
+            {
+                Name = "Main Hall, FPT Can Tho",
+                Address = "FPT University, Can Tho Campus"
+            },
+            new
+            {
+                Name = "Main Hall, FPT Quy Nhon",
+                Address = "FPT University, Quy Nhon Campus"
             }
         };
 

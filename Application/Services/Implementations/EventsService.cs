@@ -36,7 +36,7 @@ public class EventsService(IUnitOfWork _unitOfWork) : IEventsService
             LocationId = request.LocationId,
             OrganizerId = request.OrganizerId,
             ClubId = request.ClubId,
-            Status = EventStatus.Pending, // Mặc định là Pending chờ duyệt
+            Status = (EventStatus)request.Status, // Lấy trạng thái từ request (Pending = 1 hoặc Draft = 0)
             CreatedAt = DateTimeOffset.Now
         };
 

@@ -42,6 +42,11 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
             query = query.Where(e => e.StartTime.Date >= from);
         }
 
+        if (queryInfo.OrganizerId.HasValue)
+        {
+            query = query.Where(e => e.OrganizerId == queryInfo.OrganizerId.Value);
+        }
+
         if (queryInfo.StartDateTo.HasValue)
         {
             var to = queryInfo.StartDateTo.Value.Date;

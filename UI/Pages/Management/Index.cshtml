@@ -1,0 +1,246 @@
+@page
+@model UI.Pages.Management.IndexModel
+@{
+    ViewData["Title"] = "Organizer Dashboard";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>@ViewData["Title"] - FEvents</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f96706",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#23170f",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#2c1e14",
+                        "text-main": "#181411",
+                        "text-secondary": "#8c715f",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        /* Custom scrollbar for better look in table */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-main dark:text-white overflow-x-hidden transition-colors duration-200">
+    <div class="relative flex h-full min-h-screen w-full flex-col">
+        <!-- Navigation Header -->
+        <header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-[#f5f2f0] dark:border-[#3e2c22] bg-surface-light dark:bg-surface-dark px-6 py-3 shadow-sm lg:px-10">
+            <div class="flex items-center gap-4 text-text-main dark:text-white">
+                <div class="size-8 text-primary">
+                    <svg class="w-full h-full" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path clip-rule="evenodd" d="M24 18.4228L42 11.475V34.3663C42 34.7796 41.7457 35.1504 41.3601 35.2992L24 42V18.4228Z" fill="currentColor" fill-rule="evenodd"></path>
+                        <path clip-rule="evenodd" d="M24 8.18819L33.4123 11.574L24 15.2071L14.5877 11.574L24 8.18819ZM9 15.8487L21 20.4805V37.6263L9 32.9945V15.8487ZM27 37.6263V20.4805L39 15.8487V32.9945L27 37.6263ZM25.354 2.29885C24.4788 1.98402 23.5212 1.98402 22.646 2.29885L4.98454 8.65208C3.7939 9.08038 3 10.2097 3 11.475V34.3663C3 36.0196 4.01719 37.5026 5.55962 38.098L22.9197 44.7987C23.6149 45.0671 24.3851 45.0671 25.0803 44.7987L42.4404 38.098C43.9828 37.5026 45 36.0196 45 34.3663V11.475C45 10.2097 44.2061 9.08038 43.0155 8.65208L25.354 2.29885Z" fill="currentColor" fill-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <h2 class="text-text-main dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">FEvents</h2>
+            </div>
+            <div class="hidden md:flex flex-1 justify-center gap-8 px-8">
+                <nav class="flex items-center gap-9">
+                    <a class="text-primary text-sm font-bold border-b-2 border-primary pb-0.5" asp-page="/Management/Index">Dashboard</a>
+                    <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" asp-page="/Events/Index">Events</a>
+                    <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Students</a>
+                    <a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Settings</a>
+                </nav>
+            </div>
+            <div class="flex items-center justify-end gap-4 lg:gap-8">
+                <button class="flex items-center justify-center overflow-hidden rounded-full size-10 bg-[#f5f2f0] dark:bg-[#3e2c22] text-text-main dark:text-white hover:bg-gray-200 dark:hover:bg-[#523a2d] transition-colors">
+                    <span class="material-symbols-outlined text-[24px]">notifications</span>
+                </button>
+                <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-white dark:border-[#3e2c22] shadow-sm cursor-pointer" style='background-image: url("@(string.IsNullOrEmpty(Model.AvatarUrl) ? "https://lh3.googleusercontent.com/aida-public/AB6AXuBIjK2CCXpQOL0rcThYD3_gdCr3eiUysHTbQQHeE7pP-o_Qz71-HNuHM_FCZrzsLOTPwgako-vGZjUuEo__esGB4FOp7su6X7uHdS-5rOxZJJAlQ0zuk_mFFa906BPbLq4EBZoVnHnUpmXwY_2oFdzayXaMUWaQzb3reatK9-eszbrtcWK-zTZutHDssJohFJ5zHb7sfCfNXiCQycRHL2HyGHUcsh9seP6emeaY4X4hFX7bYi96xdt24gwuAliA2BGfgtwqI8dcT3lz" : Model.AvatarUrl)");'></div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 px-4 sm:px-6 lg:px-20 xl:px-40 py-8 w-full max-w-[1440px] mx-auto">
+
+            <!-- Page Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+                <div class="flex flex-col gap-2">
+                    <h1 class="text-text-main dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
+                        Your Events
+                    </h1>
+                    <p class="text-text-secondary dark:text-gray-400 text-base font-normal">
+                        Manage, publish, and track events you have organized.
+                    </p>
+                </div>
+                <div class="flex gap-3">
+                    <a asp-page="/Management/CreateEvent" class="flex items-center justify-center h-12 gap-2 rounded-full bg-primary hover:bg-orange-600 text-white px-6 font-bold text-sm transition-colors shadow-lg shadow-orange-500/20">
+                        <span class="material-symbols-outlined text-[20px]">add</span>
+                        Create Event
+                    </a>
+                </div>
+            </div>
+
+            <!-- Data Table Card -->
+            <div class="w-full overflow-hidden rounded-xl border border-[#e6e0db] dark:border-[#3e2c22] bg-surface-light dark:bg-surface-dark shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[900px]">
+                        <thead>
+                            <tr class="bg-[#f5f2f0]/50 dark:bg-[#2c1e14] border-b border-[#e6e0db] dark:border-[#3e2c22]">
+                                <th class="p-4 text-xs font-bold uppercase tracking-wider text-text-secondary dark:text-gray-400 w-16 text-center">#</th>
+                                <th class="p-4 text-xs font-bold uppercase tracking-wider text-text-secondary dark:text-gray-400 min-w-[250px]">Event Detail</th>
+                                <th class="p-4 text-xs font-bold uppercase tracking-wider text-text-secondary dark:text-gray-400">Date & Time</th>
+                                <th class="p-4 text-xs font-bold uppercase tracking-wider text-text-secondary dark:text-gray-400">Registrations</th>
+                                <th class="p-4 text-xs font-bold uppercase tracking-wider text-text-secondary dark:text-gray-400">Status</th>
+                                <th class="p-4 text-xs font-bold uppercase tracking-wider text-text-secondary dark:text-gray-400 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#e6e0db] dark:divide-[#3e2c22]">
+                            @if (Model.EventList.Items != null && Model.EventList.Items.Any())
+                            {
+                                int order = (Model.CurrentPage - 1) * 10 + 1;
+                                @foreach (var item in Model.EventList.Items)
+                                {
+                                    <tr class="group hover:bg-background-light dark:hover:bg-[#36261b] transition-colors">
+                                        <td class="p-4 text-sm text-text-secondary dark:text-gray-500 text-center">@(order++)</td>
+                                        <td class="p-4">
+                                            <div class="flex items-center gap-4">
+                                                <div class="size-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
+                                                    @if (!string.IsNullOrEmpty(item.ThumbnailUrl))
+                                                    {
+                                                        <img src="@item.ThumbnailUrl" alt="Thumb" class="w-full h-full object-cover" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="material-symbols-outlined w-full h-full flex justify-center items-center text-gray-300">image</span>
+                                                    }
+                                                </div>
+                                                <div>
+                                                    <a asp-page="/Events/Details" asp-route-id="@item.Id" class="text-sm font-bold text-text-main dark:text-white hover:text-primary transition-colors">@item.Title</a>
+                                                    <p class="text-xs text-text-secondary dark:text-gray-500 whitespace-nowrap overflow-hidden text-ellipsis max-w-[250px]">@item.LocationName</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="p-4 text-sm text-text-main dark:text-gray-300">
+                                            <p class="font-medium">@item.StartTime.ToString("MMM dd, yyyy")</p>
+                                            <p class="text-xs text-text-secondary font-normal">@item.StartTime.ToString("hh:mm tt")</p>
+                                        </td>
+                                        <td class="p-4">
+                                            <div class="flex items-center gap-2">
+                                                <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 w-full max-w-[60px]">
+                                                    <div class="bg-primary h-1.5 rounded-full" style="width: @(item.MaxParticipants > 0 ? (item.RegisteredCount * 100 / item.MaxParticipants) : 0)%"></div>
+                                                </div>
+                                                <span class="text-xs font-bold text-text-main">@item.RegisteredCount / @item.MaxParticipants</span>
+                                            </div>
+                                        </td>
+                                        <td class="p-4">
+                                            @if (item.Status == 0) // Draft
+                                            {
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-bold border border-gray-200">
+                                                    Draft
+                                                </span>
+                                            }
+                                            else if (item.Status == 1) // Pending
+                                            {
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-50 text-yellow-600 text-xs font-bold border border-yellow-100">
+                                                    Pending Appr.
+                                                </span>
+                                            }
+                                            else if (item.Status == 2) // Approved
+                                            {
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-bold border border-green-100">
+                                                    Approved
+                                                </span>
+                                            }
+                                            else if (item.Status == 3) // Rejected
+                                            {
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold border border-red-100">
+                                                    Rejected
+                                                </span>
+                                            }
+                                            else if (item.Status == 4) // Cancelled
+                                            {
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-xs font-bold border border-gray-300">
+                                                    Cancelled
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold border border-blue-100">
+                                                    Completed
+                                                </span>
+                                            }
+                                        </td>
+                                        <td class="p-4">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <a asp-page="/Management/UpdateEvent" asp-route-id="@item.Id" title="Update" class="text-[#8c715f] hover:text-blue-500 transition-colors bg-[#f5f2f0] hover:bg-blue-50 size-8 flex items-center justify-center rounded-lg">
+                                                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                                                </a>
+                                                <a asp-page="/Management/PublishEvent" asp-route-id="@item.Id" title="Publish" class="text-[#8c715f] hover:text-green-500 transition-colors bg-[#f5f2f0] hover:bg-green-50 size-8 flex items-center justify-center rounded-lg">
+                                                    <span class="material-symbols-outlined text-[18px]">publish</span>
+                                                </a>
+                                                <a asp-page="/Management/CancelEvent" asp-route-id="@item.Id" title="Cancel" class="text-[#8c715f] hover:text-yellow-500 transition-colors bg-[#f5f2f0] hover:bg-yellow-50 size-8 flex items-center justify-center rounded-lg">
+                                                    <span class="material-symbols-outlined text-[18px]">event_busy</span>
+                                                </a>
+                                                <a asp-page="/Management/DeleteEvent" asp-route-id="@item.Id" title="Delete" class="text-[#8c715f] hover:text-red-500 transition-colors bg-[#f5f2f0] hover:bg-red-50 size-8 flex items-center justify-center rounded-lg">
+                                                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="p-20 text-center">
+                                        <div class="flex flex-col items-center gap-3">
+                                            <span class="material-symbols-outlined text-gray-300 text-6xl">event_upcoming</span>
+                                            <p class="text-text-secondary dark:text-gray-400 font-medium">You haven't organizing any events yet.</p>
+                                            <a asp-page="/Management/CreateEvent" class="text-primary hover:underline font-bold mt-2">Create your first event</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                @if (Model.EventList.TotalCount.HasValue && Model.EventList.TotalCount > 0)
+                {
+                    <div class="flex flex-wrap items-center justify-center border-t border-[#e6e0db] dark:border-[#3e2c22] p-4 bg-[#f5f2f0]/30 dark:bg-[#2c1e14]/50 gap-4">
+                        <p class="text-sm text-text-secondary dark:text-gray-400">
+                            Total: <span class="font-bold text-text-main dark:text-white">@Model.EventList.TotalCount</span> events
+                        </p>
+                    </div>
+                }
+            </div>
+        </main>
+
+        <!-- Simple Footer -->
+        <footer class="mt-auto py-6 text-center text-sm text-text-secondary dark:text-gray-500 border-t border-[#e6e0db]">
+            <p>© 2026 FPT University. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
