@@ -75,11 +75,11 @@ public class CreateEventModel : PageModel
             Title = ViewModel.Title,
             Description = ViewModel.Description,
             ThumbnailUrl = thumbnailUrl,
-            StartTime = ViewModel.StartDateTime,
-            EndTime = ViewModel.EndDateTime,
+            StartTime = ViewModel.StartDateTime!.Value,
+            EndTime = ViewModel.EndDateTime!.Value,
             MaxParticipants = ViewModel.MaxParticipants,
-            CategoryId = ViewModel.CategoryId,
-            LocationId = ViewModel.LocationId,
+            CategoryId = ViewModel.CategoryId!.Value,
+            LocationId = ViewModel.LocationId!.Value,
             OrganizerId = userId,
             // ClubId would be set if the user belongs to a club
         };
