@@ -42,6 +42,7 @@ public class EventRegistrationsRepository : GenericRepository<EventRegistration>
                 LocationName = r.Event.Location.Name,
                 RegisteredAt = r.CreatedAt,
                 Status = (int)r.Status,
+                ParticipantAvatarUrl = r.User.AvatarUrl,
                 TicketCode = r.TicketCode,
                 QrCodeUrl = r.QrCodeUrl,
                 Price = r.TicketType.Price

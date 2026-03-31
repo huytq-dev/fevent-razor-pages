@@ -1,0 +1,126 @@
+@page "/Admin/EditUser/{id:guid}"
+@model UI.Pages.Admin.EditUserModel
+@{
+    Layout = "~/Pages/Shared/Admin/_AdminLayout.cshtml";
+    ViewData["Title"] = "Chỉnh sửa người dùng";
+
+    var avatarUrl = string.IsNullOrWhiteSpace(Model.Input.AvatarUrl)
+        ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(Model.Input.FullName ?? "User")}&background=f96706&color=fff"
+        : Model.Input.AvatarUrl;
+}
+
+<div class="w-full max-w-[1100px] mx-auto px-4 md:px-8 py-8">
+    <div class="mb-6 flex items-center justify-between gap-3">
+        <div>
+            <h1 class="text-3xl font-black tracking-tight text-foreground">Chỉnh sửa người dùng</h1>
+            <p class="text-muted-foreground mt-1">Admin có thể cập nhật thông tin hồ sơ và ảnh đại diện.</p>
+        </div>
+        <a asp-page="/Admin/UserManager" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground hover:bg-muted transition-colors">
+            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            Quay lại
+        </a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-1 bg-card border border-border rounded-2xl p-6 shadow-sm h-fit">
+            <p class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">Avatar</p>
+            <div class="flex flex-col items-center gap-4">
+                <img id="avatarPreview" src="@avatarUrl" alt="Avatar" class="h-36 w-36 rounded-full border-2 border-border object-cover shadow-sm" />
+                <input asp-for="AvatarFile" id="avatarInput" type="file" accept="image/*" class="hidden" onchange="previewAvatar(this)" />
+                <button type="button" onclick="document.getElementById('avatarInput').click()" class="px-4 py-2 rounded-lg border border-primary text-primary font-semibold hover:bg-primary/10 transition-colors">
+                    Đổi ảnh đại diện
+                </button>
+                <span asp-validation-for="AvatarFile" class="text-red-500 text-xs"></span>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2 bg-card border border-border rounded-2xl p-6 shadow-sm space-y-5">
+            <div asp-validation-summary="ModelOnly" class="text-red-600 text-sm"></div>
+
+            <input asp-for="Input.Id" type="hidden" />
+            <input asp-for="Input.AvatarUrl" type="hidden" />
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-sm font-semibold text-foreground">Họ và tên</span>
+                    <input asp-for="Input.FullName" class="rounded-lg border border-border px-3 py-2.5 focus:border-primary focus:ring-primary/20" />
+                    <span asp-validation-for="Input.FullName" class="text-red-500 text-xs"></span>
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-sm font-semibold text-foreground">Email</span>
+                    <input asp-for="Input.Email" class="rounded-lg border border-border px-3 py-2.5 focus:border-primary focus:ring-primary/20" />
+                    <span asp-validation-for="Input.Email" class="text-red-500 text-xs"></span>
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-sm font-semibold text-foreground">Student ID</span>
+                    <input asp-for="Input.StudentId" class="rounded-lg border border-border px-3 py-2.5 focus:border-primary focus:ring-primary/20" />
+                    <span asp-validation-for="Input.StudentId" class="text-red-500 text-xs"></span>
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-sm font-semibold text-foreground">Major</span>
+                    <input asp-for="Input.Major" class="rounded-lg border border-border px-3 py-2.5 focus:border-primary focus:ring-primary/20" />
+                    <span asp-validation-for="Input.Major" class="text-red-500 text-xs"></span>
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-sm font-semibold text-foreground">Phone</span>
+                    <input asp-for="Input.PhoneNumber" class="rounded-lg border border-border px-3 py-2.5 focus:border-primary focus:ring-primary/20" />
+                    <span asp-validation-for="Input.PhoneNumber" class="text-red-500 text-xs"></span>
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-sm font-semibold text-foreground">Date of Birth</span>
+                    <input asp-for="Input.DOB" type="date" class="rounded-lg border border-border px-3 py-2.5 focus:border-primary focus:ring-primary/20" />
+                    <span asp-validation-for="Input.DOB" class="text-red-500 text-xs"></span>
+                </label>
+
+                <label class="md:col-span-2 flex flex-col gap-1.5">
+                    <span class="text-sm font-semibold text-foreground">Address</span>
+                    <input asp-for="Input.Address" class="rounded-lg border border-border px-3 py-2.5 focus:border-primary focus:ring-primary/20" />
+                    <span asp-validation-for="Input.Address" class="text-red-500 text-xs"></span>
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                    <span class="text-sm font-semibold text-foreground">Role</span>
+                    <select asp-for="Input.RoleId" class="rounded-lg border border-border px-3 py-2.5 focus:border-primary focus:ring-primary/20">
+                        <option value="">Chọn vai trò</option>
+                        @foreach (var role in Model.AvailableRoles)
+                        {
+                            <option value="@role.Id">@role.RoleName</option>
+                        }
+                    </select>
+                </label>
+
+                <label class="flex items-center gap-2 mt-7">
+                    <input asp-for="Input.IsDeleted" type="checkbox" class="rounded border-border text-primary focus:ring-primary/20" />
+                    <span class="text-sm font-medium text-foreground">Khóa tài khoản (suspended)</span>
+                </label>
+            </div>
+
+            <div class="pt-2 flex items-center gap-3 justify-end">
+                <a asp-page="/Admin/UserManager" class="px-4 py-2.5 rounded-lg border border-border hover:bg-muted transition-colors">Hủy</a>
+                <button type="submit" class="px-5 py-2.5 rounded-lg bg-primary text-white font-bold hover:bg-primary-hover transition-colors">Lưu thay đổi</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        function previewAvatar(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

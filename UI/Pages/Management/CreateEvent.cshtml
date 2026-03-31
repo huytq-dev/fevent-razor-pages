@@ -109,12 +109,25 @@
                     }
                     else
                     {
-                        <div class="mb-6 flex items-center justify-between">
-                            <h2 class="text-xl font-bold text-[#181411] dark:text-white flex items-center gap-2">
-                                <span class="material-symbols-outlined text-primary">event_note</span>
-                                My Events
-                            </h2>
-                            <span class="text-sm text-[#8c715f]">@Model.MyEvents.Count event(s)</span>
+                        <div class="mb-6 flex flex-col gap-4">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-xl font-bold text-[#181411] dark:text-white flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">event_note</span>
+                                    My Events
+                                </h2>
+                                <span class="text-sm text-[#8c715f]">@Model.MyEvents.Count event(s)</span>
+                            </div>
+                            <div class="flex flex-col md:flex-row gap-3">
+                                <form method="get" class="flex-1 flex gap-2">
+                                    <input type="hidden" name="tab" value="events" />
+                                    <input type="text" name="EventSearch" value="@Model.EventSearch" placeholder="Search by title, category, location..." class="w-full h-11 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#1a120b] px-4 text-sm text-[#181411] dark:text-white focus:border-primary focus:ring-1 focus:ring-primary" />
+                                    <button type="submit" class="h-11 px-4 rounded-lg border border-primary text-primary font-semibold hover:bg-primary hover:text-white transition-colors">Search</button>
+                                </form>
+                                <a asp-page="/Management/CreateEvent" asp-page-handler="ExportMyEvents" asp-route-tab="events" asp-route-EventSearch="@Model.EventSearch" class="h-11 inline-flex items-center justify-center gap-2 px-4 rounded-lg bg-primary text-white font-semibold hover:bg-[#d85805] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px]">download</span>
+                                    Export Events
+                                </a>
+                            </div>
                         </div>
                         <div class="flex flex-col gap-3 mb-10">
                             @foreach (var ev in Model.MyEvents)

@@ -4,12 +4,14 @@ public class ParticipantViewModel
 {
     public int Order { get; set; }
     public string FullName { get; set; } = string.Empty;
+    public string? AvatarUrl { get; set; }
     public string Mssv { get; set; } = string.Empty;
     public string Major { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
     public DateTime RegistrationDate { get; set; }
     public string Status { get; set; } = string.Empty; // Registered, Checked-in, Cancelled
+    public DateTime? CheckInTime { get; set; }
     public string Initials =>
         string.IsNullOrWhiteSpace(FullName)
             ? "?"

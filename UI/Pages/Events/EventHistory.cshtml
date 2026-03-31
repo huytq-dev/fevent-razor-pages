@@ -107,7 +107,7 @@
                             <a href="/events/@r.EventId" class="px-5 py-2 bg-primary hover:bg-primary-hover text-white text-sm font-bold rounded-lg transition-colors shadow-sm">View Details</a>
                             @if (!isCancelled && !isPast)
                             {
-                                <button type="button" onclick="showQrModal('@r.TicketCode', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(r.EventTitle))')" class="flex items-center gap-2 px-5 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold rounded-lg transition-colors shadow-sm text-sm">
+                                <button type="button" onclick="showQrModal('@r.TicketCode', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(r.EventTitle))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(r.ParticipantAvatarUrl ?? string.Empty))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(HttpContext.Session.GetString("FullName") ?? "Guest"))')" class="flex items-center gap-2 px-5 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold rounded-lg transition-colors shadow-sm text-sm">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                                     View QR
                                 </button>
@@ -138,6 +138,10 @@
             </button>
         </div>
         <div class="p-8 flex flex-col items-center">
+            <div class="mb-4 flex flex-col items-center">
+                <img id="qrProfileAvatar" src="" alt="Ticket owner avatar" class="h-16 w-16 rounded-full object-cover border-2 border-[#e6dfdb] shadow-sm">
+                <p id="qrOwnerName" class="mt-2 text-sm font-semibold text-[#181411]"></p>
+            </div>
             <p id="qrEventTitle" class="text-center text-sm font-medium text-primary mb-6 break-words w-full px-4"></p>
             <div id="qrcode" class="p-4 bg-white border-2 border-[#e6dfdb] rounded-2xl shadow-sm mb-6 flex items-center justify-center min-h-[220px] min-w-[220px]"></div>
             <div class="bg-gray-50 border border-[#e6dfdb] rounded-xl px-6 py-3 text-center w-full">
@@ -153,14 +157,19 @@
     <script>
         let qrCodeObj = null;
 
-        function showQrModal(ticketCode, eventTitle) {
+        function showQrModal(ticketCode, eventTitle, avatarUrl, ownerName) {
             const modal = document.getElementById('qrModal');
             const modalContent = document.getElementById('qrModalContent');
             const qrContainer = document.getElementById('qrcode');
+            const avatarEl = document.getElementById('qrProfileAvatar');
+            const ownerNameEl = document.getElementById('qrOwnerName');
+            const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(ownerName || 'Guest')}&background=f96706&color=fff`;
             
             // Set text
             document.getElementById('qrTicketCodeStr').innerText = ticketCode;
             document.getElementById('qrEventTitle').innerText = eventTitle;
+            ownerNameEl.innerText = ownerName || 'Guest';
+            avatarEl.src = avatarUrl && avatarUrl.trim().length > 0 ? avatarUrl : defaultAvatar;
             
             // Generate QR
             qrContainer.innerHTML = ''; // clear old

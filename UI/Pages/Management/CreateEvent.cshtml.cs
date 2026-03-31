@@ -23,6 +23,9 @@ public class CreateEventModel : PageModel
     [BindProperty]
     public CreateEventViewModel ViewModel { get; set; } = new();
 
+    [BindProperty(SupportsGet = true)]
+    public string? EventSearch { get; set; }
+
     public List<SelectListItem> Categories { get; set; } = new();
     public List<SelectListItem> Locations { get; set; } = new();
     public List<SelectListItem> Majors { get; set; } = new();
@@ -107,7 +110,70 @@ public class CreateEventModel : PageModel
             OrderBy = "createdAt desc"
         });
 
-        MyEvents = result.Data?.Items.ToList() ?? new();
+        var events = result.Data?.Items.ToList() ?? new();
+
+        if (!string.IsNullOrWhiteSpace(EventSearch))
+        {
+            var term = EventSearch.Trim();
+            events = events.Where(e =>
+                e.Title.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                (e.LocationName?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (e.CategoryName?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false))
+                .ToList();
+        }
+
+        MyEvents = events;
+    }
+
+    public async Task<IActionResult> OnGetExportMyEventsAsync()
+    {
+        var userIdStr = HttpContext.Session.GetString("UserId");
+        if (!Guid.TryParse(userIdStr, out var userId))
+        {
+            return RedirectToPage("/Authentications/Login", new { ReturnUrl = "/Management/CreateEvent?tab=events" });
+        }
+
+        var result = await _eventsService.GetAllAsync(new QueryInfo
+        {
+            OrganizerId = userId,
+            Top = 1000,
+            Skip = 0,
+            IsActive = true,
+            NeedTotalCount = false,
+            OrderBy = "createdAt desc"
+        });
+
+        var items = result.Data?.Items ?? [];
+        if (!string.IsNullOrWhiteSpace(EventSearch))
+        {
+            var term = EventSearch.Trim();
+            items = items.Where(e =>
+                e.Title.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                (e.LocationName?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (e.CategoryName?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false))
+                .ToList();
+        }
+
+        var rows = items.Select((ev, i) => new[]
+        {
+            (i + 1).ToString(),
+            ev.Title,
+            ev.CategoryName,
+            ev.LocationName,
+            ev.StartTime.LocalDateTime.ToString("yyyy-MM-dd HH:mm"),
+            ev.EndTime.LocalDateTime.ToString("yyyy-MM-dd HH:mm"),
+            ((Domain.EventStatus)ev.Status).ToString(),
+            ev.RegisteredCount.ToString(),
+            ev.MaxParticipants.ToString(),
+            ev.ThumbnailUrl
+        });
+
+        var csv = UI.Helpers.CsvExportHelper.BuildCsv(
+            ["No", "Title", "Category", "Location", "Start", "End", "Status", "Registered", "Capacity", "Thumbnail URL"],
+            rows);
+
+        var fileName = $"my-events-{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
+        return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", fileName);
     }
 
     private async Task LoadCatalogsAsync()

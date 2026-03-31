@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure;
 using Domain;
+using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
+using UI.Helpers;
 
 namespace UI.Pages.Admin
 {
@@ -65,7 +68,29 @@ namespace UI.Pages.Admin
                 return RedirectToPage();
             }
 
-            if (await _db.Users.AnyAsync(u => u.Email == email))
+            fullName = fullName.Trim();
+            email = email.Trim();
+
+            if (!Regex.IsMatch(fullName, @"^[A-Za-zÀ-ỹ\s]{2,60}$"))
+            {
+                TempData["ErrorMessage"] = "Họ tên chỉ được chứa chữ và khoảng trắng, từ 2-60 ký tự.";
+                return RedirectToPage();
+            }
+
+            var emailValidator = new EmailAddressAttribute();
+            if (!emailValidator.IsValid(email))
+            {
+                TempData["ErrorMessage"] = "Email không đúng định dạng.";
+                return RedirectToPage();
+            }
+
+            if (password.Length < 8 || !Regex.IsMatch(password, @"^(?=.*[A-Za-z])(?=.*\d).{8,}$"))
+            {
+                TempData["ErrorMessage"] = "Mật khẩu phải từ 8 ký tự và chứa cả chữ lẫn số.";
+                return RedirectToPage();
+            }
+
+            if (await _db.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower()))
             {
                 TempData["ErrorMessage"] = "Email đã tồn tại trong hệ thống.";
                 return RedirectToPage();
@@ -101,6 +126,43 @@ namespace UI.Pages.Admin
             TempData["SuccessMessage"] = $"Đã thêm thành công người dùng {newUser.FullName}.";
 
             return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnGetExportAsync()
+        {
+            var sessionUserId = HttpContext.Session.GetString("UserId");
+            var roleName = HttpContext.Session.GetString("RoleName");
+            if (string.IsNullOrEmpty(sessionUserId) || string.IsNullOrEmpty(roleName) || roleName != "Admin")
+            {
+                return RedirectToPage("/Home/Index");
+            }
+
+            var users = await _db.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .OrderBy(u => u.FullName)
+                .ToListAsync();
+
+            var rows = users.Select((u, i) => new[]
+            {
+                (i + 1).ToString(),
+                u.FullName,
+                u.Email,
+                u.StudentId,
+                u.Major,
+                u.PhoneNumber,
+                u.DOB?.ToString("yyyy-MM-dd"),
+                u.UserRoles.FirstOrDefault()?.Role?.RoleName,
+                u.IsDeleted ? "Suspended" : "Active",
+                u.AvatarUrl
+            });
+
+            var csv = CsvExportHelper.BuildCsv(
+                ["No", "Full Name", "Email", "Student ID", "Major", "Phone", "DOB", "Role", "Status", "Avatar URL"],
+                rows);
+
+            var fileName = $"users-{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
+            return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", fileName);
         }
 
         public async Task<IActionResult> OnPostChangeRoleAsync(Guid userId, Guid newRoleId)

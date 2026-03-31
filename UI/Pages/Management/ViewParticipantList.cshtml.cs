@@ -2,6 +2,7 @@ using Application;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using UI.Models.Events;
+using UI.Helpers;
 
 namespace UI.Pages.Management;
 
@@ -79,16 +80,106 @@ public class ViewParticipantListModel(
             {
                 Order            = i + 1,
                 FullName         = p.FullName,
+                AvatarUrl        = p.AvatarUrl,
                 Mssv             = p.StudentId ?? "—",
                 Major            = p.Major ?? "—",
                 Email            = p.Email ?? "—",
                 Phone            = p.PhoneNumber ?? "—",
                 RegistrationDate = p.RegisteredAt.LocalDateTime,
                 Status           = GetStatusLabel(p.Status),
+                CheckInTime      = p.CheckInTime?.LocalDateTime,
             }).ToList()
         };
 
         return Page();
+    }
+
+    public async Task<IActionResult> OnGetExportAsync(Guid eventId, CancellationToken ct)
+    {
+        var access = await EnsureOrganizerAccessAsync(eventId, ct);
+        if (access.Result is not null)
+        {
+            return access.Result;
+        }
+
+        var participants = access.Participants;
+        var rows = participants.Select((p, i) => new[]
+        {
+            (i + 1).ToString(),
+            p.FullName,
+            p.StudentId,
+            p.Email,
+            p.PhoneNumber,
+            p.Major,
+            p.TicketCode,
+            GetStatusLabel(p.Status),
+            p.RegisteredAt.LocalDateTime.ToString("yyyy-MM-dd HH:mm"),
+            p.CheckInTime?.LocalDateTime.ToString("yyyy-MM-dd HH:mm"),
+            p.AvatarUrl
+        });
+
+        var csv = CsvExportHelper.BuildCsv(
+            ["No", "Full Name", "Student ID", "Email", "Phone", "Major", "Ticket Code", "Status", "Registered At", "Check-in Time", "Avatar URL"],
+            rows);
+
+        var fileName = $"participants-{eventId:N}-{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
+        return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", fileName);
+    }
+
+    public async Task<IActionResult> OnGetExportAttendedAsync(Guid eventId, CancellationToken ct)
+    {
+        var access = await EnsureOrganizerAccessAsync(eventId, ct);
+        if (access.Result is not null)
+        {
+            return access.Result;
+        }
+
+        var attended = access.Participants
+            .Where(p => (Domain.RegistrationStatus)p.Status == Domain.RegistrationStatus.CheckedIn)
+            .ToList();
+
+        var rows = attended.Select((p, i) => new[]
+        {
+            (i + 1).ToString(),
+            p.FullName,
+            p.StudentId,
+            p.Email,
+            p.PhoneNumber,
+            p.Major,
+            p.TicketCode,
+            p.CheckInTime?.LocalDateTime.ToString("yyyy-MM-dd HH:mm"),
+            p.AvatarUrl
+        });
+
+        var csv = CsvExportHelper.BuildCsv(
+            ["No", "Full Name", "Student ID", "Email", "Phone", "Major", "Ticket Code", "Check-in Time", "Avatar URL"],
+            rows);
+
+        var fileName = $"attended-{eventId:N}-{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
+        return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", fileName);
+    }
+
+    private async Task<(IActionResult? Result, IReadOnlyList<ParticipantSummaryResponse> Participants)> EnsureOrganizerAccessAsync(Guid eventId, CancellationToken ct)
+    {
+        var userIdStr = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+        {
+            return (RedirectToPage("/Authentications/Login"), []);
+        }
+
+        var eventResult = await eventsService.GetDetailAsync(eventId, ct);
+        if (!eventResult.IsSuccess || eventResult.Data is null)
+        {
+            return (NotFound(), []);
+        }
+
+        if (eventResult.Data.OrganizerId != userId)
+        {
+            return (Forbid(), []);
+        }
+
+        var participants = await registrationsService.GetByEventAsync(eventId, ct);
+        return (null, participants);
     }
 
     private static string GetStatusLabel(int status) => (Domain.RegistrationStatus)status switch
