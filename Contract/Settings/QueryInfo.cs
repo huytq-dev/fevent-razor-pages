@@ -27,6 +27,12 @@ public class QueryInfo
     /// <summary>Filter by major ID. Null = all majors.</summary>
     public Guid? MajorId { get; set; }
 
+    /// <summary>
+    /// Visibility filter for a viewer's major.
+    /// When set: show events for this major OR events without major restriction.
+    /// </summary>
+    public Guid? VisibleToMajorId { get; set; }
+
     /// <summary>Filter by event status. Null = all statuses.</summary>
     public int? Status { get; set; }
 }

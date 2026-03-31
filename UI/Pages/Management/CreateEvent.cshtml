@@ -129,83 +129,120 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="flex flex-col gap-3 mb-10">
-                            @foreach (var ev in Model.MyEvents)
-                            {
-                                var status = (Domain.EventStatus)ev.Status;
-                                var statusLabel = status switch
-                                {
-                                    Domain.EventStatus.Draft     => "Draft",
-                                    Domain.EventStatus.Pending   => "Pending",
-                                    Domain.EventStatus.Approved  => "Approved",
-                                    Domain.EventStatus.Rejected  => "Rejected",
-                                    Domain.EventStatus.Cancelled => "Cancelled",
-                                    Domain.EventStatus.Completed => "Completed",
-                                    _                            => "Unknown"
-                                };
-                                var statusClass = status switch
-                                {
-                                    Domain.EventStatus.Approved  => "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-                                    Domain.EventStatus.Pending   => "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-                                    Domain.EventStatus.Rejected  => "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-                                    Domain.EventStatus.Cancelled => "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
-                                    Domain.EventStatus.Completed => "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
-                                    _                            => "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
-                                };
-                                var canUpdate  = status == Domain.EventStatus.Draft || status == Domain.EventStatus.Pending || status == Domain.EventStatus.Rejected;
-                                var canPublish = status == Domain.EventStatus.Pending;
-                                var canCancel  = status == Domain.EventStatus.Pending || status == Domain.EventStatus.Approved;
-                                var canDelete  = status == Domain.EventStatus.Draft || status == Domain.EventStatus.Rejected || status == Domain.EventStatus.Cancelled;
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#1a120b] border border-[#e6dfdb] dark:border-[#3e342f] rounded-xl px-5 py-4 shadow-sm hover:border-primary/40 transition-colors">
-                                    <div class="flex items-center gap-4 min-w-0">
-                                        @if (!string.IsNullOrEmpty(ev.ThumbnailUrl))
+                        <div class="mb-10 overflow-hidden rounded-3xl border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#1a120b] shadow-sm">
+                            <div class="overflow-x-auto">
+                                <table class="w-full min-w-[980px] text-sm">
+                                    <thead>
+                                        <tr class="border-b border-[#e6dfdb] dark:border-[#3e342f] text-xs uppercase tracking-[0.12em] text-[#8c715f]">
+                                            <th class="px-6 py-4 text-left font-semibold">#</th>
+                                            <th class="px-6 py-4 text-left font-semibold">Event Detail</th>
+                                            <th class="px-6 py-4 text-left font-semibold">Date &amp; Time</th>
+                                            <th class="px-6 py-4 text-left font-semibold">Registrations</th>
+                                            <th class="px-6 py-4 text-left font-semibold">Status</th>
+                                            <th class="px-6 py-4 text-left font-semibold">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.MyEvents.Select((ev, index) => new { ev, index }))
                                         {
-                                            <div class="size-12 rounded-lg bg-cover bg-center flex-shrink-0 border border-[#e6dfdb] dark:border-[#3e342f]" style="background-image: url('@ev.ThumbnailUrl')"></div>
+                                            var ev = item.ev;
+                                            var status = (Domain.EventStatus)ev.Status;
+                                            var statusLabel = status switch
+                                            {
+                                                Domain.EventStatus.Draft     => "Draft",
+                                                Domain.EventStatus.Pending   => "Pending",
+                                                Domain.EventStatus.Approved  => "Approved",
+                                                Domain.EventStatus.Rejected  => "Rejected",
+                                                Domain.EventStatus.Cancelled => "Cancelled",
+                                                Domain.EventStatus.Completed => "Completed",
+                                                _                            => "Unknown"
+                                            };
+                                            var statusClass = status switch
+                                            {
+                                                Domain.EventStatus.Approved  => "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+                                                Domain.EventStatus.Pending   => "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+                                                Domain.EventStatus.Rejected  => "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+                                                Domain.EventStatus.Cancelled => "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
+                                                Domain.EventStatus.Completed => "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
+                                                _                            => "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                                            };
+                                            var canUpdate  = status != Domain.EventStatus.Completed;
+                                            var canPublish = status == Domain.EventStatus.Pending;
+                                            var canCancel  = status == Domain.EventStatus.Pending || status == Domain.EventStatus.Approved;
+                                            var canDelete  = status == Domain.EventStatus.Draft || status == Domain.EventStatus.Rejected || status == Domain.EventStatus.Cancelled;
+                                            var registeredPct = ev.MaxParticipants > 0
+                                                ? Math.Min(100, (int)Math.Round((double)ev.RegisteredCount / ev.MaxParticipants * 100))
+                                                : 0;
+                                            <tr class="border-b border-[#f2ece8] dark:border-[#2b241f] last:border-b-0 hover:bg-[#faf8f6] dark:hover:bg-[#221913] transition-colors">
+                                                <td class="px-6 py-5 align-middle text-[#8c715f] font-medium">@(item.index + 1)</td>
+                                                <td class="px-6 py-5">
+                                                    <div class="flex items-center gap-3 min-w-0">
+                                                        @if (!string.IsNullOrEmpty(ev.ThumbnailUrl))
+                                                        {
+                                                            <div class="size-12 rounded-lg bg-cover bg-center flex-shrink-0 border border-[#e6dfdb] dark:border-[#3e342f]" style="background-image: url('@ev.ThumbnailUrl')"></div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="size-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                                                <span class="material-symbols-outlined text-primary">image</span>
+                                                            </div>
+                                                        }
+                                                        <div class="min-w-0">
+                                                            <p class="text-base font-bold text-[#181411] dark:text-white truncate">@ev.Title</p>
+                                                            <p class="text-sm text-[#8c715f] truncate">@ev.LocationName</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-5 text-[#181411] dark:text-white">
+                                                    <p class="font-semibold">@ev.StartTime.LocalDateTime.ToString("MMM dd, yyyy")</p>
+                                                    <p class="text-xs text-[#8c715f]">@ev.StartTime.LocalDateTime.ToString("hh:mm tt")</p>
+                                                </td>
+                                                <td class="px-6 py-5">
+                                                    <div class="w-24 h-2 rounded-full bg-[#ffe5d1] dark:bg-[#3e342f] overflow-hidden mb-1.5">
+                                                        <div class="h-full rounded-full bg-primary" style="width: @registeredPct%"></div>
+                                                    </div>
+                                                    <p class="text-base font-bold text-primary leading-tight">@ev.RegisteredCount <span class="text-[#8c715f]">/</span> @ev.MaxParticipants</p>
+                                                </td>
+                                                <td class="px-6 py-5">
+                                                    <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold @statusClass">@statusLabel</span>
+                                                </td>
+                                                <td class="px-6 py-5">
+                                                    <div class="flex items-center gap-3">
+                                                        @if (canUpdate)
+                                                        {
+                                                            <a asp-page="/Management/UpdateEvent" asp-route-id="@ev.Id" title="Edit"
+                                                               class="inline-flex size-9 items-center justify-center rounded-full border border-primary/35 bg-white dark:bg-[#1a120b] text-primary hover:bg-primary/10 hover:border-primary transition-colors shadow-sm">
+                                                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                                                            </a>
+                                                        }
+                                                        <a asp-page="/Management/EventDetail" asp-route-id="@ev.Id" title="View"
+                                                           class="inline-flex size-9 items-center justify-center rounded-full border border-primary/35 bg-white dark:bg-[#1a120b] text-primary hover:bg-primary/10 hover:border-primary transition-colors shadow-sm">
+                                                            <span class="material-symbols-outlined text-[18px]">visibility</span>
+                                                        </a>
+                                                        @if (canCancel)
+                                                        {
+                                                            <a asp-page="/Management/CancelEvent" asp-route-id="@ev.Id" title="Cancel"
+                                                               class="inline-flex size-9 items-center justify-center rounded-full border border-orange-300 bg-white dark:bg-[#1a120b] text-orange-500 hover:bg-orange-50 hover:border-orange-500 transition-colors shadow-sm">
+                                                                <span class="material-symbols-outlined text-[18px]">cancel</span>
+                                                            </a>
+                                                        }
+                                                        @if (canDelete)
+                                                        {
+                                                            <a asp-page="/Management/DeleteEvent" asp-route-id="@ev.Id" title="Delete"
+                                                               class="inline-flex size-9 items-center justify-center rounded-full border border-red-300 bg-white dark:bg-[#1a120b] text-red-500 hover:bg-red-50 hover:border-red-500 transition-colors shadow-sm">
+                                                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                                                            </a>
+                                                        }
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         }
-                                        else
-                                        {
-                                            <div class="size-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                                <span class="material-symbols-outlined text-primary">event</span>
-                                            </div>
-                                        }
-                                        <div class="min-w-0">
-                                            <p class="text-sm font-bold text-[#181411] dark:text-white truncate">@ev.Title</p>
-                                            <p class="text-xs text-[#8c715f] mt-0.5">@ev.StartTime.LocalDateTime.ToString("dd/MM/yyyy") &nbsp;·&nbsp; @ev.LocationName</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-2 flex-shrink-0 flex-wrap">
-                                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold @statusClass">@statusLabel</span>
-                                        <a asp-page="/Management/EventDetail" asp-route-id="@ev.Id"
-                                           class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary/10 text-xs font-medium text-primary hover:bg-primary/20 transition-colors">
-                                            <span class="material-symbols-outlined text-[14px]">visibility</span> View
-                                        </a>
-                                        @if (canUpdate)
-                                        {
-                                            <a asp-page="/Management/UpdateEvent" asp-route-id="@ev.Id" class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#2a221b] text-xs font-medium text-[#181411] dark:text-white hover:border-primary hover:text-primary transition-colors">
-                                                <span class="material-symbols-outlined text-[14px]">edit</span> Update
-                                            </a>
-                                        }
-                                        @if (canPublish)
-                                        {
-                                            <a asp-page="/Management/PublishEvent" asp-route-id="@ev.Id" class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-600 text-xs font-medium text-white hover:bg-green-700 transition-colors">
-                                                <span class="material-symbols-outlined text-[14px]">publish</span> Publish
-                                            </a>
-                                        }
-                                        @if (canCancel)
-                                        {
-                                            <a asp-page="/Management/CancelEvent" asp-route-id="@ev.Id" class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-orange-300 dark:border-orange-700 text-xs font-medium text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">
-                                                <span class="material-symbols-outlined text-[14px]">cancel</span> Cancel
-                                            </a>
-                                        }
-                                        @if (canDelete)
-                                        {
-                                            <a asp-page="/Management/DeleteEvent" asp-route-id="@ev.Id" class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-red-300 dark:border-red-700 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                                                <span class="material-symbols-outlined text-[14px]">delete</span> Delete
-                                            </a>
-                                        }
-                                    </div>
-                                </div>
-                            }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="border-t border-[#e6dfdb] dark:border-[#3e342f] px-6 py-4 text-center text-sm text-[#8c715f]">
+                                Total: <span class="font-bold text-[#181411] dark:text-white">@Model.MyEvents.Count</span> events
+                            </div>
                         </div>
                     }
                 }
@@ -234,6 +271,20 @@
                     {
                         <div class="mb-4 rounded-lg bg-green-100 p-4 text-sm text-green-800 dark:bg-green-900 dark:text-green-200" role="alert">
                             <span class="font-medium">Success!</span> @TempData["SuccessMessage"]
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="mb-4 rounded-lg bg-red-100 p-4 text-sm text-red-800 dark:bg-red-900 dark:text-red-200" role="alert">
+                            <span class="font-medium">Error!</span> @TempData["ErrorMessage"]
+                        </div>
+                    }
+
+                    @if (TempData["InfoMessage"] != null)
+                    {
+                        <div class="mb-4 rounded-lg bg-blue-100 p-4 text-sm text-blue-800 dark:bg-blue-900 dark:text-blue-200" role="alert">
+                            <span class="font-medium">Info:</span> @TempData["InfoMessage"]
                         </div>
                     }
 
@@ -283,6 +334,7 @@
                                             </div>
                                         </div>
                                         <span asp-validation-for="ViewModel.LocationId" class="text-xs text-red-500"></span>
+                                        <p class="text-xs text-[#8c715f]">Gợi ý campus: FPT Hà Nội, FPT HCM, FPT Đà Nẵng, FPT Cần Thơ, FPT Quy Nhơn.</p>
                                     </label>
 
                                     <!-- Major -->
@@ -418,7 +470,7 @@
                                         <span class="material-symbols-outlined">send</span>
                                         Submit for Approval
                                     </button>
-                                    <button type="button" class="flex w-full items-center justify-center gap-2 rounded-lg bg-white dark:bg-[#2a221b] border border-[#e6dfdb] dark:border-[#3e342f] px-6 py-3 text-base font-medium text-[#181411] dark:text-white hover:bg-gray-50 dark:hover:bg-[#3e342f] transition-colors">
+                                    <button type="submit" asp-page-handler="Preview" class="flex w-full items-center justify-center gap-2 rounded-lg bg-white dark:bg-[#2a221b] border border-[#e6dfdb] dark:border-[#3e342f] px-6 py-3 text-base font-medium text-[#181411] dark:text-white hover:bg-gray-50 dark:hover:bg-[#3e342f] transition-colors">
                                         <span class="material-symbols-outlined">visibility</span>
                                         Preview
                                     </button>
@@ -426,6 +478,28 @@
                                 <p class="mt-4 text-xs text-[#8c715f] text-center">
                                     By submitting, you agree to the <a class="underline hover:text-primary" href="#">Event Guidelines</a> of FPT University.
                                 </p>
+
+                                @if (Model.IsPreviewMode && Model.Preview is not null)
+                                {
+                                    var preview = Model.Preview;
+                                    <div class="mt-4 rounded-xl border border-[#f4b38c] bg-[#fff5ee] p-4 text-sm text-[#6b3d1f]">
+                                        <p class="text-xs uppercase tracking-wider font-bold text-[#b55b23] mb-2">Live Preview</p>
+                                        <p class="text-base font-bold text-[#4a2a15]">@preview.Title</p>
+                                        <p class="mt-1 line-clamp-3">@preview.Description</p>
+                                        <div class="mt-3 space-y-1 text-xs">
+                                            <p><span class="font-semibold">Category:</span> @preview.CategoryName</p>
+                                            <p><span class="font-semibold">Venue:</span> @preview.LocationName</p>
+                                            <p><span class="font-semibold">Major:</span> @preview.MajorName</p>
+                                            <p><span class="font-semibold">Access:</span> @preview.AccessType</p>
+                                            <p><span class="font-semibold">Time:</span> @preview.StartTime.ToString("dd/MM/yyyy HH:mm") - @preview.EndTime.ToString("dd/MM/yyyy HH:mm")</p>
+                                            <p><span class="font-semibold">Capacity:</span> @preview.MaxParticipants</p>
+                                            @if (!string.IsNullOrWhiteSpace(preview.BannerFileName))
+                                            {
+                                                <p><span class="font-semibold">Banner:</span> @preview.BannerFileName</p>
+                                            }
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
@@ -463,8 +537,7 @@
         }
     </script>
 
-    @section Scripts {
-        <partial name="_ValidationScriptsPartial" />
-    }
+    <partial name="_AiChatbot" />
+    <partial name="_ValidationScriptsPartial" />
 </body>
 </html>

@@ -30,8 +30,8 @@ public class UpdateEventViewModel : IValidatableObject
     [Display(Name = "Cover Image")]
     public IFormFile? CoverImage { get; set; }
 
-    [Display(Name = "Published Status")]
-    public bool IsPublished { get; set; }
+    [Display(Name = "Public visibility")]
+    public bool IsPublic { get; set; }
 
     [Required(ErrorMessage = "Start date is required")]
     [DataType(DataType.Date)]
@@ -44,10 +44,6 @@ public class UpdateEventViewModel : IValidatableObject
     [Required(ErrorMessage = "End time is required")]
     [DataType(DataType.Time)]
     public TimeSpan EndTime { get; set; } = TimeSpan.FromHours(12);
-
-    [Required(ErrorMessage = "Registration deadline is required")]
-    [DataType(DataType.Date)]
-    public DateTime RegistrationDeadline { get; set; } = DateTime.Today.AddDays(-1);
 
     [Required(ErrorMessage = "Max capacity is required")]
     [Range(1, int.MaxValue, ErrorMessage = "Capacity must be at least 1")]
@@ -68,9 +64,5 @@ public class UpdateEventViewModel : IValidatableObject
             yield return new ValidationResult("End time must be after start time.", new[] { nameof(EndTime) });
         }
 
-        if (RegistrationDeadline.Date > StartDate.Date)
-        {
-            yield return new ValidationResult("Registration deadline cannot be after event date.", new[] { nameof(RegistrationDeadline) });
-        }
     }
 }

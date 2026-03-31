@@ -16,6 +16,7 @@ public sealed class EventDetailResponse
     public string CategoryName { get; init; } = null!;
     public Guid LocationId { get; init; }
     public string LocationName { get; init; } = null!;
+    public Guid? MajorId { get; init; }
     public string? LocationAddress { get; init; }
     public string? LocationMapUrl { get; init; }
     public Guid OrganizerId { get; init; }

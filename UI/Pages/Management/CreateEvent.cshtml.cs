@@ -34,6 +34,8 @@ public class CreateEventModel : PageModel
     public string? FullName { get; set; }
     public string? AvatarUrl { get; set; }
     public List<EventSummaryResponse> MyEvents { get; set; } = new();
+    public bool IsPreviewMode { get; set; }
+    public EventPreviewCard? Preview { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -87,12 +89,49 @@ public class CreateEventModel : PageModel
         if (result.IsSuccess)
         {
             TempData["SuccessMessage"] = "Event created successfully and is pending approval.";
+            TempData["InfoMessage"] = "Bạn có thể vào Dashboard để quản lý, cập nhật, publish hoặc hủy sự kiện.";
             return RedirectToPage("./CreateEvent");
         }
 
+        TempData["ErrorMessage"] = result.Message;
         ModelState.AddModelError(string.Empty, result.Message);
         await LoadCatalogsAsync();
         await LoadMyEventsAsync();
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostPreviewAsync()
+    {
+        FullName = HttpContext.Session.GetString("FullName") ?? "Anonymous Organizer";
+        AvatarUrl = HttpContext.Session.GetString("AvatarUrl");
+
+        await LoadCatalogsAsync();
+        await LoadMyEventsAsync();
+
+        if (!ModelState.IsValid)
+        {
+            TempData["ErrorMessage"] = "Vui lòng nhập đủ thông tin hợp lệ trước khi xem preview.";
+            return Page();
+        }
+
+        IsPreviewMode = true;
+        Preview = new EventPreviewCard
+        {
+            Title = ViewModel.Title,
+            Description = ViewModel.Description,
+            StartTime = ViewModel.StartDateTime ?? DateTime.Now,
+            EndTime = ViewModel.EndDateTime ?? DateTime.Now,
+            MaxParticipants = ViewModel.MaxParticipants,
+            CategoryName = Categories.FirstOrDefault(c => c.Value == ViewModel.CategoryId?.ToString())?.Text ?? "N/A",
+            LocationName = Locations.FirstOrDefault(c => c.Value == ViewModel.LocationId?.ToString())?.Text ?? "N/A",
+            MajorName = ViewModel.MajorId.HasValue
+                ? Majors.FirstOrDefault(c => c.Value == ViewModel.MajorId.Value.ToString())?.Text ?? "N/A"
+                : "All majors",
+            AccessType = ViewModel.AccessType,
+            BannerFileName = ViewModel.BannerImage?.FileName
+        };
+
+        TempData["InfoMessage"] = "Đây là bản xem trước sự kiện. Dữ liệu chưa được tạo cho đến khi bấm Submit for Approval.";
         return Page();
     }
 
@@ -191,7 +230,7 @@ public class CreateEventModel : PageModel
         Locations = locations.Select(l => new SelectListItem
         {
             Value = l.Id.ToString(),
-            Text = l.Name
+            Text = NormalizeLocationName(l.Name)
         }).ToList();
 
         var majors = await _catalogService.GetMajorsAsync();
@@ -200,5 +239,35 @@ public class CreateEventModel : PageModel
             Value = m.Id.ToString(),
             Text = string.IsNullOrEmpty(m.Code) ? m.Name : $"[{m.Code}] {m.Name}"
         }).ToList();
+    }
+
+    private static string NormalizeLocationName(string name)
+    {
+        if (name.Contains("Can Tho", StringComparison.OrdinalIgnoreCase) && !name.Contains("Campus", StringComparison.OrdinalIgnoreCase))
+            return "FPT Cần Thơ Campus";
+        if (name.Contains("Da Nang", StringComparison.OrdinalIgnoreCase) && !name.Contains("Campus", StringComparison.OrdinalIgnoreCase))
+            return "FPT Đà Nẵng Campus";
+        if (name.Contains("Quy Nhon", StringComparison.OrdinalIgnoreCase) && !name.Contains("Campus", StringComparison.OrdinalIgnoreCase))
+            return "FPT Quy Nhơn Campus";
+        if (name.Contains("HCM", StringComparison.OrdinalIgnoreCase) && !name.Contains("Campus", StringComparison.OrdinalIgnoreCase))
+            return "FPT HCM Campus";
+        if (name.Contains("Hanoi", StringComparison.OrdinalIgnoreCase) && !name.Contains("Campus", StringComparison.OrdinalIgnoreCase))
+            return "FPT Hà Nội Campus";
+
+        return name;
+    }
+
+    public sealed class EventPreviewCard
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public int MaxParticipants { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
+        public string LocationName { get; set; } = string.Empty;
+        public string MajorName { get; set; } = string.Empty;
+        public string AccessType { get; set; } = string.Empty;
+        public string? BannerFileName { get; set; }
     }
 }

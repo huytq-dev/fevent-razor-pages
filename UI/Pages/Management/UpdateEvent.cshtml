@@ -93,6 +93,20 @@
                     <input type="hidden" asp-for="ViewModel.Id" />
                     <input type="hidden" asp-for="ViewModel.ThumbnailUrl" id="currentThumbnail" />
 
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="mb-4 rounded-lg bg-green-100 p-4 text-sm text-green-800 dark:bg-green-900 dark:text-green-200" role="alert">
+                            <span class="font-medium">Success!</span> @TempData["SuccessMessage"]
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="mb-4 rounded-lg bg-red-100 p-4 text-sm text-red-800 dark:bg-red-900 dark:text-red-200" role="alert">
+                            <span class="font-medium">Error!</span> @TempData["ErrorMessage"]
+                        </div>
+                    }
+
                     <div class="flex flex-wrap justify-between gap-3 px-4 py-6">
                         <div class="flex min-w-72 flex-col gap-2">
                             <h1 class="text-text-main dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Update Event Details</h1>
@@ -204,19 +218,19 @@
                                     <div class="flex items-center gap-3">
                                         <span class="material-symbols-outlined text-primary">visibility</span>
                                         <div class="flex flex-col">
-                                            <span class="text-sm font-bold text-text-main dark:text-white">Status</span>
-                                            <span class="text-xs text-text-secondary" id="statusLabel">@(Model.ViewModel.IsPublished ? "Published" : "Draft")</span>
+                                            <span class="text-sm font-bold text-text-main dark:text-white">Visibility</span>
+                                            <span class="text-xs text-text-secondary" id="statusLabel">@(Model.ViewModel.IsPublic ? "Public" : "Private")</span>
                                         </div>
                                     </div>
                                     <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" asp-for="ViewModel.IsPublished" class="sr-only peer" id="publishToggle" />
+                                        <input type="checkbox" asp-for="ViewModel.IsPublic" class="sr-only peer" id="publishToggle" />
                                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 dark:peer-focus:ring-primary/20 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
                                     </label>
                                 </div>
                                 <div class="flex flex-col gap-3 mt-2">
                                     <button type="submit" class="w-full h-12 rounded-full bg-primary hover:bg-orange-600 text-white font-bold text-base transition-colors shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2">
                                         <span class="material-symbols-outlined text-[20px]">save</span>
-                                        Update Event
+                                        Save Changes
                                     </button>
                                     <button type="button" class="w-full h-12 rounded-full border border-transparent hover:border-[#e6dfdb] text-text-secondary font-medium text-base transition-colors hover:bg-gray-50 dark:hover:bg-white/5" onclick="window.history.back()">Cancel</button>
                                 </div>
@@ -242,11 +256,7 @@
                                     </label>
                                 </div>
                                 <div class="h-px w-full bg-[#f5f2f0] dark:bg-[#3e352f]"></div>
-                                <label class="flex flex-col gap-2">
-                                    <span class="text-sm font-medium text-text-main dark:text-gray-200">Registration Deadline</span>
-                                    <input asp-for="ViewModel.RegistrationDeadline" class="w-full rounded-xl border border-[#e6dfdb] dark:border-[#5a4d44] bg-[#f8f7f5] dark:bg-[#23170f] h-12 px-4 text-text-main dark:text-white focus:ring-2 focus:ring-primary outline-none" type="date" />
-                                    <span asp-validation-for="ViewModel.RegistrationDeadline" class="text-xs text-red-500 mt-1"></span>
-                                </label>
+                                <p class="text-xs text-text-secondary">Event registration closes automatically when the event starts.</p>
                             </div>
 
                             <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-[2rem] shadow-sm border border-[#e6dfdb] dark:border-[#3e352f] flex flex-col gap-5">
@@ -297,12 +307,10 @@
         });
 
         publishToggle.addEventListener('change', function() {
-            statusLabel.textContent = this.checked ? "Published" : "Draft";
+            statusLabel.textContent = this.checked ? "Public" : "Private";
         });
     </script>
 
-    @section Scripts {
-        <partial name="_ValidationScriptsPartial" />
-    }
+    <partial name="_ValidationScriptsPartial" />
 </body>
 </html>

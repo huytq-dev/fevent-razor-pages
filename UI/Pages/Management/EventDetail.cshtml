@@ -19,6 +19,7 @@
     };
 
     var canEdit   = status is EventStatus.Draft or EventStatus.Pending or EventStatus.Rejected;
+    var canPublish = status is EventStatus.Draft or EventStatus.Pending or EventStatus.Rejected;
     var canCancel = status is EventStatus.Pending or EventStatus.Approved;
     var canDelete = status is EventStatus.Draft or EventStatus.Rejected or EventStatus.Cancelled;
     var canViewParticipants = status is EventStatus.Approved or EventStatus.Completed;
@@ -165,6 +166,13 @@
                             <a asp-page="/Management/UpdateEvent" asp-route-id="@ev.Id"
                                class="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#2a221b] text-sm font-medium text-[#181411] dark:text-white hover:border-primary hover:text-primary transition-colors">
                                 <span class="material-symbols-outlined text-[16px]">edit</span> Edit
+                            </a>
+                        }
+                        @if (canPublish)
+                        {
+                            <a asp-page="/Management/PublishEvent" asp-route-id="@ev.Id"
+                               class="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-green-600 text-sm font-medium text-white hover:bg-green-700 transition-colors">
+                                <span class="material-symbols-outlined text-[16px]">publish</span> Publish
                             </a>
                         }
                         @if (canCancel)

@@ -1,6 +1,7 @@
 using Application;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Domain;
 using UI.Models.Events;
 
 namespace UI.Pages.Management;
@@ -19,30 +20,28 @@ public class CancelEventModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(Guid? id)
     {
+        var userIdStr = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+        {
+            return RedirectToPage("/Authentications/Login", new { ReturnUrl = "/Management/CreateEvent?tab=events" });
+        }
+
         if (id == null || id == Guid.Empty)
         {
-            // Seed mock data for UI testing if no actual ID is provided
-            ViewModel = new CancelEventViewModel
-            {
-                Id = Guid.Empty,
-                Title = "Tech Talk 2024 - AI Innovations",
-                Status = "Published",
-                StartTime = new DateTime(2024, 10, 25, 10, 0, 0),
-                EndTime = new DateTime(2024, 10, 25, 12, 0, 0),
-                LocationName = "Hall A, FPT University Campus",
-                RegisteredCount = 142,
-                ThumbnailUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuBSr4E4N06uevHzrl-rk7acaPP4lkSiDEc5AGxEsrAzL_bkN51GmlNN69MwcLmkiRDYdVGFzfYSRdAjYbAhqrLzPVIaEpFZb2E9A-GLYHTkBVWH5Fd2J3aT9RzrrZ0kKWSPzcnL9GgzWiLNjefVz3JeEKESWGprf7RbM_3XyXtTQC1sEogyi1mZXCy0XSnAAuDnWVI9CVWPBj1Uq4SnDCz8KAI-jIa3pJ0WlehU6oO9b8cc5WfUpikIrfbMvjTRdwkxINSkEWyOcTkk"
-            };
-            return Page();
+            return RedirectToPage("/Management/CreateEvent", new { tab = "events" });
         }
 
         var response = await _eventsService.GetDetailAsync(id.Value);
-        if (response == null || response.Data == null)
+        if (!response.IsSuccess || response.Data == null)
         {
             return NotFound();
         }
 
         var eventDetail = response.Data;
+        if (eventDetail.OrganizerId != userId)
+        {
+            return Forbid();
+        }
 
         ViewModel = new CancelEventViewModel
         {
@@ -61,23 +60,40 @@ public class CancelEventModel : PageModel
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
+        var userIdStr = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+        {
+            return RedirectToPage("/Authentications/Login", new { ReturnUrl = "/Management/CreateEvent?tab=events" });
+        }
+
         if (!ModelState.IsValid)
         {
             return Page();
         }
 
-        if (ViewModel.Id != Guid.Empty)
+        var eventDetail = await _eventsService.GetDetailAsync(ViewModel.Id);
+        if (!eventDetail.IsSuccess || eventDetail.Data is null)
         {
-            // Logic to update status to "Cancelled" in the database would go here:
-            // var result = await _eventsService.CancelAsync(ViewModel.Id, ViewModel.CancellationReason);
-            // if (!result.IsSuccess)
-            // {
-            //     ModelState.AddModelError(string.Empty, "Failed to cancel the event. Please try again.");
-            //     return Page();
-            // }
+            TempData["ErrorMessage"] = eventDetail.Message;
+            return RedirectToPage("/Management/CreateEvent", new { tab = "events" });
+        }
+
+        if (eventDetail.Data.OrganizerId != userId)
+        {
+            return Forbid();
+        }
+
+        var result = await _eventsService.UpdateStatusAsync(ViewModel.Id, EventStatus.Cancelled);
+        if (!result.IsSuccess)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToPage("/Management/EventDetail", new { id = ViewModel.Id });
         }
 
         TempData["SuccessMessage"] = "Event has been cancelled successfully and attendees have been notified.";
-        return RedirectToPage("./CreateEvent", new { tab = "create" });
+        TempData["InfoMessage"] = string.IsNullOrWhiteSpace(ViewModel.CancellationReason)
+            ? null
+            : $"Reason sent to attendees: {ViewModel.CancellationReason}";
+        return RedirectToPage("/Management/CreateEvent", new { tab = "events" });
     }
 }

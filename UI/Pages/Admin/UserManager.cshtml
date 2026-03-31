@@ -41,10 +41,10 @@
         </div>
     </div>
 
-    <!-- Add User Modal -->
-    <div id="addUserModal" class="fixed inset-0 z-[100] hidden">
+    <!-- Add User Modal (fixed, flex center, overlay) -->
+    <div id="addUserModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="document.getElementById('addUserModal').classList.add('hidden')"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-gray-100 z-10 animate-fade-in-up">
+        <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-gray-100 z-10 animate-fade-in-up mx-2">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-bold text-gray-900">Thêm người dùng</h3>
                 <button type="button" onclick="document.getElementById('addUserModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-full p-2 transition-colors">

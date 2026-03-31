@@ -1,0 +1,47 @@
+@{
+    var success = TempData["SuccessMessage"] as string;
+    var error = TempData["ErrorMessage"] as string;
+    var info = TempData["InfoMessage"] as string;
+}
+
+@if (!string.IsNullOrWhiteSpace(success) || !string.IsNullOrWhiteSpace(error) || !string.IsNullOrWhiteSpace(info))
+{
+    <div id="flash-toast-stack" class="fixed top-5 right-5 z-[120] flex w-[92vw] max-w-sm flex-col gap-2">
+        @if (!string.IsNullOrWhiteSpace(success))
+        {
+            <div class="flash-toast rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 shadow">
+                <span class="font-semibold">Thanh cong:</span> @success
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(error))
+        {
+            <div class="flash-toast rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 shadow">
+                <span class="font-semibold">Loi:</span> @error
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(info))
+        {
+            <div class="flash-toast rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 shadow">
+                <span class="font-semibold">Thong bao:</span> @info
+            </div>
+        }
+    </div>
+
+    <script>
+        (function () {
+            const toasts = document.querySelectorAll('.flash-toast');
+            if (!toasts.length) return;
+
+            setTimeout(() => {
+                toasts.forEach(t => {
+                    t.style.transition = 'all 280ms ease';
+                    t.style.opacity = '0';
+                    t.style.transform = 'translateY(-8px)';
+                });
+                setTimeout(() => document.getElementById('flash-toast-stack')?.remove(), 320);
+            }, 3200);
+        })();
+    </script>
+}
