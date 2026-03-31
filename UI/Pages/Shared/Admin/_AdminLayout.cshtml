@@ -50,6 +50,7 @@
     </style>
 </head>
 <body class="bg-background text-foreground font-sans antialiased flex flex-col min-h-screen">
+    <partial name="_FlashToast" />
     
     <!-- Admin Header -->
     <header class="sticky top-0 z-50 w-full border-b border-border bg-white/80 backdrop-blur-md shadow-sm">
@@ -131,6 +132,7 @@
     </main>
 
     <!-- Footer intentionally omitted for Admin Layout -->
+    <partial name="_AiChatbot" />
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

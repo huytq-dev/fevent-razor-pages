@@ -19,27 +19,28 @@ public class DeleteEventModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(Guid? id)
     {
+        var userIdStr = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+        {
+            return RedirectToPage("/Authentications/Login", new { ReturnUrl = "/Management/CreateEvent?tab=events" });
+        }
+
         if (id == null || id == Guid.Empty)
         {
-            // Seed mock data for UI testing if no actual ID is provided
-            ViewModel = new DeleteEventViewModel
-            {
-                Id = Guid.Empty,
-                Title = "Graduation Ceremony Spring 2024",
-                StartTime = new DateTime(2024, 5, 15),
-                LocationName = "Main Hall, FPT University",
-                ThumbnailUrl = "https://lh3.googleusercontent.com/aida-public/AB6AXuDWCSyTH_U50njS0wpNV9jzSKuxpJilS6Ki0Kv-b-0wNZUGVYvh4aeIBt6TL2dz-18xK7CtmP4SQz8VaDeihujosJNptb0ijg_uoB82VZV0hffomnDQqNQK6TVzUFH59QtlPD_fwGUXE5PVndKChTyVJYBOpJzTGd0spPGUZkGgZH6QyTDxPtMrEwm6_SF2mpACTvfrdUQTsuCZ8Zm1JVR505u5fJPJuZdsIbEKV-B17ZytMtP4PvMqtaHERlkoOyGr7RHUGgFdD3b4"
-            };
-            return Page();
+            return RedirectToPage("/Management/CreateEvent", new { tab = "events" });
         }
 
         var response = await _eventsService.GetDetailAsync(id.Value);
-        if (response == null || response.Data == null)
+        if (!response.IsSuccess || response.Data == null)
         {
             return NotFound();
         }
 
         var eventDetail = response.Data;
+        if (eventDetail.OrganizerId != userId)
+        {
+            return Forbid();
+        }
 
         ViewModel = new DeleteEventViewModel
         {
@@ -55,6 +56,12 @@ public class DeleteEventModel : PageModel
 
     public async Task<IActionResult> OnPostDeleteAsync()
     {
+        var userIdStr = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+        {
+            return RedirectToPage("/Authentications/Login", new { ReturnUrl = "/Management/CreateEvent?tab=events" });
+        }
+
         if (ViewModel.DeleteConfirmation != "DELETE")
         {
             ModelState.AddModelError("ViewModel.DeleteConfirmation", "Please type DELETE to confirm deletion.");
@@ -74,18 +81,20 @@ public class DeleteEventModel : PageModel
             return Page();
         }
 
-        if (ViewModel.Id != Guid.Empty)
+        if (ViewModel.Id == Guid.Empty)
         {
-            // Logic to delete from database
-            // var result = await _eventsService.DeleteAsync(ViewModel.Id);
-            // if (!result.IsSuccess)
-            // {
-            //     ModelState.AddModelError("", "Failed to delete the event.");
-            //     return Page();
-            // }
+            TempData["ErrorMessage"] = "Invalid event id.";
+            return RedirectToPage("/Management/CreateEvent", new { tab = "events" });
+        }
+
+        var result = await _eventsService.DeleteAsync(ViewModel.Id, userId);
+        if (!result.IsSuccess)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToPage("/Management/EventDetail", new { id = ViewModel.Id });
         }
 
         TempData["SuccessMessage"] = "Event deleted successfully.";
-        return RedirectToPage("./CreateEvent", new { tab = "create" });
+        return RedirectToPage("/Management/CreateEvent", new { tab = "events" });
     }
 }

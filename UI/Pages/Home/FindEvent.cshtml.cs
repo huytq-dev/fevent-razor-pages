@@ -1,6 +1,11 @@
+using Infrastructure;
+
 namespace UI;
 
-public class FindEventModel(IEventsService eventsService, ICatalogService catalogService) : PageModel
+public class FindEventModel(
+    IEventsService eventsService,
+    ICatalogService catalogService,
+    IUnitOfWork unitOfWork) : PageModel
 {
     private const int PageSizeDefault = 9;
 
@@ -28,6 +33,27 @@ public class FindEventModel(IEventsService eventsService, ICatalogService catalo
         var page = Math.Max(1, PageNumber);
         var size = Math.Clamp(PageSize < 1 ? PageSizeDefault : PageSize, 1, AppConstants.MaxPageSize);
 
+        Categories = await catalogService.GetCategoriesAsync(ct);
+        Locations = await catalogService.GetLocationsAsync(ct);
+        Majors = await catalogService.GetMajorsAsync(ct);
+
+        Guid? visibleToMajorId = null;
+        var userIdRaw = HttpContext.Session.GetString("UserId");
+        if (Guid.TryParse(userIdRaw, out var userId))
+        {
+            var viewer = await unitOfWork.Users.GetByIdAsync(userId);
+            if (!string.IsNullOrWhiteSpace(viewer?.Major))
+            {
+                var major = Majors.FirstOrDefault(m =>
+                    string.Equals(m.Name, viewer.Major, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(m.Code, viewer.Major, StringComparison.OrdinalIgnoreCase));
+                if (major is not null)
+                {
+                    visibleToMajorId = major.Id;
+                }
+            }
+        }
+
         var query = new QueryInfo
         {
             Top = size,
@@ -38,13 +64,11 @@ public class FindEventModel(IEventsService eventsService, ICatalogService catalo
             CategoryIds = CategoryIds.Count > 0 ? CategoryIds : null,
             LocationIds = LocationIds.Count > 0 ? LocationIds : null,
             MajorId = MajorId,
+            VisibleToMajorId = visibleToMajorId,
             StartDateFrom = StartDateFrom?.ToDateTime(TimeOnly.MinValue),
-            StartDateTo = StartDateTo?.ToDateTime(TimeOnly.MinValue)
+            StartDateTo = StartDateTo?.ToDateTime(TimeOnly.MinValue),
+            Status = (int)Domain.EventStatus.Approved
         };
-
-        Categories = await catalogService.GetCategoriesAsync(ct);
-        Locations = await catalogService.GetLocationsAsync(ct);
-        Majors = await catalogService.GetMajorsAsync(ct);
 
         var result = await eventsService.GetAllAsync(query, ct);
 

@@ -1,0 +1,106 @@
+<div id="ai-chatbot-root" class="fixed bottom-5 right-5 z-[90]">
+    <button id="ai-chatbot-toggle" type="button" class="group h-14 w-14 rounded-2xl bg-gradient-to-br from-[#ff7a18] to-[#f04e23] text-white shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl" aria-label="Mở trợ lý AI">
+        <svg class="h-6 w-6 transition-transform duration-300 group-hover:rotate-12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 3c3.866 0 7 3.134 7 7v4a4 4 0 01-4 4h-1.2l-1.8 2.4L10.2 18H9a4 4 0 01-4-4v-4c0-3.866 3.134-7 7-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="9" cy="11" r="1" fill="currentColor"/>
+            <circle cx="15" cy="11" r="1" fill="currentColor"/>
+        </svg>
+    </button>
+
+    <div id="ai-chatbot-panel" class="hidden mt-3 w-[360px] max-w-[94vw] rounded-2xl border border-[#f5d9c8] bg-white shadow-2xl overflow-hidden">
+        <div class="px-4 py-3 bg-gradient-to-r from-[#2b1408] to-[#1f0e06] text-white flex items-center justify-between">
+            <div>
+                <p class="text-sm font-bold">FEvents AI Assistant</p>
+                <p class="text-[11px] opacity-90">Hỗ trợ vé, hoàn vé, check-in và đăng ký sự kiện</p>
+            </div>
+            <button id="ai-chatbot-close" type="button" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-white/80 hover:text-white hover:bg-white/10" aria-label="Đóng chatbot">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+
+        <div id="ai-chatbot-messages" class="h-80 overflow-y-auto px-3 py-3 space-y-2 bg-[#fffaf7]">
+            <div class="rounded-2xl px-3 py-2 text-sm bg-[#f1f5f9] text-slate-800 max-w-[90%]">
+                Xin chào, mình là trợ lý AI của FEvents. Bạn cần hỗ trợ gì?
+            </div>
+        </div>
+
+        <form id="ai-chatbot-form" class="border-t border-[#f5d9c8] p-3 flex gap-2 bg-white">
+            <input id="ai-chatbot-input" type="text" maxlength="500" placeholder="Nhập câu hỏi..." class="flex-1 rounded-xl border border-[#f59b66] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#ff7a18]/30 focus:border-[#ff7a18]" />
+            <button type="submit" class="px-4 py-2 rounded-xl bg-[#ff6a00] hover:bg-[#e75f00] text-white text-sm font-semibold">Gửi</button>
+        </form>
+    </div>
+</div>
+
+<script>
+(function () {
+    const root = document.getElementById('ai-chatbot-root');
+    if (!root) return;
+
+    const toggle = document.getElementById('ai-chatbot-toggle');
+    const closeBtn = document.getElementById('ai-chatbot-close');
+    const panel = document.getElementById('ai-chatbot-panel');
+    const form = document.getElementById('ai-chatbot-form');
+    const input = document.getElementById('ai-chatbot-input');
+    const messages = document.getElementById('ai-chatbot-messages');
+
+    function appendMessage(text, role) {
+        const bubble = document.createElement('div');
+        const common = 'rounded-xl px-3 py-2 text-sm max-w-[90%] break-words';
+        bubble.className = role === 'user'
+            ? `${common} ml-auto bg-primary text-white`
+            : `${common} bg-[#f1f5f9] text-slate-800`;
+        bubble.textContent = text;
+        messages.appendChild(bubble);
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    async function sendMessage(text) {
+        appendMessage(text, 'user');
+        appendMessage('Đang trả lời...', 'bot');
+        const loading = messages.lastElementChild;
+
+        try {
+            const response = await fetch('/api/chatbot/message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
+
+            if (!response.ok) {
+                loading.textContent = 'Chatbot tạm thời không khả dụng. Vui lòng thử lại sau.';
+                return;
+            }
+
+            const data = await response.json();
+            if (data.errorDetail) {
+                loading.textContent = (data.reply ? data.reply + '\n\n[Gemini lỗi: ' + data.errorDetail + ']' : '[Gemini lỗi: ' + data.errorDetail + ']');
+                loading.style.color = '#b91c1c'; // red for error
+            } else {
+                loading.textContent = data.reply || 'Không nhận được phản hồi từ chatbot.';
+            }
+        } catch {
+            loading.textContent = 'Không thể kết nối chatbot lúc này. Vui lòng thử lại sau.';
+        }
+    }
+
+    toggle.addEventListener('click', () => {
+        panel.classList.toggle('hidden');
+        if (!panel.classList.contains('hidden')) {
+            input.focus();
+        }
+    });
+
+    closeBtn.addEventListener('click', () => panel.classList.add('hidden'));
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const text = input.value.trim();
+        if (!text) return;
+
+        input.value = '';
+        await sendMessage(text);
+    });
+})();
+</script>

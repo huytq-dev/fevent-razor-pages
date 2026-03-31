@@ -1,6 +1,9 @@
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using UI.Models.Chatbot;
+using UI.Services.Implementations;
+using UI.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +17,9 @@ builder.Services
     .AddInfrastructureServices(builder.Configuration)
     .AddApplicationServices(builder.Configuration)
     .AddApiServices(builder.Configuration);
+
+builder.Services.Configure<AiChatbotOptions>(builder.Configuration.GetSection("AiChatbot"));
+builder.Services.AddHttpClient<IAiChatbotService, AiChatbotService>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -65,4 +71,21 @@ app.UseSession();
 app.MapRazorPages()
    .WithStaticAssets();
 
+
+app.MapPost("/api/chatbot/message", async (
+    IAiChatbotService chatbotService,
+    ChatbotRequest request,
+    CancellationToken ct) =>
+{
+    if (string.IsNullOrWhiteSpace(request.Message))
+    {
+        return Results.BadRequest(new { error = "Message is required." });
+    }
+
+    var result = await chatbotService.GetReplyAsync(request.Message, ct);
+    return Results.Ok(new { reply = result.Reply, errorDetail = result.ErrorDetail });
+});
+
 app.Run();
+
+public sealed record ChatbotRequest(string Message);

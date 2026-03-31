@@ -52,6 +52,43 @@ public class EventsService(IUnitOfWork _unitOfWork) : IEventsService
         return PageResponse<Guid>.Fail("Lỗi khi tạo sự kiện");
     }
 
+    public async Task<PageResponse<bool>> UpdateAsync(UpdateEventRequest request, CancellationToken ct = default)
+    {
+        var @event = await _unitOfWork.Events.GetByIdAsync(request.Id);
+        if (@event is null || @event.IsDeleted)
+            return PageResponse<bool>.Fail("Event not found.");
+
+        if (@event.OrganizerId != request.OrganizerId)
+            return PageResponse<bool>.Fail("You are not allowed to update this event.");
+
+        var editable = @event.Status is not EventStatus.Completed;
+        if (!editable)
+            return PageResponse<bool>.Fail("Completed events cannot be updated.");
+
+        if (request.EndTime <= request.StartTime)
+            return PageResponse<bool>.Fail("End time must be after start time.");
+
+        var currentRegistrations = await _unitOfWork.EventRegistrations.GetByEventAsync(request.Id, ct);
+        if (request.MaxParticipants < currentRegistrations.Count)
+            return PageResponse<bool>.Fail("Capacity cannot be less than current registrations.");
+
+        @event.Title = request.Title;
+        @event.Description = request.Description;
+        @event.ThumbnailUrl = request.ThumbnailUrl;
+        @event.StartTime = request.StartTime;
+        @event.EndTime = request.EndTime;
+        @event.MaxParticipants = request.MaxParticipants;
+        @event.CategoryId = request.CategoryId;
+        @event.LocationId = request.LocationId;
+        @event.MajorId = request.MajorId;
+        @event.IsPrivate = request.IsPrivate;
+        @event.ModifiedAt = DateTimeOffset.Now;
+
+        _unitOfWork.Events.Update(@event);
+        await _unitOfWork.SaveChangesAsync(ct);
+        return PageResponse<bool>.Ok(true);
+    }
+
     public async Task<PageResponse<bool>> UpdateStatusAsync(Guid id, EventStatus newStatus, CancellationToken ct = default)
     {
         var @event = await _unitOfWork.Events.GetByIdAsync(id);
@@ -60,10 +97,12 @@ public class EventsService(IUnitOfWork _unitOfWork) : IEventsService
 
         var allowed = (@event.Status, newStatus) switch
         {
+            (EventStatus.Draft, EventStatus.Approved)    => true,
             (EventStatus.Pending,  EventStatus.Approved)  => true,
             (EventStatus.Pending,  EventStatus.Rejected)  => true,
             (EventStatus.Rejected, EventStatus.Approved)  => true,
             (EventStatus.Approved, EventStatus.Cancelled) => true,
+            (EventStatus.Pending,  EventStatus.Cancelled) => true,
             _ => false
         };
 
@@ -71,6 +110,28 @@ public class EventsService(IUnitOfWork _unitOfWork) : IEventsService
             return PageResponse<bool>.Fail($"Cannot transition from {@event.Status} to {newStatus}.");
 
         @event.Status = newStatus;
+        _unitOfWork.Events.Update(@event);
+        await _unitOfWork.SaveChangesAsync(ct);
+        return PageResponse<bool>.Ok(true);
+    }
+
+    public async Task<PageResponse<bool>> DeleteAsync(Guid id, Guid organizerId, CancellationToken ct = default)
+    {
+        var @event = await _unitOfWork.Events.GetByIdAsync(id);
+        if (@event is null || @event.IsDeleted)
+            return PageResponse<bool>.Fail("Event not found.");
+
+        if (@event.OrganizerId != organizerId)
+            return PageResponse<bool>.Fail("You are not allowed to delete this event.");
+
+        if (@event.Status is EventStatus.Approved or EventStatus.Completed)
+            return PageResponse<bool>.Fail("Approved or completed events cannot be deleted directly.");
+
+        @event.IsDeleted = true;
+        @event.DeletedAt = DateTimeOffset.Now;
+        @event.Status = EventStatus.Cancelled;
+        @event.ModifiedAt = DateTimeOffset.Now;
+
         _unitOfWork.Events.Update(@event);
         await _unitOfWork.SaveChangesAsync(ct);
         return PageResponse<bool>.Ok(true);

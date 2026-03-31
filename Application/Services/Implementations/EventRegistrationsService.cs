@@ -11,12 +11,42 @@ public class EventRegistrationsService(IUnitOfWork unitOfWork) : IEventRegistrat
         if (eventDetail is null)
             return PageResponse.Fail("Không tìm thấy sự kiện.");
 
+        var eventEntity = await unitOfWork.Events.GetByIdAsync(eventId);
+        if (eventEntity is null)
+            return PageResponse.Fail("Không tìm thấy sự kiện.");
+
         if (eventDetail.Status != (int)EventStatus.Approved)
             return PageResponse.Fail("Sự kiện chưa mở đăng ký.");
 
-            var existing = await unitOfWork.EventRegistrations.GetByEventAndUserAsync(eventId, userId, ct);
+        if (eventEntity.MajorId.HasValue)
+        {
+            var user = await unitOfWork.Users.GetByIdAsync(userId);
+            var eventMajor = await unitOfWork.Majors.GetByIdAsync(eventEntity.MajorId.Value);
+            if (user is null || eventMajor is null)
+                return PageResponse.Fail("Không thể xác thực chuyên ngành cho đăng ký sự kiện.");
+
+            var canAccessMajorEvent =
+                !string.IsNullOrWhiteSpace(user.Major) &&
+                (string.Equals(user.Major, eventMajor.Name, StringComparison.OrdinalIgnoreCase) ||
+                 string.Equals(user.Major, eventMajor.Code, StringComparison.OrdinalIgnoreCase));
+
+            if (!canAccessMajorEvent)
+                return PageResponse.Fail("Sự kiện này chỉ dành cho sinh viên thuộc đúng chuyên ngành.");
+        }
+
+        var existing = await unitOfWork.EventRegistrations.GetByEventAndUserAsync(eventId, userId, ct);
         if (existing is not null && existing.Status != RegistrationStatus.Cancelled)
             return PageResponse.Fail("Bạn đã đăng ký sự kiện này rồi.");
+
+        var currentRegistrations = await unitOfWork.EventRegistrations.GetByUserAsync(userId, ct);
+        var hasOverlap = currentRegistrations.Any(r =>
+            r.EventId != eventId &&
+            (RegistrationStatus)r.Status != RegistrationStatus.Cancelled &&
+            r.StartTime < eventDetail.EndTime &&
+            eventDetail.StartTime < r.EndTime);
+
+        if (hasOverlap)
+            return PageResponse.Fail("Bạn đã có sự kiện khác trùng thời gian. Không thể đăng ký 2 sự kiện bị chồng lịch.");
 
         var ticketType = await unitOfWork.EventRegistrations.GetFirstAvailableTicketTypeAsync(eventId, ct);
         if (ticketType is null)

@@ -2,6 +2,7 @@ using Application;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Domain;
 using UI.Models.Events;
 
 namespace UI.Pages.Management;
@@ -10,11 +11,13 @@ public class UpdateEventModel : PageModel
 {
     private readonly ICatalogService _catalogService;
     private readonly IEventsService _eventsService;
+    private readonly ICloudinaryService _cloudinaryService;
 
-    public UpdateEventModel(ICatalogService catalogService, IEventsService eventsService)
+    public UpdateEventModel(ICatalogService catalogService, IEventsService eventsService, ICloudinaryService cloudinaryService)
     {
         _catalogService = catalogService;
         _eventsService = eventsService;
+        _cloudinaryService = cloudinaryService;
     }
 
     [BindProperty]
@@ -26,32 +29,37 @@ public class UpdateEventModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(Guid? id)
     {
+        var userIdStr = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+        {
+            return RedirectToPage("/Authentications/Login", new { ReturnUrl = "/Management/CreateEvent?tab=events" });
+        }
+
         await LoadCatalogsAsync();
 
         if (id == null || id == Guid.Empty)
         {
-            // Seed mock data for UI testing if no actual ID is provided
-            ViewModel = new UpdateEventViewModel
-            {
-                Title = "AI Workshop 2024",
-                Description = "Join us for an in-depth look at the future of Artificial Intelligence...",
-                MaxParticipants = 150,
-                StartDate = DateTime.Today,
-                StartTime = new TimeSpan(9, 0, 0),
-                EndTime = new TimeSpan(12, 0, 0),
-                RegistrationDeadline = DateTime.Today.AddDays(-3),
-                IsPublished = true
-            };
-            return Page();
+            return RedirectToPage("/Management/CreateEvent", new { tab = "events" });
         }
 
         var response = await _eventsService.GetDetailAsync(id.Value);
-        if (response == null || response.Data == null)
+        if (!response.IsSuccess || response.Data == null)
         {
             return NotFound();
         }
 
         var eventDetail = response.Data;
+        if (eventDetail.OrganizerId != userId)
+        {
+            return Forbid();
+        }
+
+        var status = (EventStatus)eventDetail.Status;
+        if (status is EventStatus.Completed)
+        {
+            TempData["ErrorMessage"] = "Sự kiện ở trạng thái hiện tại không thể cập nhật.";
+            return RedirectToPage("/Management/EventDetail", new { id = eventDetail.Id });
+        }
 
         // Map domain to ViewModel
         ViewModel = new UpdateEventViewModel
@@ -60,14 +68,14 @@ public class UpdateEventModel : PageModel
             Title = eventDetail.Title,
             CategoryId = eventDetail.CategoryId,
             LocationId = eventDetail.LocationId,
+            MajorId = eventDetail.MajorId,
             Description = eventDetail.Description ?? string.Empty,
             ThumbnailUrl = eventDetail.ThumbnailUrl,
-            IsPublished = (Domain.EventStatus)eventDetail.Status == Domain.EventStatus.Approved,
+            IsPublic = !eventDetail.IsPrivate,
             MaxParticipants = eventDetail.MaxParticipants,
             StartDate = eventDetail.StartTime.LocalDateTime.Date,
             StartTime = eventDetail.StartTime.LocalDateTime.TimeOfDay,
-            EndTime = eventDetail.EndTime.LocalDateTime.TimeOfDay,
-            RegistrationDeadline = eventDetail.StartTime.LocalDateTime.Date.AddDays(-3)
+            EndTime = eventDetail.EndTime.LocalDateTime.TimeOfDay
         };
 
         return Page();
@@ -75,21 +83,65 @@ public class UpdateEventModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        var userIdStr = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+        {
+            return RedirectToPage("/Authentications/Login", new { ReturnUrl = "/Management/CreateEvent?tab=events" });
+        }
+
         if (!ModelState.IsValid)
         {
             await LoadCatalogsAsync();
             return Page();
         }
 
-        // Logic for updating the event would go here, e.g.:
-        // var success = await _eventsService.UpdateAsync(ViewModel);
-        // if (success)
-        // {
-        //     return RedirectToPage("/Events/Detail", new { id = ViewModel.Id });
-        // }
+        var oldEvent = await _eventsService.GetDetailAsync(ViewModel.Id);
+        if (!oldEvent.IsSuccess || oldEvent.Data is null)
+        {
+            TempData["ErrorMessage"] = oldEvent.Message;
+            return RedirectToPage("/Management/CreateEvent", new { tab = "events" });
+        }
+
+        if (oldEvent.Data.OrganizerId != userId)
+        {
+            return Forbid();
+        }
+
+        var startDateTime = ViewModel.StartDate.Date + ViewModel.StartTime;
+        var endDateTime = ViewModel.StartDate.Date + ViewModel.EndTime;
+        string? thumbnailUrl = oldEvent.Data.ThumbnailUrl;
+
+        if (ViewModel.CoverImage is not null)
+        {
+            thumbnailUrl = await _cloudinaryService.UploadImageAsync(ViewModel.CoverImage, "fevent-thumbnails");
+        }
+
+        var request = new UpdateEventRequest
+        {
+            Id = ViewModel.Id,
+            Title = ViewModel.Title,
+            Description = ViewModel.Description,
+            ThumbnailUrl = thumbnailUrl,
+            StartTime = startDateTime,
+            EndTime = endDateTime,
+            MaxParticipants = ViewModel.MaxParticipants,
+            CategoryId = ViewModel.CategoryId,
+            LocationId = ViewModel.LocationId,
+            MajorId = ViewModel.MajorId,
+            IsPrivate = !ViewModel.IsPublic,
+            OrganizerId = userId
+        };
+
+        var result = await _eventsService.UpdateAsync(request);
+        if (!result.IsSuccess)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            await LoadCatalogsAsync();
+            return Page();
+        }
 
         TempData["SuccessMessage"] = "Event updated successfully.";
-        return RedirectToPage("./CreateEvent", new { tab = "create" });
+        return RedirectToPage("/Management/EventDetail", new { id = ViewModel.Id });
     }
 
     private async Task LoadCatalogsAsync()

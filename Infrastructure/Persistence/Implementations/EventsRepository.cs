@@ -58,6 +58,12 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
             query = query.Where(e => e.MajorId == queryInfo.MajorId.Value);
         }
 
+        if (queryInfo.VisibleToMajorId.HasValue)
+        {
+            var visibleMajorId = queryInfo.VisibleToMajorId.Value;
+            query = query.Where(e => !e.MajorId.HasValue || e.MajorId == visibleMajorId);
+        }
+
         if (queryInfo.Status.HasValue)
         {
             query = query.Where(e => (int)e.Status == queryInfo.Status.Value);
@@ -122,6 +128,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
                 CategoryName = e.Category.Name,
                 LocationId = e.LocationId,
                 LocationName = e.Location.Name,
+                MajorId = e.MajorId,
                 LocationAddress = e.Location.Address,
                 LocationMapUrl = e.Location.MapUrl,
                 OrganizerId = e.OrganizerId,
