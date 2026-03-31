@@ -20,4 +20,13 @@ public class QueryInfo
 
     /// <summary>Filter events starting on or before this date (inclusive).</summary>
     public DateTime? StartDateTo { get; set; }
+
+    /// <summary>Filter by organizer ID.</summary>
+    public Guid? OrganizerId { get; set; }
+
+    /// <summary>Filter by major ID. Null = all majors.</summary>
+    public Guid? MajorId { get; set; }
+
+    /// <summary>Filter by event status. Null = all statuses.</summary>
+    public int? Status { get; set; }
 }

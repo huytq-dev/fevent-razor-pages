@@ -22,6 +22,7 @@ public class UpdateEventModel : PageModel
 
     public List<SelectListItem> Categories { get; set; } = new();
     public List<SelectListItem> Locations { get; set; } = new();
+    public List<SelectListItem> Majors { get; set; } = new();
 
     public async Task<IActionResult> OnGetAsync(Guid? id)
     {
@@ -87,8 +88,8 @@ public class UpdateEventModel : PageModel
         //     return RedirectToPage("/Events/Detail", new { id = ViewModel.Id });
         // }
 
-        TempData["SuccessMessage"] = "Event updated successfully (Mock-up)";
-        return RedirectToPage("./UpdateEvent", new { id = ViewModel.Id });
+        TempData["SuccessMessage"] = "Event updated successfully.";
+        return RedirectToPage("./CreateEvent", new { tab = "create" });
     }
 
     private async Task LoadCatalogsAsync()
@@ -107,6 +108,14 @@ public class UpdateEventModel : PageModel
             Value = l.Id.ToString(),
             Text = l.Name,
             Selected = l.Id == ViewModel.LocationId
+        }).ToList();
+
+        var majors = await _catalogService.GetMajorsAsync();
+        Majors = majors.Select(m => new SelectListItem
+        {
+            Value = m.Id.ToString(),
+            Text = string.IsNullOrEmpty(m.Code) ? m.Name : $"[{m.Code}] {m.Name}",
+            Selected = m.Id == ViewModel.MajorId
         }).ToList();
     }
 }

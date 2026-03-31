@@ -8,4 +8,5 @@ public interface IEventsService
 
     Task<PageResponse<EventDetailResponse>> GetDetailAsync(Guid id, CancellationToken ct = default);
     Task<PageResponse<Guid>> CreateAsync(CreateEventRequest request, CancellationToken ct = default);
+    Task<PageResponse<bool>> UpdateStatusAsync(Guid id, EventStatus newStatus, CancellationToken ct = default);
 }

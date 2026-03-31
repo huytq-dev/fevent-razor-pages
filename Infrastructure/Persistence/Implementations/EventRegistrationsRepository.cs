@@ -81,6 +81,27 @@ public class EventRegistrationsRepository : GenericRepository<EventRegistration>
                 r.UserId == userId &&
                 r.Status == RegistrationStatus.CheckedIn, ct);
 
+    public async Task<List<ParticipantSummaryResponse>> GetByEventAsync(Guid eventId, CancellationToken ct = default)
+        => await _set.AsNoTracking()
+            .Where(r => r.EventId == eventId && r.Status != RegistrationStatus.Cancelled)
+            .OrderBy(r => r.CreatedAt)
+            .Select(r => new ParticipantSummaryResponse
+            {
+                RegistrationId = r.Id,
+                UserId         = r.UserId,
+                FullName       = r.User.FullName,
+                StudentId      = r.User.StudentId,
+                Major          = r.User.Major,
+                Email          = r.User.Email,
+                PhoneNumber    = r.User.PhoneNumber,
+                AvatarUrl      = r.User.AvatarUrl,
+                TicketCode     = r.TicketCode,
+                RegisteredAt   = r.CreatedAt,
+                Status         = (int)r.Status,
+                CheckInTime    = r.CheckInTime,
+            })
+            .ToListAsync(ct);
+
     public async Task<bool> CancelAsync(Guid eventId, Guid userId, string? reason = null, CancellationToken ct = default)
     {
         var reg = await _set

@@ -40,6 +40,8 @@ public class CreateEventViewModel : IValidatableObject
     [Required(ErrorMessage = "Description is required")]
     public string Description { get; set; } = string.Empty;
 
+    public Guid? MajorId { get; set; }
+
     [Display(Name = "Banner Image")]
     public IFormFile? BannerImage { get; set; }
 }

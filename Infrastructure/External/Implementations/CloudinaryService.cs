@@ -21,24 +21,22 @@ public class CloudinaryService : ICloudinaryService
         _cloudinary = new Cloudinary(account);
     }
 
-    public async Task<string> UploadPhotoAsync(IFormFile file)
+    public async Task<string> UploadImageAsync(IFormFile file, string folder = "fevent-images")
     {
         if (file == null || file.Length == 0)
             throw new ArgumentException("File cannot be empty");
 
-        var uploadResult = new ImageUploadResult();
+        ImageUploadResult uploadResult;
 
-        using (var stream = file.OpenReadStream())
+        using var stream = file.OpenReadStream();
+        var uploadParams = new ImageUploadParams
         {
-            var uploadParams = new ImageUploadParams
-            {
-                File = new FileDescription(file.FileName, stream),
-                Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face"),
-                Folder = "hanh-trang-so-avatars"
-            };
+            File = new FileDescription(file.FileName, stream),
+            Transformation = new Transformation().Width(1200).Height(630).Crop("fill").Gravity("auto"),
+            Folder = folder
+        };
 
-            uploadResult = await _cloudinary.UploadAsync(uploadParams);
-        }
+        uploadResult = await _cloudinary.UploadAsync(uploadParams);
 
         if (uploadResult.Error != null)
             throw new Exception($"Cloudinary Error: {uploadResult.Error.Message}");

@@ -21,6 +21,7 @@ public class Event : EntityBase<Guid>, ISoftDeletable
     public Guid LocationId { get; set; }
     public Guid OrganizerId { get; set; }
     public Guid? ClubId { get; set; }
+    public Guid? MajorId { get; set; }
 
     // Soft delete
     public bool IsDeleted { get; set; }
@@ -31,6 +32,7 @@ public class Event : EntityBase<Guid>, ISoftDeletable
     public virtual Location Location { get; set; } = null!;
     public virtual User Organizer { get; set; } = null!;
     public virtual Club? Club { get; set; }
+    public virtual Major? Major { get; set; }
     public virtual ICollection<EventRegistration> Registrations { get; set; } = new List<EventRegistration>();
     public virtual ICollection<EventCollaborator> Collaborators { get; set; } = new List<EventCollaborator>();
     public virtual ICollection<EventImage> Images { get; set; } = new List<EventImage>();

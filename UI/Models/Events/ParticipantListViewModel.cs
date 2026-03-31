@@ -10,7 +10,10 @@ public class ParticipantViewModel
     public string Phone { get; set; } = string.Empty;
     public DateTime RegistrationDate { get; set; }
     public string Status { get; set; } = string.Empty; // Registered, Checked-in, Cancelled
-    public string Initials => string.Join("", FullName.Split(' ').Select(s => s[0]));
+    public string Initials =>
+        string.IsNullOrWhiteSpace(FullName)
+            ? "?"
+            : string.Join("", FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(s => s[0]));
 }
 
 public class ParticipantListViewModel
@@ -19,9 +22,7 @@ public class ParticipantListViewModel
     public string EventTitle { get; set; } = string.Empty;
     public int TotalRegistered { get; set; }
     public List<ParticipantViewModel> Participants { get; set; } = new();
-    
-    // Filter properties
-    public string? SearchQuery { get; set; }
-    public string? MajorFilter { get; set; }
-    public string? StatusFilter { get; set; }
+
+    /// <summary>Distinct majors from current registrations (for filter dropdown).</summary>
+    public List<string> MajorFilterOptions { get; set; } = new();
 }

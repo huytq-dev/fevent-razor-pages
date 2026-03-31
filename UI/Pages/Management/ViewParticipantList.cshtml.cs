@@ -5,58 +5,99 @@ using UI.Models.Events;
 
 namespace UI.Pages.Management;
 
-public class ViewParticipantListModel : PageModel
+public class ViewParticipantListModel(
+    IEventsService eventsService,
+    IEventRegistrationsService registrationsService) : PageModel
 {
-    private readonly IEventsService _eventsService;
+    [BindProperty(SupportsGet = true)] public string? Search { get; set; }
+    [BindProperty(SupportsGet = true)] public string? MajorFilter { get; set; }
+    [BindProperty(SupportsGet = true)] public string? StatusFilter { get; set; }
 
-    public ViewParticipantListModel(IEventsService eventsService)
-    {
-        _eventsService = eventsService;
-    }
+    public ParticipantListViewModel ViewModel { get; private set; } = new();
+    public string? ErrorMessage { get; private set; }
 
-    [BindProperty(SupportsGet = true)]
-    public ParticipantListViewModel ViewModel { get; set; } = new();
-
-    public async Task<IActionResult> OnGetAsync(Guid? eventId)
+    public async Task<IActionResult> OnGetAsync(Guid? eventId, CancellationToken ct)
     {
         if (eventId == null || eventId == Guid.Empty)
-        {
-            // Seed mock data for UI testing if no actual ID is provided
-            ViewModel = new ParticipantListViewModel
-            {
-                EventId = Guid.Empty,
-                EventTitle = "Tech Talk 2024",
-                TotalRegistered = 124,
-                Participants = new List<ParticipantViewModel>
-                {
-                    new ParticipantViewModel { Order = 1, FullName = "Nguyen Van An", Mssv = "SE150001", Major = "Software Engineering", RegistrationDate = new DateTime(2023, 10, 24, 10, 0, 0), Status = "Registered" },
-                    new ParticipantViewModel { Order = 2, FullName = "Tran Thi Binh", Mssv = "SS160244", Major = "Digital Marketing", RegistrationDate = new DateTime(2023, 10, 25, 9, 15, 0), Status = "Checked-in" },
-                    new ParticipantViewModel { Order = 3, FullName = "Le Van Cuong", Mssv = "SE170999", Major = "Artificial Intelligence", RegistrationDate = new DateTime(2023, 10, 26, 14, 30, 0), Status = "Registered" },
-                    new ParticipantViewModel { Order = 4, FullName = "Pham Thi Dung", Mssv = "GD140555", Major = "Graphic Design", RegistrationDate = new DateTime(2023, 10, 26, 16, 0, 0), Status = "Cancelled" },
-                    new ParticipantViewModel { Order = 5, FullName = "Hoang Tuan", Mssv = "SE162002", Major = "Software Engineering", RegistrationDate = new DateTime(2023, 10, 27, 8, 45, 0), Status = "Checked-in" }
-                }
-            };
-            return Page();
-        }
+            return BadRequest("Event ID is required.");
 
-        var response = await _eventsService.GetDetailAsync(eventId.Value);
-        if (response == null || response.Data == null)
-        {
+        // Verify event exists and current user is the organizer
+        var userIdStr = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+            return RedirectToPage("/Authentications/Login");
+
+        var eventResult = await eventsService.GetDetailAsync(eventId.Value, ct);
+        if (!eventResult.IsSuccess || eventResult.Data is null)
             return NotFound();
+
+        if (eventResult.Data.OrganizerId != userId)
+            return Forbid();
+
+        var participants = await registrationsService.GetByEventAsync(eventId.Value, ct);
+
+        // Apply search filter
+        var filtered = participants.AsEnumerable();
+        if (!string.IsNullOrWhiteSpace(Search))
+        {
+            var term = Search.Trim().ToLowerInvariant();
+            filtered = filtered.Where(p =>
+                p.FullName.ToLowerInvariant().Contains(term) ||
+                (p.StudentId ?? "").ToLowerInvariant().Contains(term) ||
+                (p.Email ?? "").ToLowerInvariant().Contains(term) ||
+                (p.TicketCode ?? "").ToLowerInvariant().Contains(term));
         }
 
-        ViewModel.EventId = eventId.Value;
-        ViewModel.EventTitle = response.Data.Title;
-        ViewModel.TotalRegistered = response.Data.RegisteredCount;
-
-        // In a real application, you would call a service to get the participants.
-        // For now, we'll continue using mock data for participants tied to this real EventTitle.
-        ViewModel.Participants = new List<ParticipantViewModel>
+        if (!string.IsNullOrWhiteSpace(MajorFilter))
         {
-            new ParticipantViewModel { Order = 1, FullName = "Nguyen Van An", Mssv = "SE150001", Major = "Software Engineering", RegistrationDate = DateTime.Now.AddDays(-2), Status = "Registered" },
-            new ParticipantViewModel { Order = 2, FullName = "Tran Thi Binh", Mssv = "SS160244", Major = "Digital Marketing", RegistrationDate = DateTime.Now.AddDays(-1), Status = "Checked-in" }
+            filtered = filtered.Where(p =>
+                (p.Major ?? "").Equals(MajorFilter.Trim(), StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(StatusFilter))
+        {
+            filtered = filtered.Where(p => GetStatusLabel(p.Status)
+                .Equals(StatusFilter, StringComparison.OrdinalIgnoreCase));
+        }
+
+        var list = filtered.ToList();
+
+        var majorOptions = participants
+            .Select(p => p.Major)
+            .Where(m => !string.IsNullOrWhiteSpace(m))
+            .Select(m => m!)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(m => m, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        ViewModel = new ParticipantListViewModel
+        {
+            EventId         = eventId.Value,
+            EventTitle      = eventResult.Data.Title,
+            TotalRegistered = participants.Count,
+            MajorFilterOptions = majorOptions,
+            Participants    = list.Select((p, i) => new ParticipantViewModel
+            {
+                Order            = i + 1,
+                FullName         = p.FullName,
+                Mssv             = p.StudentId ?? "—",
+                Major            = p.Major ?? "—",
+                Email            = p.Email ?? "—",
+                Phone            = p.PhoneNumber ?? "—",
+                RegistrationDate = p.RegisteredAt.LocalDateTime,
+                Status           = GetStatusLabel(p.Status),
+            }).ToList()
         };
 
         return Page();
     }
+
+    private static string GetStatusLabel(int status) => (Domain.RegistrationStatus)status switch
+    {
+        Domain.RegistrationStatus.Confirmed      => "Registered",
+        Domain.RegistrationStatus.CheckedIn      => "Checked-in",
+        Domain.RegistrationStatus.Cancelled      => "Cancelled",
+        Domain.RegistrationStatus.PendingPayment => "Pending Payment",
+        Domain.RegistrationStatus.Paid           => "Paid",
+        _                                        => "Unknown"
+    };
 }
