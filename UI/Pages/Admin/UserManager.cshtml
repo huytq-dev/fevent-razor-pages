@@ -29,10 +29,16 @@
                 Quản lý tài khoản học sinh, ban tổ chức và ban quản trị. Xem chi tiết thông tin, cập nhật phân quyền và theo dõi trạng thái hoạt động trên toàn hệ thống FEvents.
             </p>
         </div>
-        <button type="button" onclick="document.getElementById('addUserModal').classList.remove('hidden')" class="flex items-center justify-center rounded-2xl h-14 px-8 bg-[#181411] hover:bg-black text-white text-lg font-bold transition-all shadow-lg active:scale-95 whitespace-nowrap shrink-0">
-            <span class="material-symbols-outlined mr-2 font-bold">add</span>
-            <span>Thêm mới</span>
-        </button>
+        <div class="flex items-center gap-3">
+            <a asp-page="/Admin/UserManager" asp-page-handler="Export" class="flex items-center justify-center rounded-2xl h-14 px-6 border border-[#e6dfdb] bg-white hover:bg-[#f8f7f5] text-[#181411] text-base font-bold transition-all shadow-sm whitespace-nowrap shrink-0">
+                <span class="material-symbols-outlined mr-2">download</span>
+                <span>Xuất Excel</span>
+            </a>
+            <button type="button" onclick="document.getElementById('addUserModal').classList.remove('hidden')" class="flex items-center justify-center rounded-2xl h-14 px-8 bg-[#181411] hover:bg-black text-white text-lg font-bold transition-all shadow-lg active:scale-95 whitespace-nowrap shrink-0">
+                <span class="material-symbols-outlined mr-2 font-bold">add</span>
+                <span>Thêm mới</span>
+            </button>
+        </div>
     </div>
 
     <!-- Add User Modal -->
@@ -48,7 +54,7 @@
             <form method="post" asp-page-handler="CreateUser" class="flex flex-col gap-4">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">Họ và Tên</label>
-                    <input type="text" name="FullName" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-gray-400" placeholder="Nguyễn Văn A">
+                    <input type="text" name="FullName" required minlength="2" maxlength="60" pattern="[A-Za-zÀ-ỹ\s]{2,60}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-gray-400" placeholder="Nguyễn Văn A">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">Email</label>
@@ -56,7 +62,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">Mật khẩu</label>
-                    <input type="password" name="Password" required minlength="8" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-gray-400" placeholder="••••••••">
+                    <input type="password" name="Password" required minlength="8" pattern="(?=.*[A-Za-z])(?=.*\d).{8,}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-gray-400" placeholder="••••••••">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">Vai trò</label>
@@ -209,6 +215,9 @@
                                             </button>
                                         }
                                     </form>
+                                    <a asp-page="/Admin/EditUser" asp-route-id="@user.Id" class="h-10 w-10 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm" title="Edit User">
+                                        <span class="material-symbols-outlined shrink-0">edit</span>
+                                    </a>
                                 </div>
                             </td>
                         </tr>

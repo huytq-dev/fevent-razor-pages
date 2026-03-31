@@ -29,6 +29,22 @@
             </div>
         }
 
+        @if (!string.IsNullOrWhiteSpace(Model.CheckedInUserName))
+        {
+            var checkinAvatar = string.IsNullOrWhiteSpace(Model.CheckedInUserAvatar)
+                ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(Model.CheckedInUserName)}&background=f96706&color=fff"
+                : Model.CheckedInUserAvatar;
+
+            <div class="mb-6 rounded-2xl border border-[#e6dfdb] bg-white px-6 py-4 shadow-sm flex items-center gap-4">
+                <img src="@checkinAvatar" alt="@Model.CheckedInUserName" class="h-14 w-14 rounded-full object-cover border border-[#e6dfdb]" />
+                <div>
+                    <p class="text-sm text-muted-foreground">Đã xác nhận vé</p>
+                    <p class="text-base font-bold text-foreground">@Model.CheckedInUserName</p>
+                    <p class="text-xs text-muted-foreground">Mã vé: @Model.CheckedInTicketCode</p>
+                </div>
+            </div>
+        }
+
         <div class="bg-white border text-center border-[#e6dfdb] rounded-[2rem] p-6 shadow-xl relative overflow-hidden flex flex-col items-center">
             
             <div class="relative w-full max-w-sm rounded-3xl overflow-hidden bg-gray-50/50 aspect-[4/5] flex flex-col items-center justify-center shadow-inner ring-4 border border-gray-100 ring-gray-50 mb-6 group">

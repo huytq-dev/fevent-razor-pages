@@ -3,7 +3,6 @@ namespace Contract;
 public static class AppConstants
 {
     public readonly static string BaseUrl = "http://fevent.tryasp.net";
-
     public const int DefaultPageTop = 10;
     public const int DefaultPageSkip = 0;
     public const bool DefaultNeedTotalCount = false;

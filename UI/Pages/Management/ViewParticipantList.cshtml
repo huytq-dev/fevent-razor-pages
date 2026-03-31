@@ -141,10 +141,14 @@
                     <button type="submit" class="flex-1 xl:flex-none h-12 items-center justify-center gap-2 rounded-full border border-primary text-primary px-6 font-bold text-sm hover:bg-primary hover:text-white transition-all">
                         Apply Filters
                     </button>
-                    <button type="button" class="flex-1 xl:flex-none h-12 items-center justify-center gap-2 rounded-full bg-primary hover:bg-orange-600 text-white px-6 font-bold text-sm transition-colors shadow-lg shadow-orange-500/20">
+                    <a asp-page="/Management/ViewParticipantList" asp-page-handler="Export" asp-route-eventId="@Model.ViewModel.EventId" class="flex-1 xl:flex-none h-12 inline-flex items-center justify-center gap-2 rounded-full bg-primary hover:bg-orange-600 text-white px-6 font-bold text-sm transition-colors shadow-lg shadow-orange-500/20">
                         <span class="material-symbols-outlined text-[20px]">download</span>
-                        Export Excel
-                    </button>
+                        Export Registered (Excel)
+                    </a>
+                    <a asp-page="/Management/ViewParticipantList" asp-page-handler="ExportAttended" asp-route-eventId="@Model.ViewModel.EventId" class="flex-1 xl:flex-none h-12 inline-flex items-center justify-center gap-2 rounded-full border border-green-600 text-green-700 hover:bg-green-50 px-6 font-bold text-sm transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">how_to_reg</span>
+                        Export Attended (Excel)
+                    </a>
                 </div>
             </form>
 
@@ -172,9 +176,12 @@
                                         <td class="p-4 text-sm text-text-secondary dark:text-gray-500 text-center">@item.Order.ToString("D2")</td>
                                         <td class="p-4">
                                             <div class="flex items-center gap-3">
-                                                <div class="size-8 rounded-full bg-orange-100 dark:bg-orange-900/30 text-primary flex items-center justify-center text-xs font-bold uppercase">
-                                                    @item.Initials
-                                                </div>
+                                                @{
+                                                    var avatar = string.IsNullOrWhiteSpace(item.AvatarUrl)
+                                                        ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(item.FullName)}&background=f96706&color=fff"
+                                                        : item.AvatarUrl;
+                                                }
+                                                <img src="@avatar" alt="@item.FullName" class="size-8 rounded-full object-cover border border-[#e6e0db] dark:border-[#523a2d]" />
                                                 <div>
                                                     <p class="text-sm font-bold text-text-main dark:text-white">@item.FullName</p>
                                                     @if (!string.IsNullOrWhiteSpace(item.Email) && item.Email != "—")

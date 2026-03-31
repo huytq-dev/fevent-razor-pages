@@ -151,6 +151,14 @@
                                class="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#e6dfdb] dark:border-[#3e342f] bg-white dark:bg-[#2a221b] text-sm font-medium text-[#181411] dark:text-white hover:border-primary hover:text-primary transition-colors">
                                 <span class="material-symbols-outlined text-[16px]">group</span> Participants
                             </a>
+                            <a asp-page="/Management/ViewParticipantList" asp-page-handler="Export" asp-route-eventId="@ev.Id"
+                               class="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-blue-200 text-sm font-medium text-blue-700 hover:bg-blue-50 transition-colors">
+                                <span class="material-symbols-outlined text-[16px]">download</span> Export Registered (Excel)
+                            </a>
+                            <a asp-page="/Management/ViewParticipantList" asp-page-handler="ExportAttended" asp-route-eventId="@ev.Id"
+                               class="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-green-200 text-sm font-medium text-green-700 hover:bg-green-50 transition-colors">
+                                <span class="material-symbols-outlined text-[16px]">how_to_reg</span> Export Attended (Excel)
+                            </a>
                         }
                         @if (canEdit)
                         {

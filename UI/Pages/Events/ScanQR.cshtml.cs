@@ -15,6 +15,12 @@ namespace UI.Pages.Events
         public string? SuccessMessage { get; set; }
         [TempData]
         public string? ErrorMessage { get; set; }
+        [TempData]
+        public string? CheckedInUserName { get; set; }
+        [TempData]
+        public string? CheckedInUserAvatar { get; set; }
+        [TempData]
+        public string? CheckedInTicketCode { get; set; }
 
         public ScanQRModel(ApplicationDbContext db)
         {
@@ -94,6 +100,9 @@ namespace UI.Pages.Events
             await _db.SaveChangesAsync();
 
             SuccessMessage = $"Khách hàng {registration.User.FullName} đã check-in thành công cho sự kiện '{registration.Event.Title}'.";
+            CheckedInUserName = registration.User.FullName;
+            CheckedInUserAvatar = registration.User.AvatarUrl;
+            CheckedInTicketCode = registration.TicketCode;
             return Page();
         }
     }

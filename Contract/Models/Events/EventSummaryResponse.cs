@@ -17,6 +17,7 @@ public sealed class EventSummaryResponse
     public Guid LocationId { get; init; }
     public string LocationName { get; init; } = null!;
     public Guid OrganizerId { get; init; }
+    public string OrganizerName { get; init; } = null!;
     public Guid? ClubId { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
 }
