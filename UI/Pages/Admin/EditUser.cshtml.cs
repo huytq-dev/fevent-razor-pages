@@ -161,7 +161,8 @@ public class EditUserModel(ApplicationDbContext db, IWebHostEnvironment hostEnvi
                 return Page();
             }
 
-            var uploadsFolder = Path.Combine(hostEnvironment.WebRootPath, "uploads", "avatars");
+            // Lưu vào ContentRoot/uploads/avatars để app phục vụ qua đường dẫn /uploads
+            var uploadsFolder = Path.Combine(hostEnvironment.ContentRootPath, "uploads", "avatars");
             Directory.CreateDirectory(uploadsFolder);
 
             var uniqueFileName = $"admin_{user.Id:N}_{DateTime.UtcNow.Ticks}{extension}";
@@ -175,7 +176,8 @@ public class EditUserModel(ApplicationDbContext db, IWebHostEnvironment hostEnvi
 
         await db.SaveChangesAsync(ct);
         TempData["SuccessMessage"] = $"Đã cập nhật thông tin của {user.FullName}.";
-        return RedirectToPage("/Admin/UserManager");
+        // Redirect về lại trang EditUser để thấy avatar mới, truyền id
+        return RedirectToPage(new { id = user.Id });
     }
 
     private IActionResult? EnsureAdmin()

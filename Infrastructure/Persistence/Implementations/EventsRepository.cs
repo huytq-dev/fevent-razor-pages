@@ -89,6 +89,7 @@ public class EventsRepository : GenericRepository<Event>, IEventsRepository
                 LocationId = e.LocationId,
                 LocationName = e.Location.Name,
                 OrganizerId = e.OrganizerId,
+                OrganizerName = e.Organizer.FullName,
                 ClubId = e.ClubId,
                 CreatedAt = e.CreatedAt
             })

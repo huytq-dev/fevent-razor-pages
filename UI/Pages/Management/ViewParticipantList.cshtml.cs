@@ -118,12 +118,13 @@ public class ViewParticipantListModel(
             p.AvatarUrl
         });
 
-        var csv = CsvExportHelper.BuildCsv(
+        var workbook = ExcelExportHelper.BuildWorkbook(
             ["No", "Full Name", "Student ID", "Email", "Phone", "Major", "Ticket Code", "Status", "Registered At", "Check-in Time", "Avatar URL"],
-            rows);
+            rows,
+            "Participants");
 
-        var fileName = $"participants-{eventId:N}-{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
-        return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", fileName);
+        var fileName = $"participants-{eventId:N}-{DateTime.UtcNow:yyyyMMddHHmmss}.xlsx";
+        return File(workbook, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 
     public async Task<IActionResult> OnGetExportAttendedAsync(Guid eventId, CancellationToken ct)
@@ -151,12 +152,13 @@ public class ViewParticipantListModel(
             p.AvatarUrl
         });
 
-        var csv = CsvExportHelper.BuildCsv(
+        var workbook = ExcelExportHelper.BuildWorkbook(
             ["No", "Full Name", "Student ID", "Email", "Phone", "Major", "Ticket Code", "Check-in Time", "Avatar URL"],
-            rows);
+            rows,
+            "Attended");
 
-        var fileName = $"attended-{eventId:N}-{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
-        return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", fileName);
+        var fileName = $"attended-{eventId:N}-{DateTime.UtcNow:yyyyMMddHHmmss}.xlsx";
+        return File(workbook, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 
     private async Task<(IActionResult? Result, IReadOnlyList<ParticipantSummaryResponse> Participants)> EnsureOrganizerAccessAsync(Guid eventId, CancellationToken ct)

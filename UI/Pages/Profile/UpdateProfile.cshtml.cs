@@ -100,7 +100,8 @@ namespace UI.Pages.Profile
                     return Page();
                 }
 
-                string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "uploads", "avatars");
+                // Lưu vào ContentRoot/uploads/avatars để app phục vụ qua đường dẫn /uploads
+                string uploadsFolder = Path.Combine(_hostEnvironment.ContentRootPath, "uploads", "avatars");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);

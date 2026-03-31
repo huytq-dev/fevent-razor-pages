@@ -3,6 +3,7 @@ using Contract;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using UI.Helpers;
 using UI.Models.Events;
 
 namespace UI.Pages.Management;
@@ -168,12 +169,13 @@ public class CreateEventModel : PageModel
             ev.ThumbnailUrl
         });
 
-        var csv = UI.Helpers.CsvExportHelper.BuildCsv(
+        var workbook = ExcelExportHelper.BuildWorkbook(
             ["No", "Title", "Category", "Location", "Start", "End", "Status", "Registered", "Capacity", "Thumbnail URL"],
-            rows);
+            rows,
+            "My Events");
 
-        var fileName = $"my-events-{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
-        return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", fileName);
+        var fileName = $"my-events-{DateTime.UtcNow:yyyyMMddHHmmss}.xlsx";
+        return File(workbook, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 
     private async Task LoadCatalogsAsync()

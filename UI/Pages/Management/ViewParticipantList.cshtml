@@ -143,11 +143,11 @@
                     </button>
                     <a asp-page="/Management/ViewParticipantList" asp-page-handler="Export" asp-route-eventId="@Model.ViewModel.EventId" class="flex-1 xl:flex-none h-12 inline-flex items-center justify-center gap-2 rounded-full bg-primary hover:bg-orange-600 text-white px-6 font-bold text-sm transition-colors shadow-lg shadow-orange-500/20">
                         <span class="material-symbols-outlined text-[20px]">download</span>
-                        Export Registered
+                        Export Registered (Excel)
                     </a>
                     <a asp-page="/Management/ViewParticipantList" asp-page-handler="ExportAttended" asp-route-eventId="@Model.ViewModel.EventId" class="flex-1 xl:flex-none h-12 inline-flex items-center justify-center gap-2 rounded-full border border-green-600 text-green-700 hover:bg-green-50 px-6 font-bold text-sm transition-colors">
                         <span class="material-symbols-outlined text-[20px]">how_to_reg</span>
-                        Export Attended
+                        Export Attended (Excel)
                     </a>
                 </div>
             </form>

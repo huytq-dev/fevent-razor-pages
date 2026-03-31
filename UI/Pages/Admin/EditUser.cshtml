@@ -6,7 +6,7 @@
 
     var avatarUrl = string.IsNullOrWhiteSpace(Model.Input.AvatarUrl)
         ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(Model.Input.FullName ?? "User")}&background=f96706&color=fff"
-        : Model.Input.AvatarUrl;
+        : Model.Input.AvatarUrl + "?v=" + Guid.NewGuid();
 }
 
 <div class="w-full max-w-[1100px] mx-auto px-4 md:px-8 py-8">

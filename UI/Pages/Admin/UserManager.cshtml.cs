@@ -157,12 +157,13 @@ namespace UI.Pages.Admin
                 u.AvatarUrl
             });
 
-            var csv = CsvExportHelper.BuildCsv(
+            var workbook = ExcelExportHelper.BuildWorkbook(
                 ["No", "Full Name", "Email", "Student ID", "Major", "Phone", "DOB", "Role", "Status", "Avatar URL"],
-                rows);
+                rows,
+                "Users");
 
-            var fileName = $"users-{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
-            return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", fileName);
+            var fileName = $"users-{DateTime.UtcNow:yyyyMMddHHmmss}.xlsx";
+            return File(workbook, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
         public async Task<IActionResult> OnPostChangeRoleAsync(Guid userId, Guid newRoleId)
