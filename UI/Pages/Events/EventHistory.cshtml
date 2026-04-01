@@ -2,6 +2,7 @@
 @using Contract
 @using Domain
 @using System.Globalization
+@using System.Text.Json
 @model UI.EventHistoryModel
 @{
     ViewData["Title"] = "Registration History";
@@ -18,14 +19,14 @@
                 <p class="text-muted-foreground">Track your event registrations and attendance history.</p>
             </div>
             <div class="flex items-center gap-3">
-                <button class="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium text-foreground hover:border-primary transition-colors shadow-sm">
+                <button type="button" onclick="openCalendarModal()" class="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium text-foreground hover:border-primary transition-colors shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     Calendar View
                 </button>
-                <button class="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium text-foreground hover:border-primary transition-colors shadow-sm">
+                <a asp-page="/Events/EventHistory" asp-page-handler="Export" class="inline-flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium text-foreground hover:border-primary transition-colors shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     Export Data
-                </button>
+                </a>
             </div>
         </div>
 
@@ -126,6 +127,56 @@
     </div>
 </div>
 
+<!-- Calendar Modal -->
+<div id="calendarModal" class="fixed inset-0 z-50 hidden bg-[#181411]/70 backdrop-blur-sm items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+    <div id="calendarModalContent" class="w-full max-w-5xl max-h-[92vh] overflow-hidden rounded-3xl bg-white shadow-2xl transform scale-95 transition-transform duration-300">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-[#e6dfdb]">
+            <div>
+                <h3 class="text-2xl font-display font-extrabold text-[#181411]">Upcoming Events Calendar</h3>
+                <p class="text-sm text-[#8c715f] mt-1">Your schedule overview by month</p>
+            </div>
+            <button type="button" onclick="closeCalendarModal()" class="rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-red-500 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-0">
+            <div class="lg:col-span-2 p-6 border-r border-[#f0ebe7]">
+                <div class="flex items-center justify-between mb-4">
+                    <button type="button" onclick="shiftCalendarMonth(-1)" class="rounded-lg border border-[#e6dfdb] px-3 py-2 text-sm font-semibold text-[#181411] hover:border-primary hover:text-primary transition-colors">
+                        Prev
+                    </button>
+                    <h4 id="calendarMonthLabel" class="text-lg font-extrabold text-[#181411]"></h4>
+                    <button type="button" onclick="shiftCalendarMonth(1)" class="rounded-lg border border-[#e6dfdb] px-3 py-2 text-sm font-semibold text-[#181411] hover:border-primary hover:text-primary transition-colors">
+                        Next
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold uppercase tracking-wider text-[#8c715f] mb-2">
+                    <div>Sun</div>
+                    <div>Mon</div>
+                    <div>Tue</div>
+                    <div>Wed</div>
+                    <div>Thu</div>
+                    <div>Fri</div>
+                    <div>Sat</div>
+                </div>
+                <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
+            </div>
+
+            <div class="p-6 bg-[#faf8f6]">
+                <h5 class="text-base font-bold text-[#181411] mb-3">Events On Selected Day</h5>
+                <p id="calendarSelectedDateLabel" class="text-sm text-[#8c715f] mb-4">Choose a date</p>
+                <div id="calendarDayEvents" class="space-y-3 max-h-[55vh] overflow-auto pr-1">
+                    <p class="text-sm text-[#8c715f]">No events on this day.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- QR Code Modal -->
 <div id="qrModal" class="fixed inset-0 z-50 hidden bg-[#181411]/80 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden" id="qrModalContent">
@@ -155,6 +206,167 @@
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
+        const calendarEvents = @Html.Raw(JsonSerializer.Serialize(
+            registrations.Select(r => new
+            {
+                id = r.EventId,
+                title = r.EventTitle,
+                location = r.LocationName,
+                start = r.StartTime,
+                end = r.EndTime,
+                status = (RegistrationStatus)r.Status == RegistrationStatus.CheckedIn
+                    ? "Attended"
+                    : ((RegistrationStatus)r.Status == RegistrationStatus.Cancelled
+                        ? "Cancelled"
+                        : "Upcoming")
+            })));
+
+        let calendarMonthCursor = new Date();
+        let selectedCalendarDate = null;
+
+        function openCalendarModal() {
+            const modal = document.getElementById('calendarModal');
+            const content = document.getElementById('calendarModalContent');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+
+            const now = new Date();
+            calendarMonthCursor = new Date(now.getFullYear(), now.getMonth(), 1);
+            selectedCalendarDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            renderCalendar();
+        }
+
+        function closeCalendarModal() {
+            const modal = document.getElementById('calendarModal');
+            const content = document.getElementById('calendarModalContent');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        }
+
+        function shiftCalendarMonth(delta) {
+            calendarMonthCursor = new Date(calendarMonthCursor.getFullYear(), calendarMonthCursor.getMonth() + delta, 1);
+            renderCalendar();
+        }
+
+        function toIsoDate(dateObj) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function getEventsByDate(isoDate) {
+            return calendarEvents.filter(e => {
+                const d = new Date(e.start);
+                return toIsoDate(d) === isoDate;
+            });
+        }
+
+        function renderCalendar() {
+            const monthLabel = document.getElementById('calendarMonthLabel');
+            const grid = document.getElementById('calendarGrid');
+
+            const year = calendarMonthCursor.getFullYear();
+            const month = calendarMonthCursor.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const firstWeekday = firstDay.getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            monthLabel.textContent = firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            grid.innerHTML = '';
+
+            for (let i = 0; i < firstWeekday; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'h-20 rounded-xl bg-transparent';
+                grid.appendChild(empty);
+            }
+
+            const todayIso = toIsoDate(new Date());
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const iso = toIsoDate(date);
+                const dayEvents = getEventsByDate(iso);
+                const hasEvents = dayEvents.length > 0;
+                const isSelected = selectedCalendarDate && iso === toIsoDate(selectedCalendarDate);
+                const isToday = iso === todayIso;
+
+                const cell = document.createElement('button');
+                cell.type = 'button';
+                cell.className = 'h-20 rounded-xl border text-left p-2 transition-all ' +
+                    (isSelected
+                        ? 'border-primary bg-orange-50 shadow-sm'
+                        : hasEvents
+                            ? 'border-orange-200 bg-white hover:border-primary'
+                            : 'border-[#ece6e2] bg-white hover:border-[#d6c6bc]');
+
+                cell.innerHTML =
+                    `<div class="text-sm font-bold ${isToday ? 'text-primary' : 'text-[#181411]'}">${day}</div>` +
+                    (hasEvents ? `<div class="mt-1 text-[11px] font-semibold text-primary">${dayEvents.length} event${dayEvents.length > 1 ? 's' : ''}</div>` : '');
+
+                cell.addEventListener('click', () => {
+                    selectedCalendarDate = date;
+                    renderCalendar();
+                    renderDayEvents();
+                });
+
+                grid.appendChild(cell);
+            }
+
+            renderDayEvents();
+        }
+
+        function renderDayEvents() {
+            const list = document.getElementById('calendarDayEvents');
+            const label = document.getElementById('calendarSelectedDateLabel');
+            if (!selectedCalendarDate) {
+                label.textContent = 'Choose a date';
+                list.innerHTML = '<p class="text-sm text-[#8c715f]">No events on this day.</p>';
+                return;
+            }
+
+            const iso = toIsoDate(selectedCalendarDate);
+            const events = getEventsByDate(iso);
+            label.textContent = selectedCalendarDate.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            if (events.length === 0) {
+                list.innerHTML = '<p class="text-sm text-[#8c715f]">No events on this day.</p>';
+                return;
+            }
+
+            list.innerHTML = events.map(e => {
+                const start = new Date(e.start);
+                const end = new Date(e.end);
+                const badgeClass = e.status === 'Cancelled'
+                    ? 'bg-red-50 text-red-600'
+                    : e.status === 'Attended'
+                        ? 'bg-green-50 text-green-700'
+                        : 'bg-orange-50 text-primary';
+
+                return `<div class="rounded-xl border border-[#eadfd8] bg-white p-3">`
+                    + `<div class="flex items-start justify-between gap-2">`
+                    + `<p class="font-bold text-[#181411] text-sm leading-5">${e.title}</p>`
+                    + `<span class="text-[10px] px-2 py-1 rounded-full font-bold ${badgeClass}">${e.status}</span>`
+                    + `</div>`
+                    + `<p class="mt-1 text-xs text-[#8c715f]">${e.location}</p>`
+                    + `<p class="mt-2 text-xs font-medium text-[#4d3b30]">${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>`
+                    + `<a href="/events/${e.id}" class="mt-3 inline-flex text-xs font-bold text-primary hover:underline">View details</a>`
+                    + `</div>`;
+            }).join('');
+        }
+
         let qrCodeObj = null;
 
         function showQrModal(ticketCode, eventTitle, avatarUrl, ownerName) {
@@ -207,6 +419,12 @@
         document.getElementById('qrModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeQrModal();
+            }
+        });
+
+        document.getElementById('calendarModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCalendarModal();
             }
         });
     </script>
