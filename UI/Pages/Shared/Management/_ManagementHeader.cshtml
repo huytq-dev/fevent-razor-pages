@@ -33,6 +33,10 @@
                    class="text-foreground hover:text-primary font-medium transition-colors">
                     Create Event
                 </a>
+                <a asp-page="/Events/ScanQR"
+                   class="@(currentPage.Contains("ScanQR") ? "text-primary font-bold" : "text-foreground hover:text-primary font-medium") transition-colors">
+                    Organizer Check-in
+                </a>
             </nav>
 
             <div class="flex items-center gap-5">
