@@ -3,10 +3,12 @@ namespace UI;
 public class ExportListModel : PageModel
 {
     private readonly IEventsService _eventsService;
+    private readonly IEventRegistrationsService _registrationsService;
 
-    public ExportListModel(IEventsService eventsService)
+    public ExportListModel(IEventsService eventsService, IEventRegistrationsService registrationsService)
     {
         _eventsService = eventsService;
+        _registrationsService = registrationsService;
     }
 
     [BindProperty]
@@ -63,12 +65,132 @@ public class ExportListModel : PageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPostDownloadAsync()
+    public async Task<IActionResult> OnPostDownloadAsync(CancellationToken ct)
     {
-        // Placeholder for file generation logic
-        // Depending on ViewModel.SelectedFormat and ViewModel.SelectedFields
-        
-        TempData["SuccessMessage"] = "Export started. Your file will be ready shortly.";
-        return Page();
+        if (ViewModel.EventId == Guid.Empty)
+        {
+            TempData["ErrorMessage"] = "Event ID is required for export.";
+            return RedirectToPage(new { eventId = ViewModel.EventId });
+        }
+
+        var userIdStr = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+        {
+            return RedirectToPage("/Authentications/Login");
+        }
+
+        var eventResult = await _eventsService.GetDetailAsync(ViewModel.EventId, ct);
+        if (!eventResult.IsSuccess || eventResult.Data is null)
+        {
+            TempData["ErrorMessage"] = "Event not found.";
+            return RedirectToPage(new { eventId = ViewModel.EventId });
+        }
+
+        if (eventResult.Data.OrganizerId != userId)
+        {
+            return Forbid();
+        }
+
+        var participants = await _registrationsService.GetByEventAsync(ViewModel.EventId, ct);
+        var selectedFields = (ViewModel.SelectedFields ?? new List<string>()).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        if (selectedFields.Count == 0)
+        {
+            selectedFields = ["FullName", "StudentId", "Email", "Status"];
+        }
+
+        var columns = selectedFields
+            .Select(GetColumnDefinition)
+            .Where(c => c is not null)
+            .Select(c => c!.Value)
+            .ToList();
+
+        if (columns.Count == 0)
+        {
+            TempData["ErrorMessage"] = "Please select at least one valid field to export.";
+            return RedirectToPage(new { eventId = ViewModel.EventId });
+        }
+
+        IEnumerable<ParticipantSummaryResponse> filtered = participants;
+        if (string.Equals(ViewModel.StatusFilter, "Attended Only", StringComparison.OrdinalIgnoreCase))
+        {
+            filtered = filtered.Where(p => (Domain.RegistrationStatus)p.Status == Domain.RegistrationStatus.CheckedIn);
+        }
+        else if (string.Equals(ViewModel.StatusFilter, "Registered but Absent", StringComparison.OrdinalIgnoreCase))
+        {
+            filtered = filtered.Where(p => (Domain.RegistrationStatus)p.Status == Domain.RegistrationStatus.Confirmed);
+        }
+        else if (string.Equals(ViewModel.StatusFilter, "Cancelled", StringComparison.OrdinalIgnoreCase))
+        {
+            filtered = filtered.Where(p => (Domain.RegistrationStatus)p.Status == Domain.RegistrationStatus.Cancelled);
+        }
+
+        filtered = (ViewModel.SortBy ?? string.Empty) switch
+        {
+            "Student ID" => filtered.OrderBy(p => p.StudentId ?? string.Empty, StringComparer.OrdinalIgnoreCase),
+            "Check-in Time (Latest)" => filtered.OrderByDescending(p => p.CheckInTime),
+            _ => filtered.OrderBy(p => p.FullName ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+        };
+
+        var list = filtered.ToList();
+        var safeEventTitle = string.Join("-", eventResult.Data.Title.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)).Trim();
+        if (string.IsNullOrWhiteSpace(safeEventTitle))
+        {
+            safeEventTitle = ViewModel.EventId.ToString("N");
+        }
+
+        if (string.Equals(ViewModel.SelectedFormat, "csv", StringComparison.OrdinalIgnoreCase))
+        {
+            var lines = new List<string>
+            {
+                string.Join(",", columns.Select(c => QuoteCsv(c.Header)))
+            };
+
+            lines.AddRange(list.Select(p => string.Join(",", columns.Select(c => QuoteCsv(c.Selector(p))))));
+
+            var csv = string.Join(Environment.NewLine, lines);
+            var fileName = $"participants-{safeEventTitle}-{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
+            return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", fileName);
+        }
+
+        if (!string.Equals(ViewModel.SelectedFormat, "excel", StringComparison.OrdinalIgnoreCase))
+        {
+            TempData["ErrorMessage"] = "Only Excel and CSV export are supported right now.";
+            return RedirectToPage(new { eventId = ViewModel.EventId });
+        }
+
+        var rows = list.Select(p => columns.Select(c => c.Selector(p)));
+        var workbook = ExcelExportHelper.BuildWorkbook(columns.Select(c => c.Header), rows, "Participants");
+        var excelFileName = $"participants-{safeEventTitle}-{DateTime.UtcNow:yyyyMMddHHmmss}.xlsx";
+        return File(workbook, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelFileName);
+    }
+
+    private static (string Header, Func<ParticipantSummaryResponse, string?> Selector)? GetColumnDefinition(string field)
+    {
+        return field.Trim() switch
+        {
+            "FullName" => ("Full Name", p => p.FullName),
+            "StudentId" => ("Student ID", p => p.StudentId),
+            "Email" => ("Email", p => p.Email),
+            "Phone" => ("Phone", p => p.PhoneNumber),
+            "Status" => ("Status", p => GetStatusLabel(p.Status)),
+            "Time" => ("Check-in Time", p => p.CheckInTime?.LocalDateTime.ToString("yyyy-MM-dd HH:mm")),
+            _ => null
+        };
+    }
+
+    private static string GetStatusLabel(int status) => (Domain.RegistrationStatus)status switch
+    {
+        Domain.RegistrationStatus.Confirmed => "Registered",
+        Domain.RegistrationStatus.CheckedIn => "Checked-in",
+        Domain.RegistrationStatus.Cancelled => "Cancelled",
+        Domain.RegistrationStatus.PendingPayment => "Pending Payment",
+        Domain.RegistrationStatus.Paid => "Paid",
+        _ => "Unknown"
+    };
+
+    private static string QuoteCsv(string? value)
+    {
+        var text = value ?? string.Empty;
+        return $"\"{text.Replace("\"", "\"\"")}\"";
     }
 }
