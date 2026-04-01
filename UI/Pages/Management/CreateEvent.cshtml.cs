@@ -1,12 +1,4 @@
-using Application;
-using Contract;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using UI.Helpers;
-using UI.Models.Events;
-
-namespace UI.Pages.Management;
+namespace UI;
 
 public class CreateEventModel : PageModel
 {

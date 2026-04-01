@@ -1,23 +1,11 @@
-
-
-
-
-
-
-// removed stray brace
-// removed stray brace
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using UI.Models.Chatbot;
-using UI.Services.Interfaces;
 
-namespace UI.Services.Implementations;
+namespace UI;
 
+[RegisterService(typeof(IAiChatbotService))]
 public sealed class AiChatbotService : IAiChatbotService
 {
     private readonly AiChatbotOptions _options;
@@ -47,11 +35,12 @@ public sealed class AiChatbotService : IAiChatbotService
         _faqPath = Path.Combine(environment.ContentRootPath, "ChatbotKnowledge", "faq_vi.md");
         _apiKey =
             configuration["AiChatbot:ApiKey"]
+            ?? Environment.GetEnvironmentVariable("GROQ_API_KEY")
             ?? Environment.GetEnvironmentVariable("GEMINI_API_KEY")
             ?? Environment.GetEnvironmentVariable("GOOGLE_API_KEY")
             ?? options.Value.ApiKey;
 
-        _logger.LogInformation("[FEvents Gemini] API key loaded: {MaskedKey}", MaskSecret(_apiKey));
+        _logger.LogInformation("[FEvents AI] API key loaded: {MaskedKey}", MaskSecret(_apiKey));
     }
 
 
@@ -89,8 +78,8 @@ public sealed class AiChatbotService : IAiChatbotService
 
         if (string.IsNullOrWhiteSpace(_apiKey))
         {
-            _logger.LogError("[FEvents Gemini] API key is missing or empty at runtime!");
-            return new AiChatbotReply { Reply = "Chatbot chưa được cấu hình API key Gemini. Vui lòng cập nhật mục AiChatbot:ApiKey hoặc biến môi trường GEMINI_API_KEY." };
+            _logger.LogError("[FEvents AI] API key is missing or empty at runtime!");
+            return new AiChatbotReply { Reply = "Chatbot chưa được cấu hình API key. Vui lòng cập nhật mục AiChatbot:ApiKey hoặc biến môi trường GROQ_API_KEY." };
         }
 
         var isGemini = _options.Endpoint.Contains("generativelanguage.googleapis.com", StringComparison.OrdinalIgnoreCase);

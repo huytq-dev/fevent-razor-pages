@@ -1,4 +1,4 @@
-namespace UI.Models.Chatbot;
+namespace Contract;
 
 public sealed class AiChatbotOptions
 {

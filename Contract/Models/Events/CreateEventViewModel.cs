@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
-namespace UI.Models.Events;
+namespace Contract;
 
 public class CreateEventViewModel : IValidatableObject
 {

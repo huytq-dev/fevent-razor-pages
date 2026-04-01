@@ -1,6 +1,6 @@
 using ClosedXML.Excel;
 
-namespace UI.Helpers;
+namespace UI;
 
 public static class ExcelExportHelper
 {

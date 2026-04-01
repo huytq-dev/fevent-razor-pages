@@ -1,10 +1,4 @@
-using Application;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using UI.Models.Events;
-using UI.Helpers;
-
-namespace UI.Pages.Management;
+namespace UI;
 
 public class ViewParticipantListModel(
     IEventsService eventsService,

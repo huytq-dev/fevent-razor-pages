@@ -1,11 +1,4 @@
-using Application;
-using Contract;
-using Domain;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using UI.Helpers;
-
-namespace UI.Pages.Admin;
+namespace UI;
 
 public class EventApprovalModel(IEventsService eventsService, IEventRegistrationsService registrationsService) : PageModel
 {

@@ -15,14 +15,12 @@ public class FindEventModel(
     [BindProperty(SupportsGet = true)] public string? OrderBy { get; set; }
     [BindProperty(SupportsGet = true)] public List<Guid> CategoryIds { get; set; } = [];
     [BindProperty(SupportsGet = true)] public List<Guid> LocationIds { get; set; } = [];
-    [BindProperty(SupportsGet = true)] public Guid? MajorId { get; set; }
     [BindProperty(SupportsGet = true)] public DateOnly? StartDateFrom { get; set; }
     [BindProperty(SupportsGet = true)] public DateOnly? StartDateTo { get; set; }
 
     public IReadOnlyList<EventSummaryResponse> Events { get; private set; } = [];
     public IReadOnlyList<CategoryFilterItem> Categories { get; private set; } = [];
     public IReadOnlyList<LocationFilterItem> Locations { get; private set; } = [];
-    public IReadOnlyList<MajorFilterItem> Majors { get; private set; } = [];
     public int TotalCount { get; private set; }
     public int CurrentPage { get; private set; } = 1;
     public int TotalPages { get; private set; } = 1;
@@ -35,7 +33,7 @@ public class FindEventModel(
 
         Categories = await catalogService.GetCategoriesAsync(ct);
         Locations = await catalogService.GetLocationsAsync(ct);
-        Majors = await catalogService.GetMajorsAsync(ct);
+        var majors = await catalogService.GetMajorsAsync(ct);
 
         Guid? visibleToMajorId = null;
         var userIdRaw = HttpContext.Session.GetString("UserId");
@@ -44,7 +42,7 @@ public class FindEventModel(
             var viewer = await unitOfWork.Users.GetByIdAsync(userId);
             if (!string.IsNullOrWhiteSpace(viewer?.Major))
             {
-                var major = Majors.FirstOrDefault(m =>
+                var major = majors.FirstOrDefault(m =>
                     string.Equals(m.Name, viewer.Major, StringComparison.OrdinalIgnoreCase) ||
                     string.Equals(m.Code, viewer.Major, StringComparison.OrdinalIgnoreCase));
                 if (major is not null)
@@ -63,7 +61,6 @@ public class FindEventModel(
             SearchText = string.IsNullOrWhiteSpace(Search) ? null : Search.Trim(),
             CategoryIds = CategoryIds.Count > 0 ? CategoryIds : null,
             LocationIds = LocationIds.Count > 0 ? LocationIds : null,
-            MajorId = MajorId,
             VisibleToMajorId = visibleToMajorId,
             StartDateFrom = StartDateFrom?.ToDateTime(TimeOnly.MinValue),
             StartDateTo = StartDateTo?.ToDateTime(TimeOnly.MinValue),

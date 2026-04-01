@@ -1,4 +1,4 @@
-namespace UI.Models.Events;
+namespace Contract;
 
 public class ParticipantViewModel
 {
