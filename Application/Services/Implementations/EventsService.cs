@@ -42,6 +42,18 @@ public class EventsService(IUnitOfWork _unitOfWork) : IEventsService
         };
 
         await _unitOfWork.Events.AddAsync(@event);
+
+        var ticketType = new TicketType
+        {
+            Id = Guid.NewGuid(),
+            EventId = @event.Id,
+            Name = "Standard",
+            Price = 0,
+            Quantity = request.MaxParticipants,
+            SoldCount = 0
+        };
+        await _unitOfWork.Repository<TicketType>().AddAsync(ticketType);
+
         var rowsAffected = await _unitOfWork.SaveChangesAsync(ct);
 
         if (rowsAffected > 0)
@@ -85,6 +97,15 @@ public class EventsService(IUnitOfWork _unitOfWork) : IEventsService
         @event.ModifiedAt = DateTimeOffset.Now;
 
         _unitOfWork.Events.Update(@event);
+
+        var existingTicket = _unitOfWork.Repository<TicketType>().GetQueryable()
+            .FirstOrDefault(t => t.EventId == request.Id);
+        if (existingTicket is not null)
+        {
+            existingTicket.Quantity = request.MaxParticipants;
+            _unitOfWork.Repository<TicketType>().Update(existingTicket);
+        }
+
         await _unitOfWork.SaveChangesAsync(ct);
         return PageResponse<bool>.Ok(true);
     }
