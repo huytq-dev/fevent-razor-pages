@@ -1,4 +1,4 @@
-namespace UI.Services.Interfaces;
+namespace UI;
 
 public interface IAiChatbotService
 {

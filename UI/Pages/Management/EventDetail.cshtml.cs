@@ -1,8 +1,4 @@
-using Application;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
-namespace UI.Pages.Management;
+namespace UI;
 
 public class EventDetailModel(IEventsService eventsService) : PageModel
 {

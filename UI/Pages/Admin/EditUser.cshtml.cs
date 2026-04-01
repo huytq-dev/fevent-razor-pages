@@ -1,14 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
-using Domain;
-using Infrastructure;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 
-namespace UI.Pages.Admin;
+namespace UI;
 
-public class EditUserModel(ApplicationDbContext db, IWebHostEnvironment hostEnvironment) : PageModel
+public class EditUserModel(ApplicationDbContext db, ICloudinaryService cloudinaryService) : PageModel
 {
     [BindProperty]
     public EditUserInput Input { get; set; } = new();
@@ -161,17 +156,8 @@ public class EditUserModel(ApplicationDbContext db, IWebHostEnvironment hostEnvi
                 return Page();
             }
 
-            // Lưu vào ContentRoot/uploads/avatars để app phục vụ qua đường dẫn /uploads
-            var uploadsFolder = Path.Combine(hostEnvironment.ContentRootPath, "uploads", "avatars");
-            Directory.CreateDirectory(uploadsFolder);
-
-            var uniqueFileName = $"admin_{user.Id:N}_{DateTime.UtcNow.Ticks}{extension}";
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            await using var fileStream = new FileStream(filePath, FileMode.Create);
-            await AvatarFile.CopyToAsync(fileStream, ct);
-
-            user.AvatarUrl = $"/uploads/avatars/{uniqueFileName}";
+            var avatarUrl = await cloudinaryService.UploadImageAsync(AvatarFile, "fevent-avatars");
+            user.AvatarUrl = avatarUrl;
         }
 
         await db.SaveChangesAsync(ct);

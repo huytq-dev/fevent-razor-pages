@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace UI.Models.Events;
+namespace Contract;
 
 public class CancelEventViewModel
 {

@@ -1,4 +1,4 @@
-﻿namespace Contract;
+namespace Contract;
 public sealed class ResetPasswordRequest
 {
     public required string Token { get; set; }

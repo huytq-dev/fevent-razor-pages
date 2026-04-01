@@ -1,7 +1,11 @@
-﻿global using Contract;
+global using Contract;
 global using Domain;
 global using Infrastructure;
 global using Application;
 global using UI;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.RazorPages;
+global using Microsoft.EntityFrameworkCore;
+global using System.ComponentModel.DataAnnotations;
+global using System.Text.RegularExpressions;
+global using Microsoft.AspNetCore.Mvc.Rendering;

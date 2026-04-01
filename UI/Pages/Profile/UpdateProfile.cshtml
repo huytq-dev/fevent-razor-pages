@@ -1,5 +1,5 @@
 @page
-@model UI.Pages.Profile.UpdateProfileModel
+@model UI.UpdateProfileModel
 @{
     var roleName = HttpContext.Session.GetString("RoleName");
     Layout = roleName == "Organizer" ? "~/Pages/Shared/Management/_ManagementLayout.cshtml"
